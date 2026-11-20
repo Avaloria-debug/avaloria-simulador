@@ -32,3 +32,12 @@
 - DECIDIDO (2026-11-20, decisión 3A de Tomás): daño grave sin reparación = rencor, desconfianza o miedo que llegó a nivel 3 sobre un objetivo. Reparar es quitar el tag: si al final del run queda ese tipo sobre ese objetivo en cualquier nivel (por ejemplo, bajó de 3 a 2), no está reparado.
 - SUPUESTO: una excepción es "del narrador" cuando `narrar` devuelve `error_interno`; se marca `origenError: narrador` y va a "Fallas graves" del informe, cualquiera sea el perfil.
 - SUPUESTO: el reporte de F2 pide runs/seg con 100 runs mixtos: se usan los 13 perfiles (8 runs los primeros 9, 7 los últimos 4).
+
+## F3
+- SUPUESTO: `npm run ui` levanta el servidor y muestra la URL en consola; no abre el navegador solo (sin dependencias para hacerlo). Escucha en `127.0.0.1`; el puerto se puede cambiar con la variable `PUERTO`.
+- SUPUESTO: un solo lote a la vez; un segundo `POST /api/lote` mientras corre otro da 409. "Parar" mata el proceso hijo: lo ya registrado queda en disco y se puede reanudar con `npm run simular -- --reanudar <loteId>`.
+- SUPUESTO: el servidor valida los parámetros con `resolverParametros` antes de lanzar el hijo, así los errores vuelven como 400 con el mensaje. Los perfiles con 0 agentes o sin marcar no entran al lote.
+- SUPUESTO: runs/seg del último lote para la estimación: el hijo guarda `tiempo.json` (runs y segundos) en la carpeta del lote; se usa el lote más reciente que lo tenga. Turnos esperados = runs × media de turnos del último informe; sin lote previo, runs × trabada.
+- SUPUESTO: "similitud media" de la tarjeta = media de Jaccard de todos los casos, ponderada por cantidad de pares. "% reformulación" = porcentaje de turnos con resultado `reformula` del lote.
+- SUPUESTO: `GET /api/config` muestra las keys enmascaradas (`••••` + últimos 4). Además, toda respuesta JSON pasa por un filtro que reemplaza cualquier valor de `keys.json` por su versión enmascarada.
+- SUPUESTO: edición de perfiles: un campo por cada hoja del JSON; los valores `null` y las listas se editan como JSON. Para agregar un verbo nuevo a `pesos` hay que editar el archivo. El id no se edita: para otro id se usa "Duplicar", que crea `config/perfiles/<id>.json`.
