@@ -125,3 +125,10 @@ El h1 de cada caso pide la pista del NPC de la ranura p1 (Brenn, Sarin, Ysolde o
 - **La pista no alcanza para el h1 con los perfiles actuales.** La causa es la del diagnóstico (`docs/charla-npc/diagnostico-trabada.md`): los perfiles no van hacia el NPC de p1. amable sigue con Serel en el Mercado aunque la narración nombre el lugar, porque las políticas del simulador eligen por pesos y no leen la narración. Además, la pista llega en los turnos 10 a 14 y la trabada corta en el 15, así que queda poco margen para viajar. En directo no apareció: se mueve de escena y no llega a 8 turnos de caso seguidos fuera de la escena del dueño, o el caso todavía no arrancó.
 - No se corrió el lote de 30 (seed-base 500), porque estaba condicionado a que hubiera hitos h1.
 - Para medir la opción A completa falta, en el simulador, un perfil o política que siga pistas (leer la narración, viajar a la escena nombrada, construir relación con ese NPC). Queda pendiente de decisión.
+
+## Pista de camino a p1: aprobada y en main (2026-11-20)
+- Tomás aprobó la [PR #9 del narrador](https://github.com/Avaloria-debug/Avaloria-narrador/pull/9). Se mergeó a main (`9162e84`, VERSION 0.0.40) con estos textos exactos en `textos_pista_camino` de los 4 casos:
+  - "Alguien comenta al pasar que {npc:p1} anda por {escena:p1}. Tal vez valga la pena ir hasta allá."
+  - "Según dicen por acá, {npc:p1} suele estar en {escena:p1}. Puede que sepa algo de lo que buscás."
+- Simulador 0.5.5 en main con el narrador fijado a `9162e84cf4c2a79208a0a7c17d268f25ca687b60`. Reemplaza el sha de la rama de la PR (`719ba5d`) que se usó para medir.
+- Pendiente, sin implementar: un perfil o política del simulador que siga pistas (leer la narración de la pista, viajar a la escena nombrada, construir relación con ese NPC y consultarlo). Sin eso, la pista se narra pero los perfiles actuales no llegan al h1 (ver la medición de arriba).

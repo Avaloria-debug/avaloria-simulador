@@ -1,6 +1,6 @@
 {
   "name": "avaloria-simulador",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "private": true,
   "scripts": {
     "simular": "node src/cli.js",
@@ -10,7 +10,7 @@
     "prepare": "node scripts/instalar-hook.js"
   },
   "dependencies": {
-    "narrador": "github:Avaloria-debug/Avaloria-narrador#719ba5d93223fd7398e9045bb14f5defabc072eb"
+    "narrador": "github:Avaloria-debug/Avaloria-narrador#9162e84cf4c2a79208a0a7c17d268f25ca687b60"
   },
   "devDependencies": {
     "fake-indexeddb": "^6.2.8"
