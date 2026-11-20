@@ -137,6 +137,7 @@ export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}`, ia
         op = { ...opciones, groqKey: k.key, http: ia.http(k, turnoIa), ...(ia.esperar ? { esperar: ia.esperar } : {}) };
       }
       const npcsPresentes = opcionesDeEscena(e, contenido).npcs.map((n) => ({ id: n.id, nombre: n.nombre }));
+      const eventosActivos = (e.eventosActivos ?? []).map((a) => ({ id: a.id, escena: a.escenaId }));
       const r = await narrar(e, ent, op);
       if (r.tipo === 'error' && r.errores.some((x) => x.startsWith('error_interno'))) throw new Error(`narrador: ${r.errores.join('; ')}`);
       e = r.estado;
@@ -164,6 +165,7 @@ export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}`, ia
         tipoSalida: r.tipo,
         consulta: d.consulta,
         npcsPresentes,
+        eventosActivos,
         errores: r.errores,
       };
     },
