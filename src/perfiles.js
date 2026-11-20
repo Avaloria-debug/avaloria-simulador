@@ -27,9 +27,6 @@ export function validarPerfil(p, archivo = '(perfil)') {
   if (objetivo.sesgo !== undefined && (!esNum(objetivo.sesgo) || objetivo.sesgo < 0)) falla('objetivo.sesgo', 'número >= 0');
   if (objetivo.fuente !== undefined && !['estado', 'narracion'].includes(objetivo.fuente)) falla('objetivo.fuente', 'estado o narracion');
   if (objetivo.fuente === 'narracion' && objetivo.tipo !== 'seguir_pistas') falla('objetivo.fuente', 'narracion solo con seguir_pistas');
-  if (objetivo.alLlegar !== undefined && !['consultar', 'relacion'].includes(objetivo.alLlegar)) falla('objetivo.alLlegar', 'consultar o relacion');
-  if (objetivo.alLlegar !== undefined && objetivo.fuente !== 'narracion') falla('objetivo.alLlegar', 'solo con fuente narracion');
-  if (objetivo.favoresAntes !== undefined && !(Number.isInteger(objetivo.favoresAntes) && objetivo.favoresAntes >= 1)) falla('objetivo.favoresAntes', 'entero >= 1');
   const entrada = { pBoton: 0.5, pGenerico: 0, genericoHastaTurno: 0, ...(p.entrada ?? {}) };
   for (const k of ['pBoton', 'pGenerico']) if (!esProb(entrada[k])) falla(`entrada.${k}`, 'probabilidad fuera de 0..1');
   if (!Number.isInteger(entrada.genericoHastaTurno) || entrada.genericoHastaTurno < 0) falla('entrada.genericoHastaTurno', 'entero >= 0');
@@ -50,7 +47,7 @@ export function validarPerfil(p, archivo = '(perfil)') {
   if (p.ia !== undefined && p.ia !== null && !esProb(p.ia.p)) falla('ia.p', 'probabilidad fuera de 0..1');
   return {
     id: p.id, nombre: p.nombre ?? p.id, descripcion: p.descripcion ?? '',
-    pesos: { ...p.pesos }, objetivo: { tipo: objetivo.tipo, sesgo: objetivo.sesgo ?? 1, ...(objetivo.fuente ? { fuente: objetivo.fuente } : {}), ...(objetivo.alLlegar ? { alLlegar: objetivo.alLlegar, favoresAntes: objetivo.favoresAntes ?? 2 } : {}) },
+    pesos: { ...p.pesos }, objetivo: { tipo: objetivo.tipo, sesgo: objetivo.sesgo ?? 1, ...(objetivo.fuente ? { fuente: objetivo.fuente } : {}) },
     entrada, ruido, paciencia, repiteSiFalla, aprendeDeRespuestas: p.aprendeDeRespuestas === true, evolucion: ev, ia: p.ia ?? null,
   };
 }

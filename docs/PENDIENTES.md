@@ -153,3 +153,4 @@ El h1 de cada caso pide la pista del NPC de la ranura p1 (Brenn, Sarin, Ysolde o
   - amable: 0 pistas seguidas, h1 en 0, _1 en 3, _2 en 2.
 - Resultado: seguidor_relacional **no mejora** a seguidor_pistas ni en h1 ni en runs con conocimiento revelado. La pista se narra entre los turnos 9 y 12 y la trabada corta en el 15; con menos viaje y más favores, el perfil no llega a tiempo.
 - Para Tomás: conservar, ajustar (más peso de viaje o 1 favor) o quitar el perfil. Medirlo con `--trabada 25` daría margen para llegar, pero subir `--trabada` ya mostró costo en la medición anterior. No se lanzó nada más (contador del día: 528 de 800).
+- Actualización (2026-11-20): `seguidor_relacional` se quitó (perfil, test y modo `alLlegar`). Motivo en SUPUESTOS. Para recuperarlo: commit a9d8a48.
