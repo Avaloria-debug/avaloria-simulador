@@ -199,3 +199,44 @@ El h1 de cada caso pide la pista del NPC de la ranura p1 (Brenn, Sarin, Ysolde o
   - Contra el lote 700: consultas al dueño 0 y 0; `_1` 0 y 2; `_2` 0 y 0.
 - **El umbral 0 no se ejerció en juego simulado.** La pista se narra tarde (turnos 9 a 14) para una trabada de 15. Pregunta para Tomás: ¿se mide con `--trabada 25` solo para este caso? Sería un lote chico; el costo de subir `--trabada` ya está medido.
 - Contador IA del día: 587 de 800.
+
+## Etapas del 2026-11-20 (rama claude/margen-trabada-y-etapas; decisiones de Opus en nombre de Tomás)
+
+### Etapa 1: umbral 0 con margen de turnos
+- Decisión: correr un lote con `--trabada 25`. En el lote 800 la pista llegó en el turno 14 con la trabada en el 15 y 2 viajes por delante; con 25 quedaban 11 turnos. El motivo está en SUPUESTOS.
+- Lote `20261120-235036-800` (`seguidor_pistas_dueno:12,amable:6`, 30 llamadas). Detalle en `docs/charla-npc/lote-800-trabada25/umbral-ejercido.md`.
+  - 2 consultas al dueño de p1 después de la pista, ninguna revela:
+    - Turno 19, relación 0: `no_se` por evento. Pasó el umbral 0, pero el `_1` de Hollis pide la tormenta de verano.
+    - Turno 37, relación 5: `fallo` por umbral. Volvió el umbral original de 30.
+  - **El umbral 0 se ejerció**, aunque no se pudo ver una revelación por él.
+  - El tope de 30 llamadas cortó los 6 runs de amable (cierre `cuota`, sin reanudar).
+- Preguntas para Tomás:
+  1. ¿La marca de primer contacto debería quedar sin usar cuando la consulta no revela por evento o por marca, y no por relación?
+  2. El h1 narra el contenido del `_1` ("Un sendero sin vigilancia en las colinas") sin marcarlo revelado, y la consulta siguiente responde "no sabe nada". ¿El h1 debería marcar el conocimiento como revelado?
+
+### Etapa 2: candidatos
+- `docs/candidatos/charla-npc-300-800-textos.jsonl` (60 textos) y `charla-npc-300-800-frases-agrupadas.json` (29 frases). Todos pendientes, con un resumen por intención y por tipo en `docs/candidatos/charla-npc-300-800-resumen.md`.
+- Reemplazan a los archivos 300-500, que son un subconjunto: los mismos ids y textos.
+- Se descartaron 64 salidas rotas del jugador IA. **89 pendientes de revisión de Tomás.**
+
+### Etapa 3: costo del simulador (con los registros existentes, sin llamadas nuevas)
+Llamadas IA por run en modo `ia`, sin contar los runs cortados por cuota. "Narrador" es la IA de última instancia; "jugador" son los pedidos al jugador IA (frases más fallas).
+
+| Perfil | Trabada | Jugador IA | Runs medidos | Narrador/run | Jugador/run | Total/run | Runs en 800 llamadas |
+|---|---|---|---|---|---|---|---|
+| seguidor_pistas_dueno | 15 | sí | 15 | 0,00 | 1,47 | 1,47 | ~544 |
+| seguidor_pistas_dueno | 25 | sí | 12 | 0,17 | 2,33 | 2,50 | ~320 |
+| seguidor_pistas | 15 | sí | 40 | 0,20 | 2,35 | 2,55 | ~313 |
+| amable | 15 | sí | 83 | 0,06 | 1,70 | 1,76 | ~454 |
+| amable | 15 | no | 40 | 0,07 | 0,00 | 0,07 | (sin límite práctico) |
+| primerizo | 15 | sí | 9 | 2,22 | 1,78 | 4,00 | ~200 |
+| primerizo | 15 | no | 40 | 0,90 | 0,00 | 0,90 | ~888 |
+
+- Con 4 keys de Groq la capacidad configurada es de 1000 llamadas por día (250 por key); el tope de trabajo es 800. Un lote mixto con jugador IA y trabada 15, en tercios de seguidor_pistas_dueno, amable y primerizo, cuesta unas 2,4 llamadas por run: **~330 runs por día**. Sin jugador IA, el costo baja a ~0,3 por run.
+- El costo lo domina el jugador IA (`ia.p` 0,1 por turno), no el narrador. Subir `--trabada` sube el costo en proporción a los turnos.
+- La muestra de primerizo con jugador IA es chica (9 runs): tomarla como orden de magnitud.
+
+### Qué sigue
+- Revisión de Tomás de los 89 candidatos.
+- Las 2 preguntas de la etapa 1, que son de diseño del narrador: no se implementó nada.
+- Sin lotes nuevos hasta tener esas decisiones. Contador IA del día: 617 de 800.

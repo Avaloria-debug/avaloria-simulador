@@ -1,5 +1,5 @@
 {
-  "generado": "2026-11-20T22:45:55.843Z",
+  "generado": "2026-11-20T23:51:50.741Z",
   "fuente": [
     "20261120-193218-300",
     "20261120-193756-400",
@@ -7,22 +7,26 @@
     "20261120-194310-400",
     "20261120-222945-400",
     "20261120-224407-400",
-    "20261120-224440-500"
+    "20261120-224440-500",
+    "20261120-225453-600",
+    "20261120-231351-700",
+    "20261120-234103-800",
+    "20261120-235036-800"
   ],
   "excluidas": {
     "yaEnCandidatos": 94,
-    "salidaRotaJugadorIa": 58
+    "salidaRotaJugadorIa": 64
   },
   "resumen": {
-    "entradas": 17,
+    "entradas": 29,
     "yaConocidas": 0,
-    "candidatos": 17,
-    "apariciones": 17,
+    "candidatos": 29,
+    "apariciones": 29,
     "marcadas": 0,
     "conjugacionDudosa": 0,
     "revisar": 0,
     "porIntencion": {
-      "(sin intención)": 17
+      "(sin intención)": 29
     }
   },
   "candidatos": {
@@ -45,6 +49,66 @@
         ],
         "ejemplos": [
           "Acercome a Serel Norlen, le saludo con una sonrisa y le digo: «Che, vi que tenés la espada rota. ¿Te doy una mano a repararla mientras te compro un pan fresco y un poco de queso?»."
+        ]
+      },
+      {
+        "id": "c0018",
+        "frase": "Che, decime al menos una pista que sepas del dueño.",
+        "normalizada": "che decime al menos una pista que sepas del dueno",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-234103-800"
+        ],
+        "perfiles": [
+          "seguidor_pistas_dueno"
+        ],
+        "ejemplos": [
+          "Che, decime al menos una pista que sepas del dueño."
+        ]
+      },
+      {
+        "id": "c0019",
+        "frase": "Che, me llevás un pan fresco y un poco de queso curado, por favor.",
+        "normalizada": "che me llevas un pan fresco y un poco de queso curado por favor",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-231351-700"
+        ],
+        "perfiles": [
+          "amable"
+        ],
+        "ejemplos": [
+          "Che, me llevás un pan fresco y un poco de queso curado, por favor."
+        ]
+      },
+      {
+        "id": "c0020",
+        "frase": "Che, me voy al Camino del este a buscar a Sarin Tolle.",
+        "normalizada": "che me voy al camino del este a buscar a sarin tolle",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_retirarse",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-231351-700"
+        ],
+        "perfiles": [
+          "amable"
+        ],
+        "ejemplos": [
+          "Che, me voy al Camino del este a buscar a Sarin Tolle."
         ]
       },
       {
@@ -228,6 +292,46 @@
         ]
       },
       {
+        "id": "c0021",
+        "frase": "viajar Panadería",
+        "normalizada": "viajar panaderia",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-231351-700"
+        ],
+        "perfiles": [
+          "seguidor_pistas"
+        ],
+        "ejemplos": [
+          "viajar Panadería"
+        ]
+      },
+      {
+        "id": "c0022",
+        "frase": "viajo a Brenn Holt y lo busco para preguntarle.",
+        "normalizada": "viajo a brenn holt y lo busco para preguntarle",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-225453-600"
+        ],
+        "perfiles": [
+          "seguidor_pistas"
+        ],
+        "ejemplos": [
+          "viajo a Brenn Holt y lo busco para preguntarle."
+        ]
+      },
+      {
         "id": "c0011",
         "frase": "Viajo a Ysolde Varn para buscarla y preguntarle.",
         "normalizada": "viajo a ysolde varn para buscarla y preguntarle",
@@ -265,6 +369,26 @@
         ],
         "ejemplos": [
           "Viajo al puesto de la panadería y compro pan fresco."
+        ]
+      },
+      {
+        "id": "c0023",
+        "frase": "Viajo al puesto de Serel Norlen y le pregunto qué necesita.",
+        "normalizada": "viajo al puesto de serel norlen y le pregunto que necesita",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-225453-600"
+        ],
+        "perfiles": [
+          "seguidor_pistas"
+        ],
+        "ejemplos": [
+          "Viajo al puesto de Serel Norlen y le pregunto qué necesita."
         ]
       },
       {
@@ -328,6 +452,46 @@
         ]
       },
       {
+        "id": "c0024",
+        "frase": "viajo hacia Serel Norlen para ayudarlo.",
+        "normalizada": "viajo hacia serel norlen para ayudarlo",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-225453-600"
+        ],
+        "perfiles": [
+          "seguidor_pistas"
+        ],
+        "ejemplos": [
+          "viajo hacia Serel Norlen para ayudarlo."
+        ]
+      },
+      {
+        "id": "c0025",
+        "frase": "Voy a acercarme a Serel Norlen y le pregunto qué necesita.",
+        "normalizada": "voy a acercarme a serel norlen y le pregunto que necesita",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-231351-700"
+        ],
+        "perfiles": [
+          "seguidor_pistas"
+        ],
+        "ejemplos": [
+          "Voy a acercarme a Serel Norlen y le pregunto qué necesita."
+        ]
+      },
+      {
         "id": "c0016",
         "frase": "Voy a Brenn Holt y le hablo.",
         "normalizada": "voy a brenn holt y le hablo",
@@ -345,6 +509,86 @@
         ],
         "ejemplos": [
           "Voy a Brenn Holt y le hablo."
+        ]
+      },
+      {
+        "id": "c0026",
+        "frase": "Voy a buscar a Serel Norlen y le pregunto qué sabe del dueño.",
+        "normalizada": "voy a buscar a serel norlen y le pregunto que sabe del dueno",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-234103-800"
+        ],
+        "perfiles": [
+          "seguidor_pistas_dueno"
+        ],
+        "ejemplos": [
+          "Voy a buscar a Serel Norlen y le pregunto qué sabe del dueño."
+        ]
+      },
+      {
+        "id": "c0027",
+        "frase": "Voy a ver a Serel, le ofrezco una mano y le pregunto qué le preocupa.",
+        "normalizada": "voy a ver a serel le ofrezco una mano y le pregunto que le preocupa",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-225453-600"
+        ],
+        "perfiles": [
+          "seguidor_relacional"
+        ],
+        "ejemplos": [
+          "Voy a ver a Serel, le ofrezco una mano y le pregunto qué le preocupa."
+        ]
+      },
+      {
+        "id": "c0028",
+        "frase": "Voy a Ysolde Varn y le pregunto qué sabe del mapa de la posada escondida.",
+        "normalizada": "voy a ysolde varn y le pregunto que sabe del mapa de la posada escondida",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-234103-800"
+        ],
+        "perfiles": [
+          "seguidor_pistas_dueno"
+        ],
+        "ejemplos": [
+          "Voy a Ysolde Varn y le pregunto qué sabe del mapa de la posada escondida."
+        ]
+      },
+      {
+        "id": "c0029",
+        "frase": "Voy al Camino del sur a buscar a Hollis Dren y ver en qué lo puedo ayudar.",
+        "normalizada": "voy al camino del sur a buscar a hollis dren y ver en que lo puedo ayudar",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_ayudar",
+        "motorRegla": "npc_ausente",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-225453-600"
+        ],
+        "perfiles": [
+          "amable"
+        ],
+        "ejemplos": [
+          "Voy al Camino del sur a buscar a Hollis Dren y ver en qué lo puedo ayudar."
         ]
       },
       {
