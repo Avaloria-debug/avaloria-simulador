@@ -39,6 +39,24 @@ export const npcsDef = new Map(contenido.npcs.map((n) => [n.id, n]));
 export const conocimientos = contenido.npcs.flatMap((n) => (n.conocimientos ?? []).map((k) => ({ id: k.id, npcId: n.id, palabrasClave: k.palabrasClave ?? [] })));
 export const palabrasClave = new Set(conocimientos.flatMap((k) => k.palabrasClave));
 
+// Pista de camino a p1 en el texto narrado: se reconoce por las plantillas `textos_pista_camino` de los casos.
+const escaparRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const RE_PISTAS_CAMINO = [...new Set(casos.flatMap((c) => (c.textos_pista_camino ?? []).map((t) => t.texto)))].map((t) =>
+  new RegExp(escaparRe(t).replace(escaparRe('{npc:p1}'), '(?<npc>.+?)').replace(escaparRe('{escena:p1}'), '(?<escena>.+?)')));
+const escenaPorNombre = new Map(contenido.escenas.map((x) => [x.nombre, x.id]));
+const npcPorNombre = new Map(contenido.npcs.map((n) => [n.nombre, n.id]));
+/** Lee una pista de camino del texto narrado: `{ npcId, escena }` o null. Solo con nombres que existen en el contenido. */
+export function leerPistaCamino(texto) {
+  if (typeof texto !== 'string') return null;
+  for (const re of RE_PISTAS_CAMINO) {
+    const m = texto.match(re);
+    const escena = m && escenaPorNombre.get(m.groups.escena);
+    const npcId = m && npcPorNombre.get(m.groups.npc);
+    if (escena && npcId) return { npcId, escena };
+  }
+  return null;
+}
+
 const nombres = new Map([...contenido.npcs, ...contenido.objetos, ...contenido.escenas].map((x) => [x.id, x.nombre]));
 export const nombreDe = (id) => nombres.get(id) ?? id;
 

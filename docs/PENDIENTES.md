@@ -1,7 +1,7 @@
 # Pendientes
 
 ## Tests en rojo
-Ninguno (F1).
+- `tests/perfiles.test.js`, "carga los 13 perfiles" (2026-11-20, paso 1 del perfil `seguidor_pistas`). Esperado: 13 perfiles. Real: 14, porque se agregó `config/perfiles/seguidor_pistas.json`. El test fija la cantidad de F2. Falta decidir si se actualiza a 14 o se cambia a "contiene los 13 de F2"; no se cambió el esperado.
 
 ## Hallazgos F2 (no son tests en rojo)
 

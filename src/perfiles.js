@@ -25,6 +25,8 @@ export function validarPerfil(p, archivo = '(perfil)') {
   const objetivo = p.objetivo ?? { tipo: 'ninguno' };
   if (!OBJETIVOS.includes(objetivo.tipo)) falla('objetivo.tipo', `desconocido "${objetivo.tipo}"`);
   if (objetivo.sesgo !== undefined && (!esNum(objetivo.sesgo) || objetivo.sesgo < 0)) falla('objetivo.sesgo', 'número >= 0');
+  if (objetivo.fuente !== undefined && !['estado', 'narracion'].includes(objetivo.fuente)) falla('objetivo.fuente', 'estado o narracion');
+  if (objetivo.fuente === 'narracion' && objetivo.tipo !== 'seguir_pistas') falla('objetivo.fuente', 'narracion solo con seguir_pistas');
   const entrada = { pBoton: 0.5, pGenerico: 0, genericoHastaTurno: 0, ...(p.entrada ?? {}) };
   for (const k of ['pBoton', 'pGenerico']) if (!esProb(entrada[k])) falla(`entrada.${k}`, 'probabilidad fuera de 0..1');
   if (!Number.isInteger(entrada.genericoHastaTurno) || entrada.genericoHastaTurno < 0) falla('entrada.genericoHastaTurno', 'entero >= 0');
@@ -45,7 +47,7 @@ export function validarPerfil(p, archivo = '(perfil)') {
   if (p.ia !== undefined && p.ia !== null && !esProb(p.ia.p)) falla('ia.p', 'probabilidad fuera de 0..1');
   return {
     id: p.id, nombre: p.nombre ?? p.id, descripcion: p.descripcion ?? '',
-    pesos: { ...p.pesos }, objetivo: { tipo: objetivo.tipo, sesgo: objetivo.sesgo ?? 1 },
+    pesos: { ...p.pesos }, objetivo: { tipo: objetivo.tipo, sesgo: objetivo.sesgo ?? 1, ...(objetivo.fuente ? { fuente: objetivo.fuente } : {}) },
     entrada, ruido, paciencia, repiteSiFalla, aprendeDeRespuestas: p.aprendeDeRespuestas === true, evolucion: ev, ia: p.ia ?? null,
   };
 }
