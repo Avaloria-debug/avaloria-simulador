@@ -132,3 +132,14 @@ El h1 de cada caso pide la pista del NPC de la ranura p1 (Brenn, Sarin, Ysolde o
   - "Según dicen por acá, {npc:p1} suele estar en {escena:p1}. Puede que sepa algo de lo que buscás."
 - Simulador 0.5.5 en main con el narrador fijado a `9162e84cf4c2a79208a0a7c17d268f25ca687b60`. Reemplaza el sha de la rama de la PR (`719ba5d`) que se usó para medir.
 - Pendiente, sin implementar: un perfil o política del simulador que siga pistas (leer la narración de la pista, viajar a la escena nombrada, construir relación con ese NPC y consultarlo). Sin eso, la pista se narra pero los perfiles actuales no llegan al h1 (ver la medición de arriba).
+
+## Perfil seguidor_pistas: medición (2026-11-20)
+- Perfil `config/perfiles/seguidor_pistas.json` (objetivo `seguir_pistas`, fuente `narracion`): sigue solo la pista de camino leída en el texto narrado; no mira el estado del caso (test "no adivina la escena" en `tests/seguidor.test.js`).
+- Test de perfiles: por decisión de Tomás verifica que estén los 13 de F2, sin cantidad exacta (ver SUPUESTOS).
+- Medición: `docs/charla-npc/lote-500/pistas-seguidas.md`. Paso 2 (lote `20261120-224407-400`, 10 runs): 1 pista seguida, 1 h1 de seguidor_pistas. Paso 3 (lote `20261120-224440-500`, 30 runs): 2 pistas seguidas, 5 h1 de seguidor_pistas; amable 0 h1 con la pista narrada en 20 de 20 runs. 74 llamadas IA (contador del día: 478 de 800).
+- Cuando la pista aparece, seguidor_pistas la sigue en 3 de 3 runs y alcanza h1. Pero la pista aparece solo en 3 de 20 runs de ese perfil. Hipótesis sin verificar: viaja tanto que suele estar en la escena del dueño de p1 cuando la regla se evalúa.
+- Pregunta para Tomás: seguidor_pistas casi no revela conocimientos (1 de 20) porque no construye relación. ¿Se arma un perfil que siga la pista y además construya relación (por ejemplo, la mezcla de seguidor_pistas y amable)?
+- Candidatos consolidados de los lotes 300, 400 y 500, todos `pendiente`, sin tocar los de los lotes 100 y 200:
+  - `docs/candidatos/charla-npc-300-500-textos.jsonl`: 51 textos (47 del lote 300, 1 del `193756-400`, 1 del `224407-400`, 2 del 500). Sin duplicados ni repetidos de los decididos. Cada uno lleva `lote` e `idOriginal`.
+  - `docs/candidatos/charla-npc-300-500-frases-agrupadas.json`: 17 frases del jugador IA de los 5 lotes 400 y del 500. Contra todas las frases agrupadas existentes, se excluyeron 58 salidas rotas del jugador IA (tokens de catálogo como `hablar_con Serel Norlen` o `consulta_tema …`, ids o JSON).
+  - Reemplazan para la revisión a `charla-npc-300-textos.jsonl`, `charla-npc-400-textos.jsonl` y `charla-npc-400-frases-agrupadas.json`. Esos archivos no se borraron (quedan como fuente); su c0002 rechazado (`consulta_tema coonas`) no pasa al consolidado.
