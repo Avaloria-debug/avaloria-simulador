@@ -240,3 +240,22 @@ Llamadas IA por run en modo `ia`, sin contar los runs cortados por cuota. "Narra
 - Revisión de Tomás de los 89 candidatos.
 - Las 2 preguntas de la etapa 1, que son de diseño del narrador: no se implementó nada.
 - Sin lotes nuevos hasta tener esas decisiones. Contador IA del día: 617 de 800.
+
+## Decisiones de primer contacto y revelado por el h1 (2026-11-20, pendiente de aprobación de Tomás)
+Decisiones de Opus en nombre de Tomás. Criterio: el jugador no debe sentir que el juego lo castiga por algo que no dependió de él, y el texto narrado no se puede contradecir con la respuesta siguiente. Los motivos están en `docs/SUPUESTOS-v3.md` del narrador.
+1. **El hito revela el conocimiento que narra.** Si el texto del h1 (o de cualquier hito) narra `{conocimiento:pN}`, el conocimiento queda revelado. La consulta siguiente de un conocimiento ya revelado repite lo contado con la plantilla `revelar_conocimiento.exito`, que ya existe; antes usaba "no te cuenta nada nuevo por ahora". Motivo: la respuesta no puede contradecir lo que el jugador acaba de leer.
+2. **El primer contacto por pista solo se consume si la consulta revela o falla por relación.** Un bloqueo por evento o por marca no lo gasta. Motivo: el bloqueo por un evento no depende del jugador.
+- [PR del narrador #11](https://github.com/Avaloria-debug/Avaloria-narrador/pull/11), VERSION 0.0.42, **sin mergear: pendiente de tu aprobación.** No se cambiaron textos de `data/`: los textos del h1 siguen igual.
+- Rama del simulador `claude/decisiones-primer-contacto`: narrador fijado al sha de la PR (`03ea2f0a5e62fcc01df91b935c0fa1934d4dda74`) solo para verificar. **No mergear hasta que la PR esté aprobada;** después, fijarlo a main del narrador.
+- Verificación:
+  - r0006-s806 se rejugó sin IA con sus entradas registradas, sobre el narrador de la PR.
+    - Turno 19: antes "Hollis Dren se encoge de hombros: de eso no sabe nada."; ahora "Hollis Dren baja la voz y te cuenta: Un sendero sin vigilancia en las colinas."
+    - Turno 37: antes "Hollis Dren no te cuenta nada nuevo por ahora."; ahora "Después de un rato, Hollis Dren te dice: Un sendero sin vigilancia en las colinas."
+  - El lote pedido, `20261120-235915-800` (`seguidor_pistas_dueno:6`, seed-base 800, `--trabada 25`, 19 llamadas), corre las seeds 800 a 805 y no incluye a r0006. En él:
+    - h1 en 3 runs, y en los 3 el conocimiento de p1 quedó revelado.
+    - 0 pistas narradas y 0 consultas al dueño después de la pista.
+    - Una consulta `ya_revelado` (r0003, Tiren) respondió con lo contado.
+- Hallazgos para Tomás:
+  - El h1 deja revelado el `_1` de Hollis aunque ese conocimiento pida la tormenta de verano: el hito ya lo narró.
+  - Varios conocimientos del contenido terminan en punto y las plantillas de revelar agregan otro, lo que deja ".." (por ejemplo, "…la primera hora.."). Aparece en 75 turnos de los lotes de hoy y es anterior a este cambio, que lo hace más visible. Se corrige en `contenido-v3.json` o en el completado de plantillas; las dos cosas son del narrador. No se tocó.
+- Contador IA del día: 636 de 800.
