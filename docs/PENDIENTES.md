@@ -67,3 +67,22 @@ Todos cortan por trabada en el turno 15 (umbral 15). Muestra chica: hallazgo a c
 - Cierres: 240 por `trabada` (turno 15 a 17). Ningún desenlace, `maxTurnos`, `cuota` ni excepción. Es el mismo hallazgo de F2: los perfiles de charla no avanzan hitos con la relación inicial.
 - Fuego: de los 47 textos de IA, ninguno menciona humo, fuego, incendio, llamas ni quemar, y no hubo rechazos `fuego_sin_evento`. En ningún turno IA estaba activo el incendio.
 - Informe: `docs/charla-npc/lote-300/informe-charla.md` (y `.json`). Textos candidatos: `docs/candidatos/charla-npc-300-textos.jsonl` (47, todos pendientes).
+
+## Charla-npc: lote con relación construida y jugador IA (2026-11-20)
+- Diagnóstico: `docs/charla-npc/diagnostico-trabada.md`. El h1 de cada caso depende del NPC de la ranura p1, que nunca es Serel. amable construye relación solo con Serel, y curioso no construye relación. Sin hito en 15 turnos, el run corta por trabada.
+- Decisión (Opus, sin tocar el juego): opción **b**, amable y directo con jugador IA. Motivo:
+  - Son los perfiles que ya revelan conocimientos en el lote 300: amable serel_1 26/40; directo maren, serel y tiren, y además sale de la escena.
+  - El jugador IA trae frases libres que ejercitan comprensión e IA.
+  - No requiere código nuevo ni un escenario artificial.
+- Lote `20261120-193756-400`, seed-base 400, `--perfiles amable:20,directo:20 --mezcla 0/100 --jugador-ia si --max-llamadas-ia 300`. Con 60+60 la estimación daba 840; se redujo a 40 runs (estimación 280). Se usaron 79 llamadas (78 del jugador, 1 del narrador) y 31 183 tokens. El contador del día quedó en 332.
+- Cierres: 40 trabada (turnos 15 a 22). 0 desenlace, maxTurnos, cuota y excepción. Hitos: 3 h1 (directo, caso_03).
+- Conocimientos revelados: amable serel_1 14/20, serel_2 9/20; directo maren_1 2, maren_2 2, serel_1 2, brenn_1 1. Nuevo respecto al lote 300: `conocimiento_brenn_1` (r0035-s435, directo, caso_04), que es p1 en caso_01. No apareció ningún `_2` nuevo.
+- Candidatos (pendientes, nada aprobado):
+  - `docs/candidatos/charla-npc-400-textos.jsonl`: 1 texto.
+  - `docs/candidatos/charla-npc-400-frases-agrupadas.json`: 4 frases no entendidas, sin duplicar los 94 candidatos existentes.
+  - Una de las frases ("consulta_tema coonas") parece salida rota del jugador IA, no una frase real.
+- Hallazgo: el motor entendió 73 de las 78 frases del jugador IA (ejecuta 30, consulta 25, negativa_relacion 18). Solo 1 llegó a la IA del narrador, así que este diseño genera pocos textos de diálogo.
+- Alternativas no corridas:
+  - **a)** Relación inicial alta para los NPC, solo en el simulador y como escenario de prueba. Mide la charla profunda, pero no lo que vive el jugador real, y requiere código en el adaptador.
+  - **c)** a + b en dos tandas separadas en el informe.
+  - Además: subir `--trabada` (por ejemplo a 40) para que los perfiles alcancen a salir del Mercado y construir relación con el NPC de p1. Es un parámetro del simulador, no del juego.

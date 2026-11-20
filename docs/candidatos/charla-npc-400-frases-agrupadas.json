@@ -1,0 +1,106 @@
+{
+  "generado": "2026-11-20T19:39:05.200Z",
+  "fuente": [
+    "20261120-193756-400"
+  ],
+  "excluidas": {
+    "yaEnCandidatos": 94
+  },
+  "resumen": {
+    "entradas": 4,
+    "yaConocidas": 0,
+    "candidatos": 4,
+    "apariciones": 4,
+    "marcadas": 0,
+    "conjugacionDudosa": 0,
+    "revisar": 0,
+    "porIntencion": {
+      "(sin intención)": 4
+    }
+  },
+  "candidatos": {
+    "(sin intención)": [
+      {
+        "id": "c0001",
+        "frase": "Che, ¿querés que vaya a la molinería a confirmar el pedido y dejar el pago?",
+        "normalizada": "che queres que vaya a la molineria a confirmar el pedido y dejar el pago",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_comprar",
+        "motorRegla": "falta_objeto",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-193756-400"
+        ],
+        "perfiles": [
+          "amable"
+        ],
+        "ejemplos": [
+          "Che, ¿querés que vaya a la molinería a confirmar el pedido y dejar el pago?"
+        ]
+      },
+      {
+        "id": "c0002",
+        "frase": "consulta_tema coonas",
+        "normalizada": "consulta tema coonas",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-193756-400"
+        ],
+        "perfiles": [
+          "directo"
+        ],
+        "ejemplos": [
+          "consulta_tema coonas"
+        ]
+      },
+      {
+        "id": "c0003",
+        "frase": "consulto el pliego de precios de la panadería para ver si puedo conseguirle a Serel un mejor trato.",
+        "normalizada": "consulto el pliego de precios de la panaderia para ver si puedo conseguirle a serel un mejor trato",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-193756-400"
+        ],
+        "perfiles": [
+          "amable"
+        ],
+        "ejemplos": [
+          "consulto el pliego de precios de la panadería para ver si puedo conseguirle a Serel un mejor trato."
+        ]
+      },
+      {
+        "id": "c0004",
+        "frase": "Serel, pasame el pliego de precios, por favor.",
+        "normalizada": "serel pasame el pliego de precios por favor",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-193756-400"
+        ],
+        "perfiles": [
+          "directo"
+        ],
+        "ejemplos": [
+          "Serel, pasame el pliego de precios, por favor."
+        ]
+      }
+    ]
+  },
+  "marcadas": []
+}
