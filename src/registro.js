@@ -25,8 +25,10 @@ export function abrirRegistro(dir, { reanudar = false } = {}) {
   return {
     completados: new Set(completados),
     turno: (t) => fs.appendFileSync(f('turnos.jsonl'), JSON.stringify(t) + '\n'),
+    // Un run cerrado por cuota no cuenta como completado: --reanudar lo vuelve a correr con la misma seed.
     run(r) {
       fs.appendFileSync(f('runs.jsonl'), JSON.stringify(r) + '\n');
+      if (r.cierre === 'cuota') return;
       completados.push(r.idx);
       fs.writeFileSync(f('estado.json'), JSON.stringify({ completados }));
     },

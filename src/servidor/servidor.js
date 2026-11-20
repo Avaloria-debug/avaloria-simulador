@@ -3,12 +3,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { leerConfig, resolverParametros } from '../lote.js';
+import { leerConfig, resolverParametros, estimarLote } from '../lote.js';
 import { cargarPerfiles, validarPerfil, DIR_PERFILES } from '../perfiles.js';
 import { leerJsonl } from '../registro.js';
 import { idsCasos, versionNarrador } from '../adaptador.js';
 import { ejecutarCorpus, resolverCorpus } from '../corpus.js';
-import { leerKeysGroq, ultimos4 } from '../ia/keys.js';
+import { leerKeysGroq, ultimos4, crearPool } from '../ia/keys.js';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DIR_UI = path.join(RAIZ, 'ui');
@@ -38,7 +38,7 @@ export function crearServidor({ dirSim = path.join(RAIZ, 'simulaciones'), dirPer
     const seg = (Date.now() - lote.inicio) / 1000;
     const rps = seg > 0 ? lote.hechos / seg : 0;
     return {
-      estado: lote.estado, modo: lote.modo, loteId: lote.loteId, hechos: lote.hechos, total: lote.total, cierres: lote.cierres,
+      estado: lote.estado, modo: lote.modo, iaLlamadas: lote.iaLlamadas ?? 0, loteId: lote.loteId, hechos: lote.hechos, total: lote.total, cierres: lote.cierres,
       runsPorSeg: Number(rps.toFixed(2)), etaSeg: rps > 0 ? Math.round((lote.total - lote.hechos) / rps) : null, mensaje: lote.mensaje ?? null,
     };
   };
@@ -82,6 +82,13 @@ export function crearServidor({ dirSim = path.join(RAIZ, 'simulaciones'), dirPer
   function lanzar(body) {
     if (lote && lote.estado === 'corriendo') throw new ErrorHttp(409, 'ya hay un lote corriendo');
     if (body.modo === 'corpus') return lanzarCorpus(body);
+    const cli = cliLote(body);
+    let p;
+    try { p = resolverParametros(cli, leerConfig(archivoConfig), cargarPerfiles(dirPerfiles)); } catch (e) { throw new ErrorHttp(400, e.message); }
+    arrancar('lote', cli, p.runs);
+    return { runs: p.runs, perfiles: p.perfiles, casos: p.casos };
+  }
+  function cliLote(body) {
     const cli = {};
     if (body.perfiles !== undefined) {
       if (!Array.isArray(body.perfiles)) throw new ErrorHttp(400, 'perfiles tiene que ser una lista de {id, agentes}');
@@ -91,12 +98,13 @@ export function crearServidor({ dirSim = path.join(RAIZ, 'simulaciones'), dirPer
     }
     for (const k of ['trabada', 'maxTurnos', 'seedBase']) if (body[k] !== undefined) cli[k] = String(body[k]);
     if (body.casos !== undefined) cli.casos = Array.isArray(body.casos) ? body.casos.join(',') : String(body.casos);
-    if (body.mezcla !== undefined) cli.mezcla = body.mezcla;
+    if (body.mezcla !== undefined) cli.mezcla = typeof body.mezcla === 'object' && body.mezcla ? `${body.mezcla.codigo}/${body.mezcla.ia}` : body.mezcla;
+    if (body.jugadorIa !== undefined) cli.jugadorIa = body.jugadorIa ? 'si' : 'no';
+    if (body.maxLlamadasIa !== undefined) cli.maxLlamadasIa = String(body.maxLlamadasIa);
+    // El hijo lee config/config.json; la mezcla del servidor se pasa explícita para que mande la configuración que validó.
+    if (cli.mezcla === undefined) { const mz = leerConfig(archivoConfig).mezcla; if (mz) cli.mezcla = `${mz.codigo}/${mz.ia}`; }
     cli.salida = dirSim;
-    let p;
-    try { p = resolverParametros(cli, leerConfig(archivoConfig), cargarPerfiles(dirPerfiles)); } catch (e) { throw new ErrorHttp(400, e.message); }
-    arrancar('lote', cli, p.runs);
-    return { runs: p.runs, perfiles: p.perfiles, casos: p.casos };
+    return cli;
   }
   const cliCorpus = (body) => {
     const cli = { perfiles: Array.isArray(body.perfiles) ? body.perfiles.join(',') : body.perfiles, salida: dirSim };
@@ -115,9 +123,9 @@ export function crearServidor({ dirSim = path.join(RAIZ, 'simulaciones'), dirPer
     lote = { hijo, modo, loteId: null, total, hechos: 0, cierres: {}, inicio: Date.now(), estado: 'corriendo' };
     const este = lote;
     hijo.on('message', (m) => {
-      if (m.tipo === 'run') { este.hechos = m.n; este.total = m.total; este.cierres[m.cierre] = (este.cierres[m.cierre] ?? 0) + 1; }
+      if (m.tipo === 'run') { este.hechos = m.n; este.total = m.total; este.cierres[m.cierre] = (este.cierres[m.cierre] ?? 0) + 1; este.iaLlamadas = (este.iaLlamadas ?? 0) + (m.iaLlamadas ?? 0); }
       else if (m.tipo === 'aviso') este.mensaje = m.mensaje;
-      else if (m.tipo === 'fin') { este.estado = 'terminado'; este.loteId = m.loteId; if (m.mensaje) este.mensaje = m.mensaje; }
+      else if (m.tipo === 'fin') { este.estado = m.cuota ? 'cuota' : 'terminado'; este.loteId = m.loteId; if (m.iaLlamadas != null) este.iaLlamadas = m.iaLlamadas; if (m.mensaje) este.mensaje = m.mensaje; }
       else if (m.tipo === 'error') { este.estado = 'error'; este.mensaje = m.mensaje; }
       if (!este.loteId) este.loteId = ultimoLoteDesde(este.inicio);
       emitir();
@@ -136,6 +144,16 @@ export function crearServidor({ dirSim = path.join(RAIZ, 'simulaciones'), dirPer
         keys: keys ? { groq: (keys.groq ?? []).map((k) => ({ nombre: k.nombre, key: enmascarar(k.key) })), anthropic: { key: enmascarar(keys.anthropic?.key) } } : null,
         ultimoRunsPorSeg: listarLotes().find((l) => l.runsPorSeg)?.runsPorSeg ?? null,
       });
+    }
+    if (m === 'GET' && r === '/api/ajustes') {
+      const config = leerConfig(archivoConfig);
+      const keys = leerKeysGroq({ env, archivo: archivoKeys });
+      const pool = crearPool({ keys, limiteDiarioPorKey: config.groq?.limiteDiarioPorKey ?? 250, archivoUso: path.join(dirSim, 'uso-keys.json') });
+      return json(res, 200, { keys: pool.resumen(), modelo: config.modelos?.groq ?? null, limiteDiarioPorKey: config.groq?.limiteDiarioPorKey ?? 250, mezcla: config.mezcla ?? null });
+    }
+    if (m === 'POST' && r === '/api/lote/estimar') {
+      const cli = cliLote(await cuerpo(req));
+      try { return json(res, 200, estimarLote(cli, { config: leerConfig(archivoConfig), env, archivoKeys })); } catch (e) { throw new ErrorHttp(400, e.message); }
     }
     if (m === 'GET' && r === '/api/perfiles') return json(res, 200, perfilesCrudos());
     if (m === 'POST' && (x = r.match(/^\/api\/perfiles\/([^/]+)$/))) {

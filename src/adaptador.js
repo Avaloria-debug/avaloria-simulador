@@ -55,7 +55,8 @@ function estadoCasoInicial(caso, seed, escena) {
   };
 }
 
-export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}` }) {
+// `ia` (modo ia): {tomarKey, http} de src/ia/narrador.js. Sin `ia` el narrador no recibe key (modo código).
+export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}`, ia = null }) {
   const caso = casos.find((c) => c.id === casoId);
   if (!caso) throw new Error(`caso inexistente: ${casoId}`);
   const persistencia = await abrirPersistenciaCasos({ versionContenido: contenido.version, indexedDB: new IDBFactory(), nombreBD: partidaId });
@@ -129,7 +130,14 @@ export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}` }) 
         : { tipo: 'texto', texto: entrada.texto };
       const d = clasificar(ent);
       const antes = e.caso ?? {};
-      const r = await narrar(e, ent, opciones);
+      const turnoIa = { llamadas: 0, tokens: 0, limitada: false };
+      let op = opciones;
+      if (ia && d.tipo === 'ia') {
+        const k = await ia.tomarKey();
+        op = { ...opciones, groqKey: k.key, http: ia.http(k, turnoIa), ...(ia.esperar ? { esperar: ia.esperar } : {}) };
+      }
+      const npcsPresentes = opcionesDeEscena(e, contenido).npcs.map((n) => ({ id: n.id, nombre: n.nombre }));
+      const r = await narrar(e, ent, op);
       if (r.tipo === 'error' && r.errores.some((x) => x.startsWith('error_interno'))) throw new Error(`narrador: ${r.errores.join('; ')}`);
       e = r.estado;
       const despues = e.caso ?? {};
@@ -150,8 +158,11 @@ export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}` }) 
         hito: (despues.hitosAlcanzados ?? []).find((h) => !hitosAntes.has(h)) ?? null,
         desenlace,
         tipoDesenlace: desenlace ? caso?.desenlaces?.find((x) => x.id === desenlace)?.tipo ?? null : null,
-        iaLlamadas: 0,
-        iaTokens: 0,
+        iaLlamadas: turnoIa.llamadas,
+        iaTokens: turnoIa.tokens,
+        iaLimitada: turnoIa.limitada,
+        tipoSalida: r.tipo,
+        npcsPresentes,
         errores: r.errores,
       };
     },

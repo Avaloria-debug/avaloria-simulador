@@ -11,7 +11,8 @@ import { aleatoria } from '../src/politicas.js';
 import { chequear } from '../scripts/chequear-keys.js';
 
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'sim-'));
-const lote = (cli, opciones = {}) => ejecutarLote({ salida: tmp(), ...cli }, { config: {}, ...opciones });
+// Modo código: estos tests no usan IA (desde F5 la mezcla por defecto es 40/60).
+const lote = (cli, opciones = {}) => ejecutarLote({ salida: tmp(), ...cli }, { config: { mezcla: { codigo: 100, ia: 0 } }, ...opciones });
 const leer = (dir, n) => fs.readFileSync(path.join(dir, n), 'utf8');
 
 test('mismo seed dos veces => turnos.jsonl idéntico', async () => {
@@ -77,7 +78,7 @@ test('--reanudar completa un lote cortado y da el mismo turnos.jsonl', async () 
   fs.writeFileSync(path.join(dir, 'runs.jsonl'), JSON.stringify(runs[0]) + '\n');
   fs.writeFileSync(path.join(dir, 'turnos.jsonl'), [...deRun(0), ...deRun(1).slice(0, 2)].map((t) => JSON.stringify(t) + '\n').join(''));
   fs.writeFileSync(path.join(dir, 'estado.json'), JSON.stringify({ completados: [0] }));
-  const r = await ejecutarLote({ salida, reanudar: 'cortado' }, { config: {} });
+  const r = await ejecutarLote({ salida, reanudar: 'cortado' }, { config: { mezcla: { codigo: 100, ia: 0 } } });
   assert.equal(r.loteId, 'cortado');
   assert.equal(leer(dir, 'turnos.jsonl'), leer(completo.dir, 'turnos.jsonl'));
   assert.equal(leer(dir, 'runs.jsonl'), leer(completo.dir, 'runs.jsonl'));
@@ -90,7 +91,8 @@ test('validación de parámetros y precedencia', () => {
   assert.throws(() => resolverParametros({ trabada: '-3' }), /trabada/);
   assert.throws(() => resolverParametros({ maxTurnos: '2.5' }), /maxTurnos/);
   assert.throws(() => resolverParametros({ casos: 'caso_99' }), /caso_99/);
-  assert.throws(() => resolverParametros({ mezcla: '40/60' }), /ia/);
+  // F5: el modo ia ya está disponible; 40/60 es la mezcla por defecto.
+  assert.deepEqual(resolverParametros({ mezcla: '40/60' }).mezcla, { codigo: 40, ia: 60 });
   assert.throws(() => resolverParametros({ mezcla: '50/20' }), /mezcla/);
   assert.throws(() => leerArgs(['--nada', '1']), /desconocido/);
   assert.throws(() => leerArgs(['--runs']), /falta/);

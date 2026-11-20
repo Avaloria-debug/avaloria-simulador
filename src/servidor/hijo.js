@@ -11,9 +11,9 @@ try {
     const r = await ejecutarCorpus(cli, { avisar, progreso: (n, total) => process.send({ tipo: 'run', n, total, cierre: 'llamada' }) });
     process.send({ tipo: 'fin', loteId: r.loteId, runs: r.llamadas, mensaje: r.corte ?? null });
   } else {
-    const r = await ejecutarLote(cli, { avisar, progreso: (n, total, run) => process.send({ tipo: 'run', n, total, cierre: run.cierre }) });
+    const r = await ejecutarLote(cli, { avisar, progreso: (n, total, run) => process.send({ tipo: 'run', n, total, cierre: run.cierre, iaLlamadas: (run.iaLlamadas ?? 0) + (run.jugadorIa?.frases ?? 0) + (run.jugadorIa?.fallasJugador ?? 0) }) });
     fs.writeFileSync(path.join(r.dir, 'tiempo.json'), JSON.stringify({ runs: r.parametros.runs, segundos: r.segundos }));
-    process.send({ tipo: 'fin', loteId: r.loteId, segundos: r.segundos, runs: r.parametros.runs });
+    process.send({ tipo: 'fin', loteId: r.loteId, segundos: r.segundos, runs: r.parametros.runs, cuota: r.cuota, iaLlamadas: r.ia.llamadas, mensaje: r.cuota ? `Sin cuota de IA. Reanudá con --reanudar ${r.loteId} cuando se renueve la cuota` : null });
   }
 } catch (e) {
   process.send({ tipo: 'error', mensaje: e.message });

@@ -14,7 +14,7 @@ async function api(ruta, opciones = {}) {
 
 // Navegación
 $('#menu').addEventListener('click', () => { const n = $('#nav'); n.classList.toggle('abierto'); $('#menu').setAttribute('aria-expanded', n.classList.contains('abierto')); });
-const PANTALLAS = { nueva, vivo, informes, perfiles, corpus };
+const PANTALLAS = { nueva, vivo, informes, perfiles, corpus, ajustes };
 let salir = () => {};
 function ruta() {
   salir(); salir = () => {};
@@ -42,7 +42,9 @@ async function nueva() {
       <label class="campo">Trabada (turnos)<input type="number" name="trabada" min="1" value="${esc(c.trabada ?? 15)}"></label>
       <label class="campo">maxTurnos<input type="number" name="maxTurnos" min="1" value="${esc(c.maxTurnos ?? 400)}"></label>
       <label class="campo">Seed base<input type="number" name="seedBase" min="1" value="${esc(c.seedBase ?? 1)}"></label>
-      <label class="campo">Mezcla código / IA<span class="fila"><input type="number" value="100" disabled aria-label="código"> / <input type="number" value="0" disabled aria-label="IA"></span><span class="suave">IA disponible desde F5</span></label>
+      <label class="campo">Mezcla código / IA (%)<span class="fila"><input type="number" name="mzCodigo" min="0" max="100" value="${esc(c.mezcla?.codigo ?? 40)}" aria-label="código"> / <input type="number" name="mzIa" min="0" max="100" value="${esc(c.mezcla?.ia ?? 60)}" aria-label="IA"></span></label>
+      <label class="campo">Tope de llamadas IA<input type="number" name="maxLlamadasIa" min="1" value="300"></label>
+      <label><input type="checkbox" name="jugadorIa"> Jugador IA (Groq)</label>
     </div>
     <h2>Casos</h2><div class="fila"><label><input type="checkbox" id="todos" checked> Todos</label>
       ${cfg.casos.map((x) => `<label><input type="checkbox" name="caso" value="${esc(x)}" checked disabled> ${esc(x)}</label>`).join('')}</div></div>
@@ -54,7 +56,7 @@ async function nueva() {
   const leer = () => {
     const perfiles = [...f.querySelectorAll('input[name=usa]:checked')].map((x) => ({ id: x.value, agentes: Number(f.querySelector(`[data-agentes="${x.value}"]`).value) }));
     const casos = $('#todos').checked ? 'todos' : [...f.querySelectorAll('input[name=caso]:checked')].map((x) => x.value);
-    return { perfiles, casos, trabada: Number(f.trabada.value), maxTurnos: Number(f.maxTurnos.value), seedBase: Number(f.seedBase.value) };
+    return { perfiles, casos, trabada: Number(f.trabada.value), maxTurnos: Number(f.maxTurnos.value), seedBase: Number(f.seedBase.value), mezcla: { codigo: Number(f.mzCodigo.value), ia: Number(f.mzIa.value) }, maxLlamadasIa: Number(f.maxLlamadasIa.value), jugadorIa: f.jugadorIa.checked };
   };
   const estimar = () => {
     const p = leer();
@@ -64,7 +66,20 @@ async function nueva() {
     $('#estimacion').innerHTML = `<h2 style="margin-top:0">Estimación</h2><div class="tarjetas">
       <div class="tarjeta"><div class="cifra">${runs}</div><div class="etiqueta">runs</div></div>
       <div class="tarjeta"><div class="cifra">${num(runs * turnos, 0)}</div><div class="etiqueta">turnos esperados (${turnosMedia ? `media del último lote: ${num(turnosMedia)}` : 'sin lote previo: trabada'})</div></div>
-      <div class="tarjeta"><div class="cifra">${cfg.ultimoRunsPorSeg ? duracion(runs / cfg.ultimoRunsPorSeg) : '—'}</div><div class="etiqueta">tiempo estimado${cfg.ultimoRunsPorSeg ? ` (${num(cfg.ultimoRunsPorSeg)} runs/seg del último lote)` : ' (sin lote previo medido)'}</div></div></div>`;
+      <div class="tarjeta"><div class="cifra">${cfg.ultimoRunsPorSeg ? duracion(runs / cfg.ultimoRunsPorSeg) : '—'}</div><div class="etiqueta">tiempo estimado${cfg.ultimoRunsPorSeg ? ` (${num(cfg.ultimoRunsPorSeg)} runs/seg del último lote)` : ' (sin lote previo medido)'}</div></div></div><div id="estIa"></div>`;
+    estimarIa(p);
+  };
+  let pedido = 0;
+  const estimarIa = async (p) => {
+    const n = ++pedido;
+    try {
+      const e = await api('/api/lote/estimar', { method: 'POST', body: JSON.stringify(p) });
+      if (n !== pedido || !$('#estIa')) return;
+      $('#estIa').innerHTML = `<div class="tarjetas"><div class="tarjeta"><div class="cifra">${num(e.llamadas, 0)}</div><div class="etiqueta">llamadas IA estimadas (${e.runsIa} runs ia; narrador ${num(e.llamadasNarrador, 0)}, jugador ${num(e.llamadasJugador, 0)})</div></div>
+        <div class="tarjeta"><div class="cifra">${num(e.tokens, 0)}</div><div class="etiqueta">tokens estimados</div></div>
+        <div class="tarjeta"><div class="cifra">${e.keys}</div><div class="etiqueta">keys de Groq · capacidad ${num(e.capacidad, 0)} llamadas por día</div></div></div>
+        ${e.llamadas > 0 && e.superaCapacidad ? `<p class="error">Advertencia: la estimación (${num(e.llamadas, 0)} llamadas) supera la capacidad de las keys (${num(e.capacidad, 0)}). Los runs que no entren cierran por cuota y se reanudan después.</p>` : ''}`;
+    } catch (err) { if ($('#estIa')) $('#estIa').innerHTML = `<p class="error">${esc(err.message)}</p>`; }
   };
   $('#todos').addEventListener('change', (e) => f.querySelectorAll('input[name=caso]').forEach((x) => { x.disabled = e.target.checked; }));
   f.addEventListener('input', estimar);
@@ -89,14 +104,14 @@ async function vivo() {
     const p = d.total ? (100 * d.hechos) / d.total : 0;
     $('#pb').style.width = `${p}%`;
     $('.progreso').setAttribute('aria-valuenow', Math.round(p));
-    const estados = { corriendo: 'Corriendo', terminado: 'Terminado', parado: 'Parado', error: 'Con error' };
+    const estados = { corriendo: 'Corriendo', terminado: 'Terminado', parado: 'Parado', error: 'Con error', cuota: 'Sin cuota de IA' };
     $('#est').textContent = `${estados[d.estado] ?? d.estado}${d.loteId ? ` · lote ${d.loteId}` : ''}${d.mensaje ? ` · ${d.mensaje}` : ''}`;
     const u = d.modo === 'corpus' ? 'llamadas' : 'runs';
-    $('#cifras').innerHTML = [[`${d.hechos} / ${d.total}`, `${u} hechas`.replace('runs hechas', 'runs hechos')], [num(d.runsPorSeg, 2), `${u}/seg`], [d.estado === 'corriendo' ? duracion(d.etaSeg) : '—', 'tiempo restante']]
+    $('#cifras').innerHTML = [[`${d.hechos} / ${d.total}`, `${u} hechas`.replace('runs hechas', 'runs hechos')], [num(d.runsPorSeg, 2), `${u}/seg`], [d.estado === 'corriendo' ? duracion(d.etaSeg) : '—', 'tiempo restante'], [num(d.iaLlamadas ?? 0, 0), 'llamadas IA']]
       .map(([v, e]) => `<div class="tarjeta"><div class="cifra">${esc(v)}</div><div class="etiqueta">${e}</div></div>`).join('');
     $('#cierres').innerHTML = barras(d.cierres, d.total);
     $('#parar').disabled = d.estado !== 'corriendo';
-    $('#fin').innerHTML = d.estado === 'terminado' && d.loteId ? `<a href="#${d.modo === 'corpus' ? 'corpus' : 'informes'}/${encodeURIComponent(d.loteId)}">${d.modo === 'corpus' ? 'Ver frases del corpus' : 'Ver informe'}</a>` : '';
+    $('#fin').innerHTML = ['terminado', 'cuota'].includes(d.estado) && d.loteId ? `<a href="#${d.modo === 'corpus' ? 'corpus' : 'informes'}/${encodeURIComponent(d.loteId)}">${d.modo === 'corpus' ? 'Ver frases del corpus' : 'Ver informe'}</a>` : '';
   };
   $('#parar').addEventListener('click', async () => { try { await api('/api/lote/parar', { method: 'POST' }); } catch (e) { $('#msg').textContent = e.message; } });
 }
@@ -250,6 +265,18 @@ async function verAgrupadas(id) {
   };
   $('#fi').addEventListener('change', pintar); $('#ff').addEventListener('input', pintar);
   pintar();
+}
+
+// Ajustes
+async function ajustes() {
+  const a = await api('/api/ajustes');
+  const estados = { disponible: 'disponible', cooldown: 'en espera', agotada: 'agotada', limite_diario: 'límite diario' };
+  vista.innerHTML = `<h1>Ajustes</h1>
+  <div class="tarjeta"><h2 style="margin-top:0">Keys de Groq</h2>
+    <p class="suave">Modelo: ${esc(a.modelo ?? '—')} · límite diario por key: ${esc(a.limiteDiarioPorKey)} llamadas · mezcla por defecto: ${esc(a.mezcla ? `${a.mezcla.codigo} % código / ${a.mezcla.ia} % IA` : '—')}</p>
+    ${a.keys.length ? tabla(['Nombre', 'Key', 'Usadas hoy', 'Estado'], a.keys.map((k) => [k.nombre, k.key, `${k.usadas} / ${k.limite}`, estados[k.estado] ?? k.estado]))
+      : '<p>No hay keys de Groq. Se cargan en <code>config/keys.json</code> (lista <code>groq</code>) o en las variables <code>GROQ_API_KEY</code>, <code>GROQ_API_KEY_2</code>…</p>'}
+    <p class="suave">Las keys se muestran solo con los últimos 4 caracteres.</p></div>`;
 }
 
 ruta();

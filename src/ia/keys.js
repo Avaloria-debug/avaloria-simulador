@@ -8,8 +8,14 @@ export const ARCHIVO_KEYS = path.join(RAIZ, 'config', 'keys.json');
 export const ultimos4 = (k) => (typeof k === 'string' && k.length ? `••••${k.slice(-4)}` : '');
 const hoy = (ahora) => new Date(ahora()).toISOString().slice(0, 10);
 
+// Variables: GROQ_API_KEY y GROQ_API_KEY_2…GROQ_API_KEY_20 (o GROQ_API_KEYS separadas por coma). Si no hay ninguna, config/keys.json.
 export function leerKeysGroq({ env = process.env, archivo = ARCHIVO_KEYS } = {}) {
-  if (env.GROQ_API_KEY && env.GROQ_API_KEY.trim()) return [{ nombre: 'env', key: env.GROQ_API_KEY.trim() }];
+  const deEnv = [];
+  const sumar = (nombre, v) => { const k = String(v ?? '').trim(); if (k && !deEnv.some((x) => x.key === k)) deEnv.push({ nombre, key: k }); };
+  sumar('env', env.GROQ_API_KEY);
+  for (let i = 2; i <= 20; i++) sumar(`env${i}`, env[`GROQ_API_KEY_${i}`]);
+  String(env.GROQ_API_KEYS ?? '').split(',').forEach((v, i) => sumar(`envs${i + 1}`, v));
+  if (deEnv.length) return deEnv;
   let d;
   try { d = JSON.parse(fs.readFileSync(archivo, 'utf8')); } catch { return []; }
   return (Array.isArray(d.groq) ? d.groq : []).filter((k) => typeof k?.key === 'string' && k.key && k.key !== 'PEGAR')
@@ -45,6 +51,12 @@ export function crearPool({ keys, limiteDiarioPorKey = 250, archivoUso = null, a
       const s = Number.isFinite(segundos) && segundos > 0 ? segundos : 10;
       if (s <= 120) k.cooldownHasta = ahora() + s * 1000; else k.agotadaHasta = ahora() + s * 1000;
     },
-    resumen() { return [...estado.values()].map((k) => ({ nombre: k.nombre, key: ultimos4(k.key), usadas: usadas(k.nombre), limite: limiteDiarioPorKey })); },
+    resumen() {
+      const t = ahora();
+      return [...estado.values()].map((k) => ({
+        nombre: k.nombre, key: ultimos4(k.key), usadas: usadas(k.nombre), limite: limiteDiarioPorKey,
+        estado: k.agotadaHasta > t ? 'agotada' : usadas(k.nombre) >= limiteDiarioPorKey ? 'limite_diario' : k.cooldownHasta > t ? 'cooldown' : 'disponible',
+      }));
+    },
   };
 }

@@ -10,7 +10,8 @@ import { ejecutarLote, resolverParametros } from '../src/lote.js';
 import { leerJsonl } from '../src/registro.js';
 
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'sim-f2-'));
-const lote = (cli, opciones = {}) => ejecutarLote({ salida: tmp(), ...cli }, { config: {}, ...opciones });
+// Modo código: estos tests no usan IA (desde F5 la mezcla por defecto es 40/60).
+const lote = (cli, opciones = {}) => ejecutarLote({ salida: tmp(), ...cli }, { config: { mezcla: { codigo: 100, ia: 0 } }, ...opciones });
 const base = () => JSON.parse(fs.readFileSync(new URL('../config/perfiles/curioso.json', import.meta.url), 'utf8'));
 
 test('carga los 13 perfiles', () => {

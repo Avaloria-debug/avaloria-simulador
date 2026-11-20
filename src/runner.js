@@ -9,7 +9,7 @@ const resumenEntrada = (e) => (e.tipo === 'boton' ? `[${e.intencion}] ${JSON.str
 
 // Un run: bucle de turnos hasta el primer cierre.
 // `jugadorIa` (opcional): con probabilidad perfil.ia.p la frase la escribe la IA; si falla o es inválida, reglas.
-export async function correrRun({ idx, seed, casoId, perfil, modo, trabada, maxTurnos, politica, alTurno = () => {}, jugadorIa = null, avisar = () => {} }) {
+export async function correrRun({ idx, seed, casoId, perfil, modo, trabada, maxTurnos, politica, alTurno = () => {}, jugadorIa = null, iaNarrador = null, avisar = () => {} }) {
   const runId = `r${String(idx).padStart(4, '0')}-s${seed}`;
   const run = {
     runId, idx, seed, perfil: perfil.id, modo, caso: casoId, cierre: null, turnos: 0, hitos: [], desenlace: null,
@@ -27,7 +27,7 @@ export async function correrRun({ idx, seed, casoId, perfil, modo, trabada, maxT
   await conAzarDeterminista(seed, async () => {
     let sim = null;
     try {
-      sim = await crearPartida({ seed, casoId, partidaId: runId });
+      sim = await crearPartida({ seed, casoId, partidaId: runId, ia: modo === 'ia' ? iaNarrador : null });
       const rng = mulberry32(seed ^ 0x9e3779b9);
       const escenas = new Set([sim.estado().escena]);
       let sinHito = 0;
@@ -64,7 +64,8 @@ export async function correrRun({ idx, seed, casoId, perfil, modo, trabada, maxT
             ? { tipo: 'boton', intencion: entrada.intencion, parametros: entrada.parametros }
             : { tipo: 'texto', texto: entrada.texto, intencion: entrada.intencion ?? null, parametros: {} },
           decision: { intencion: r.intencion, regla: r.regla, resultado: r.resultado },
-          salida: { texto: r.texto, textoId: r.textoId },
+          salida: { texto: r.texto, textoId: r.textoId, tipo: r.tipoSalida ?? null },
+          npcs: (r.npcsPresentes ?? []).map((n) => n.id),
           tagsEscritos: r.tagsEscritos, tagsBorrados: r.tagsBorrados, hito: r.hito,
           iaLlamadas: r.iaLlamadas, iaTokens: r.iaTokens,
           ...(entrada.sinAccion ? { sinAccion: true } : {}),
@@ -81,6 +82,10 @@ export async function correrRun({ idx, seed, casoId, perfil, modo, trabada, maxT
       run.conocimientosRevelados = sim.detalle().revelados;
       run.estadoFinal = { escena: est.escena, hora: est.hora, tags: est.tags, hitos: est.hitos, ultimasAcciones: [...ultimas] };
     } catch (e) {
+      if (e?.name === 'SinKeys' || e?.name === 'TopeAlcanzado') {
+        run.cierre = 'cuota'; run.motivoCuota = e.message;
+        return;
+      }
       run.cierre = 'excepcion';
       run.error = e instanceof Error ? e.stack : String(e);
       run.origenError = String(e?.message ?? e).startsWith('narrador:') ? 'narrador' : 'simulador';

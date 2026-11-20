@@ -10,6 +10,8 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'sim-ui-'));
 const dirSim = path.join(tmp, 'sim');
 const dirPerfiles = path.join(tmp, 'perfiles');
 const archivoKeys = path.join(tmp, 'keys.json');
+// Modo código: con keys falsas, un run ia llamaría a Groq.
+const archivoConfig = path.join(tmp, 'config.json');
 // Keys falsas armadas por partes para no disparar el chequeo de keys del commit.
 const KEYS = { groq: [{ nombre: 'k1', key: ['gsk', 'PRUEBA_SECRETA_123456wxyz'].join('_') }], anthropic: { key: ['sk', 'ant', 'PRUEBA_SECRETA_abcd9876'].join('-') } };
 let srv; let base;
@@ -25,7 +27,8 @@ before(async () => {
   fs.mkdirSync(dirPerfiles);
   for (const f of fs.readdirSync(DIR_PERFILES)) fs.copyFileSync(path.join(DIR_PERFILES, f), path.join(dirPerfiles, f));
   fs.writeFileSync(archivoKeys, JSON.stringify(KEYS));
-  srv = crearServidor({ dirSim, dirPerfiles, archivoKeys, env: {} });
+  fs.writeFileSync(archivoConfig, JSON.stringify({ mezcla: { codigo: 100, ia: 0 }, salida: 'simulaciones' }));
+  srv = crearServidor({ dirSim, dirPerfiles, archivoKeys, archivoConfig, env: {} });
   await new Promise((ok) => srv.listen(0, '127.0.0.1', ok));
   base = `http://127.0.0.1:${srv.address().port}`;
 });
@@ -59,7 +62,7 @@ test('GET /api/perfiles y POST /api/perfiles/:id validan', async () => {
 });
 
 test('POST /api/lote con parámetros inválidos da 400 con mensaje', async () => {
-  for (const cuerpo of [{ perfiles: [{ id: 'noexiste', agentes: 2 }] }, { perfiles: [] }, { perfiles: [{ id: 'curioso', agentes: 1 }], trabada: -3 }, { perfiles: [{ id: 'curioso', agentes: 1 }], casos: ['caso_99'] }, { perfiles: [{ id: 'curioso', agentes: 1 }], mezcla: '40/60' }]) {
+  for (const cuerpo of [{ perfiles: [{ id: 'noexiste', agentes: 2 }] }, { perfiles: [] }, { perfiles: [{ id: 'curioso', agentes: 1 }], trabada: -3 }, { perfiles: [{ id: 'curioso', agentes: 1 }], casos: ['caso_99'] }, { perfiles: [{ id: 'curioso', agentes: 1 }], mezcla: '50/20' }]) {
     const r = await pedir('/api/lote', { method: 'POST', body: JSON.stringify(cuerpo) });
     assert.equal(r.estado, 400, JSON.stringify(cuerpo));
     assert.ok(r.json.error.length > 5);
@@ -120,12 +123,23 @@ test('corpus: estimación, 400 sin perfiles, lista vacía', { timeout: 60000 }, 
 });
 
 test('corpus sin keys de Groq da 400', async () => {
-  const s2 = crearServidor({ dirSim, dirPerfiles, archivoKeys: path.join(tmp, 'no-hay.json'), env: {} });
+  const s2 = crearServidor({ dirSim, dirPerfiles, archivoKeys: path.join(tmp, 'no-hay.json'), archivoConfig, env: {} });
   await new Promise((ok) => s2.listen(0, '127.0.0.1', ok));
   const r = await fetch(`http://127.0.0.1:${s2.address().port}/api/corpus`, { method: 'POST', body: JSON.stringify({ perfiles: ['curioso'] }) });
   assert.equal(r.status, 400);
   assert.match((await r.json()).error, /no hay keys de Groq/);
   await new Promise((ok) => s2.close(ok));
+});
+
+test('ajustes y estimación del lote: keys enmascaradas', async () => {
+  const a = await pedir('/api/ajustes');
+  assert.equal(a.estado, 200);
+  assert.deepEqual(a.json.keys.map((k) => [k.key, k.estado]), [[enmascarar(KEYS.groq[0].key), 'disponible']]);
+  const e = await pedir('/api/lote/estimar', { method: 'POST', body: JSON.stringify({ perfiles: [{ id: 'curioso', agentes: 10 }], mezcla: { codigo: 0, ia: 100 }, jugadorIa: true }) });
+  assert.equal(e.estado, 200);
+  assert.equal(e.json.llamadas, 70);
+  assert.equal(e.json.keys, 1);
+  assert.equal((await pedir('/api/lote/estimar', { method: 'POST', body: JSON.stringify({ perfiles: [{ id: 'curioso', agentes: 1 }], mezcla: { codigo: 50, ia: 20 } }) })).estado, 400);
 });
 
 test('la UI se sirve y no hay rutas fuera de ui/', async () => {

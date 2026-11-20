@@ -1,10 +1,10 @@
 {
   "name": "avaloria-simulador",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "private": true,
   "scripts": {
     "simular": "node src/cli.js",
-    "test": "node --test tests/*.test.js",
+    "test": "node --import ./tests/sin-red.js --test tests/*.test.js",
     "corpus": "node src/cli.js corpus",
     "ui": "node src/servidor/servidor.js",
     "prepare": "node scripts/instalar-hook.js"

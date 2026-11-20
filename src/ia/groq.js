@@ -12,16 +12,18 @@ const esperar = (ms) => new Promise((ok) => setTimeout(ok, ms));
 const borrarKey = (texto, key) => (key ? String(texto).split(key).join(ultimos4(key)) : String(texto));
 
 // Devuelve { llamar({system, user, maxTokens}) → {texto, usage}, llamadas, tokens }.
-export function crearClienteGroq({ pool, modelo = MODELO_POR_DEFECTO, maxLlamadas = 300, timeoutMs = 30000, reintentos = 2, backoffMs = 1000, fetch: f = globalThis.fetch, log = () => {} }) {
+export function crearClienteGroq({ pool, modelo = MODELO_POR_DEFECTO, maxLlamadas = 300, cuenta = null, timeoutMs = 30000, reintentos = 2, backoffMs = 1000, fetch: f = globalThis.fetch, log = () => {} }) {
   const c = { llamadas: 0, tokens: 0, tokensEntrada: 0, tokensSalida: 0, modelo };
+  // `cuenta` (opcional) se comparte con la IA del narrador para el tope del lote.
+  const total = cuenta ?? { llamadas: 0, tokens: 0, max: maxLlamadas };
   c.llamar = async ({ system, user, maxTokens = 1024 }) => {
     let ultimoError = null;
     for (let intento = 0; intento <= reintentos; intento++) {
-      if (c.llamadas >= maxLlamadas) throw new TopeAlcanzado(maxLlamadas);
+      if (total.llamadas >= total.max) throw new TopeAlcanzado(total.max);
       let k = pool.elegir();
-      if (!k) { const ms = pool.esperaMinima?.(); if (ms != null) { await esperar(ms + 250); k = pool.elegir(); } }
+      if (!k) { const ms = pool.esperaMinima?.(); if (ms != null) { log(`todas las keys en espera: pausa de ${Math.ceil(ms / 1000)} s`); await esperar(ms + 250); k = pool.elegir(); } }
       if (!k) throw new SinKeys();
-      c.llamadas += 1; pool.contar(k.nombre);
+      c.llamadas += 1; total.llamadas += 1; pool.contar(k.nombre);
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), timeoutMs);
       let res;
@@ -40,7 +42,7 @@ export function crearClienteGroq({ pool, modelo = MODELO_POR_DEFECTO, maxLlamada
       if (res.ok) {
         const d = await res.json();
         const u = d.usage ?? {};
-        c.tokens += u.total_tokens ?? 0; c.tokensEntrada += u.prompt_tokens ?? 0; c.tokensSalida += u.completion_tokens ?? 0;
+        c.tokens += u.total_tokens ?? 0; total.tokens += u.total_tokens ?? 0; c.tokensEntrada += u.prompt_tokens ?? 0; c.tokensSalida += u.completion_tokens ?? 0;
         return { texto: d.choices?.[0]?.message?.content ?? '', usage: u };
       }
       const cuerpo = borrarKey(await res.text().catch(() => ''), k.key).slice(0, 300);

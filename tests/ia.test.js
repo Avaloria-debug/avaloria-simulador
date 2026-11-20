@@ -136,7 +136,7 @@ test('estimación de llamadas y tokens', () => {
 
 test('sin key ⇒ reglas con aviso', async () => {
   const avisos = [];
-  const r = await ejecutarLote({ perfiles: 'curioso:2', jugadorIa: 'si' }, { raiz: tmp, config: {}, env: {}, archivoKeys: SIN_KEYS, avisar: (m) => avisos.push(m) });
+  const r = await ejecutarLote({ perfiles: 'curioso:2', jugadorIa: 'si' }, { raiz: tmp, config: { mezcla: { codigo: 100, ia: 0 } }, env: {}, archivoKeys: SIN_KEYS, avisar: (m) => avisos.push(m) });
   assert.ok(avisos.some((m) => /sin keys de Groq/.test(m)));
   const turnos = leerJsonl(path.join(r.dir, 'turnos.jsonl'));
   assert.ok(turnos.length > 0 && turnos.every((t) => !t.origen));
