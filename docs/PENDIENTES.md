@@ -86,3 +86,26 @@ Todos cortan por trabada en el turno 15 (umbral 15). Muestra chica: hallazgo a c
   - **a)** Relación inicial alta para los NPC, solo en el simulador y como escenario de prueba. Mide la charla profunda, pero no lo que vive el jugador real, y requiere código en el adaptador.
   - **c)** a + b en dos tandas separadas en el informe.
   - Además: subir `--trabada` (por ejemplo a 40) para que los perfiles alcancen a salir del Mercado y construir relación con el NPC de p1. Es un parámetro del simulador, no del juego.
+
+## Charla-npc: costo de subir `--trabada` (2026-11-20)
+- Lotes de 10 runs (amable:5, directo:5), modo `ia`, jugador IA encendido, seed-base 400 y tope de 40 llamadas cada uno:
+
+| `--trabada` | Lote | Llamadas IA | Por run | Runs con h1 | Runs con conocimiento | Conocimientos revelados |
+|---|---|---|---|---|---|---|
+| 15 | `20261120-194300-400` | 20 | 2,0 | 0 | 7 | 8 |
+| 25 | `20261120-194310-400` | 32 | 3,2 | 0 | 8 | 13 |
+
+- Decisión (Opus): el default queda en **15**. Con 25 el costo por run sube 1,6× (no llega al doble), pero los hitos h1 no suben (0 y 0). Lo único que sube son revelaciones de Serel en amable (serel_1 y serel_2 en los 5 runs). No se corrió el lote de 30 (seed-base 500), porque estaba condicionado a que subieran los hitos.
+- Las llamadas son todas del jugador IA. El narrador no llamó a la IA en ninguno de los dos lotes, así que no hubo textos candidatos.
+- Mismo seed no garantiza la misma partida en modo `ia`: las frases del jugador IA vienen de Groq y cambian entre corridas. Por ejemplo, directo r0005 y r0006 revelan maren_1 o serel_1 con 15 y nada con 25.
+- Llamadas usadas hoy en esta tarea: 52. Contador del día: 384.
+
+## Limpieza de candidatos (2026-11-20)
+- `docs/candidatos/charla-npc-400-frases-agrupadas.json` (lote 400, no 300), `c0002` "consulta_tema coonas": estado `rechazado`, motivo `salida_rota_jugador_ia`. No hay otras frases con token de catálogo en los archivos de frases ni en el contexto de los textos candidatos.
+- Hallazgo del simulador, sin corregir: en el lote 400, 18 de las 78 frases del jugador IA empiezan con un token del catálogo. Por ejemplo: "hablar_con Serel Norlen", "consultar_tema precio del pan fresco", `consultar_tema {"tema":"copia del sello"}`. El motor entiende la mayoría, así que inflan el porcentaje de frases entendidas. Propuesta: que `validarFrase` (`src/ia/jugador.js`) descarte las frases con token `palabra_palabra` y cuente esos casos como falla del jugador. Cambia las mediciones del jugador IA, así que queda para decidir.
+
+## Pregunta para Tomás: camino hacia el NPC de la ranura p1
+El h1 de cada caso pide la pista del NPC de la ranura p1 (Brenn, Sarin, Ysolde o el sendero, según el caso). Ese NPC no es el que el jugador encuentra al empezar: Serel, en el Mercado. Los perfiles de charla construyen relación con quien tienen delante y no llegan al NPC de p1. ¿El juego tiene que indicar ese camino?
+- **a) El juego indica el camino** (una pista visible cerca del primer hito). Costo para el simulador: un perfil o una política nueva que siga pistas (leer la pista, viajar a la escena indicada, construir relación con ese NPC) y un lote para medir cuántos runs llegan al h1. Requiere el cambio de contenido en el narrador, aprobado por Tomás.
+- **b) El juego no cambia.** Costo para el simulador: ninguno. Se prueban los perfiles tal cual, y el resultado esperado es que los perfiles de charla sigan cortando por trabada sin h1, salvo el caso_03 con investigador o directo.
+- No se implementó ninguna de las dos.

@@ -49,7 +49,7 @@
         "motorIntencion": null,
         "motorRegla": "no_entendido",
         "tipo": "no_valida",
-        "estado": "pendiente",
+        "estado": "rechazado",
         "tandas": [
           "20261120-193756-400"
         ],
@@ -58,7 +58,8 @@
         ],
         "ejemplos": [
           "consulta_tema coonas"
-        ]
+        ],
+        "motivo": "salida_rota_jugador_ia"
       },
       {
         "id": "c0003",
