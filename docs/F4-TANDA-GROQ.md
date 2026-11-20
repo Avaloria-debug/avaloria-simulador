@@ -94,3 +94,58 @@ Resultado del motor sobre las 108 válidas: consulta 47, ejecuta 27, reformula 2
 2. **Al forzar el voseo, el modelo escribe las acciones como órdenes.** "viajá al norte", "descansá un poco" o "defendé el campamento" están dirigidas a otro, no son la acción del jugador ("viajo al norte"). Muchas igual se ejecutan, pero como frase de jugador no son naturales, y hay errores como "rendime". Pregunta para Tomás: ¿las acciones del jugador tienen que ir en voseo (dirigidas a alguien) o en primera persona, y el voseo solo cuando le habla a un NPC?
 3. Las no entendidas suben de 10,4 % a 22,2 %, sobre todo frases con "fijate"/"mirá" + pedido que el motor manda a `reformula` o a otra intención (f00097, f00168, f00243). Son buenos candidatos para el narrador.
 4. Total del día contra Groq: 37 llamadas (1 de verificación + 8 + 16 + 12) y 35.641 tokens.
+
+---
+
+# Tercera tanda: voseo en diálogo, primera persona en acciones (2026-11-20)
+
+Decisiones de Tomás aplicadas:
+- Prompt: las acciones van en primera persona ("viajo al norte", "defiendo el campamento", "hablo con Brenn"); el voseo solo cuando el jugador le habla a un NPC o a otro personaje. El system tiene 6 ejemplos fijos: 3 acciones en primera persona y 3 diálogos en voseo.
+- Validación con un detector único (`tipoFrase` en `src/corpus.js`), el mismo para la línea base y para la tanda. Cada frase con formato válido queda con su `tipo`:
+  - `voseo_dialogo`: alguna forma de vos. Son las formas fijas, los verbos en -ás/-és/-ís, los imperativos en -á/-é/-í (explorá, viajá, defendé) y los imperativos con pronombre sin tilde (fijate, decime, rendime, contame). Se excluyen aquí, acá, allá, así, ahí y otras palabras que no son voseo.
+  - `primera_persona_accion`: la frase, después de un vocativo opcional ("Maren,") y de muletillas ("che", "yo"), empieza con un verbo en primera persona del presente, con o sin pronombre ("me escondo"), o con voy/doy/estoy/soy.
+  - `no_valida`: ninguna de las dos. No entra a `frases-agrupadas.json`.
+
+Comando: el mismo (`--perfiles curioso,torpe,primerizo --frases 30 --max-estados 3 --max-llamadas-ia 20`). Corpus: `simulaciones/20261120-063343-1-corpus`.
+
+## Las tres tandas con el detector único
+| Tanda | Frases con formato | voseo_dialogo | primera_persona_accion | no_valida |
+|---|---|---|---|---|
+| 1.ª (prompt original) | 279 | 70 (25,1 %) | 75 (26,9 %) | 134 (48,0 %) |
+| 2.ª (todo en voseo) | 247 | 234 (94,7 %) | 1 (0,4 %) | 12 (4,9 %) |
+| 3.ª (acciones en 1.ª persona) | 218 | 40 (18,3 %) | 152 (69,7 %) | 26 (11,9 %) |
+
+Los porcentajes de voseo de la 1.ª y 2.ª tanda en las secciones anteriores salieron de los detectores de esas tandas; esta tabla los recalcula con el detector único.
+
+## Resultado de la 3.ª tanda
+| Métrica | Valor |
+|---|---|
+| Llamadas | 13 (9 con respuesta, 4 con 429 por tokens por minuto) |
+| Tokens (`usage`) | 14.383 (entrada 6.795, salida 7.588) |
+| Respuestas sin JSON legible | 2 (perfil torpe) |
+| Válidas (voseo o primera persona) sobre pedidas | 192 / 218 (88,1 %) |
+| No entendidas por el motor (sobre las válidas) | 37 / 192 (19,3 %), todas `reformula` |
+| Resultado del motor sobre las válidas | ejecuta 127, reformula 37, consulta 16, negativa_relacion 12 |
+
+Por perfil: curioso 25 voseo, 59 primera persona, 9 no válidas; primerizo 13, 65, 16; torpe 2, 28, 1 (torpe perdió 2 de 3 respuestas por JSON ilegible).
+
+Las 26 no válidas son casi todas acciones en infinitivo ("comprar pan fresco", "avanzar con cautela…", "retirarme al campamento") y algunas en tercera persona por error de tilde ("avanzó con cautela", "examinó el suelo", "Ysolde, necesitó tu ayuda").
+
+## Muestra de 10 frases (al azar, semilla 20261120)
+| Id | Frase | Perfil | Intención objetivo | Motor | Tipo |
+|---|---|---|---|---|---|
+| f00086 | exploro el sótano oscuro bajo el archivo | curioso | intencion_explorar | ejecuta: explorar | primera_persona_accion |
+| f00131 | leo el pergamino que está sobre la mesa de roble | primerizo | intencion_leer | ejecuta: leer | primera_persona_accion |
+| f00148 | leo un libro viejo que habla de sellos antiguos | primerizo | intencion_leer | reformula (hablar_con) | primera_persona_accion |
+| f00176 | leo en voz alta el texto del mapa | curioso | intencion_leer | ejecuta: leer | primera_persona_accion |
+| f00177 | me oculto detrás de los barriles del campamento | curioso | intencion_ocultarse | ejecuta: ocultarse | primera_persona_accion |
+| f00184 | retirarme al campamento para revisar el mapa | curioso | intencion_retirarse | reformula (retirarse) | no_valida |
+| f00185 | defiendo el puesto de guardia del norte | curioso | intencion_defender | reformula (defender) | primera_persona_accion |
+| f00191 | observo el horizonte buscando señales de camino | primerizo | intencion_observar | ejecuta: observar | primera_persona_accion |
+| f00214 | calmar la situación hablando con Ysolde | primerizo | intencion_calmar | ejecuta: calmar | no_valida |
+| f00218 | leéo el libro viejo que estaba bajo la mesa | primerizo | intencion_leer | ejecuta: leer | primera_persona_accion |
+
+Observaciones:
+- f00148: "leo un libro … que habla de …" se va a hablar_con por la palabra "habla". Es candidato para el narrador.
+- f00185: "defiendo" reformula; el motor no reconoce la primera persona de defender.
+- Total del día contra Groq: 50 llamadas y 50.024 tokens.

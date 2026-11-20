@@ -13,14 +13,14 @@ import { validarFrase, describirPerfil, describirEstado } from './ia/jugador.js'
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const VERSION = JSON.parse(fs.readFileSync(path.join(RAIZ, 'package.json'), 'utf8')).version;
-export const INSTRUCCION_VOSEO = 'Todas las frases en voseo rioplatense, nunca usar tú ni usted.';
+export const INSTRUCCION_VOSEO = 'Las acciones van en primera persona ("viajo al norte", "defiendo el campamento", "hablo con Brenn"). El voseo rioplatense se usa solo cuando el jugador le habla a un NPC o a otro personaje ("¿podés negociar?", "Brenn, decime qué sabés"). Nunca usar tú ni usted.';
 export const EJEMPLOS_VOSEO = Object.freeze([
-  'Decime qué sabés del robo en el puerto',
-  'mirá, tenés que ayudarme con esto',
-  'fijate si hay algo raro en la mesa',
-  '¿querés venderme esa capa? podés ponerle precio',
-  'che, ¿sos vos el que vio al ladrón?',
-  'hacé lugar, andá a buscar al guardia',
+  'viajo al puerto antes de que oscurezca',
+  'examino la mesa con cuidado',
+  'me escondo detrás de los barriles',
+  'Brenn, decime qué sabés del robo',
+  'che, ¿podés bajarme el precio de la capa?',
+  'mirá, Maren, tenés que ayudarme con esto',
 ]);
 export const SYSTEM_CORPUS = `${SYSTEM_JUGADOR} ${INSTRUCCION_VOSEO}\nEjemplos de cómo escribís:\n${EJEMPLOS_VOSEO.map((e) => `- ${e}`).join('\n')}`;
 export const PEDIDO = 'Devolvé solo un JSON: [{"frase":"...","intencion":"<id>"}]. Mezclá frases cortas y largas, con y sin errores de tipeo, nombrando o no al NPC, y palabras sueltas.';
@@ -75,12 +75,44 @@ export function parsearFrasesJson(texto) {
   return d.filter((x) => x && typeof x === 'object').map((x) => ({ frase: x.frase, intencion: typeof x.intencion === 'string' ? x.intencion : null }));
 }
 
-// Voseo: formas fijas (con o sin tilde cuando no hay ambigüedad) o verbos terminados en -ás/-és/-ís con tilde.
+// Detector único de tipo de frase (línea base y validación).
 const FORMAS_VOSEO = new Set(['vos', 'sos', 'tenés', 'tenes', 'querés', 'queres', 'podés', 'podes', 'decime', 'mirá', 'fijate', 'fijá', 'hacé', 'andá']);
-const NO_VERBOS = new Set(['más', 'además', 'jamás', 'atrás', 'detrás', 'demás', 'quizás', 'compás', 'después', 'través', 'inglés', 'francés', 'interés', 'revés', 'cortés', 'marqués', 'portugués', 'estrés', 'ciprés', 'país', 'maíz', 'raíz', 'anís']);
+// Terminadas en -ás/-és/-ís con tilde que no son verbos de vos.
+const NO_VOSEO_S = new Set(['más', 'además', 'jamás', 'atrás', 'detrás', 'demás', 'quizás', 'compás', 'después', 'través', 'inglés', 'francés', 'interés', 'revés', 'cortés', 'marqués', 'portugués', 'estrés', 'ciprés', 'país', 'maíz', 'raíz', 'anís']);
+// Terminadas en -á/-é/-í con tilde que no son imperativos de vos: adverbios, tercera persona, futuros, pretéritos y sustantivos.
+const NO_IMPERATIVO = new Set(['aquí', 'acá', 'allá', 'así', 'ahí', 'allí', 'está', 'quizá', 'café', 'papá', 'mamá', 'sofá', 'bebé', 'jabalí', 'rubí', 'será', 'estará', 'habrá', 'podrá', 'tendrá', 'hará', 'dirá', 'irá', 'vendrá', 'sabrá', 'dará', 'querrá', 'saldrá', 'pondrá', 'valdrá', 'llegará', 'pasará', 'quedará', 'volverá', 'fui', 'vi']);
+// Imperativo de vos con pronombre enclítico sin tilde (contame, fijate, rendime); en tú llevaría tilde.
+const NO_ENCLITICO = new Set(['tomate', 'chocolate', 'debate', 'combate', 'rescate', 'remate', 'disparate', 'aguacate', 'quilate', 'primate', 'magnate', 'escondite', 'aceite', 'deleite', 'derrame']);
+const palabras = (f) => String(f).toLowerCase().match(/[a-záéíóúüñ]+/g) ?? [];
+
 export function tieneVoseo(frase) {
-  const palabras = String(frase).toLowerCase().match(/[a-záéíóúüñ]+/g) ?? [];
-  return palabras.some((w) => FORMAS_VOSEO.has(w) || (w.length > 3 && /(ás|és|ís)$/.test(w) && !NO_VERBOS.has(w)));
+  return palabras(frase).some((w) => FORMAS_VOSEO.has(w)
+    || (w.length > 3 && /(ás|és|ís)$/.test(w) && !NO_VOSEO_S.has(w))
+    || (w.length > 2 && /[áéí]$/.test(w) && !NO_IMPERATIVO.has(w))
+    || (w.length >= 6 && /(ame|ime|ate|ite)$/.test(w) && !/[áéíóú]/.test(w) && !NO_ENCLITICO.has(w)));
+}
+
+// Primera persona de acción: después de un vocativo opcional ("Maren,") y de muletillas ("che", "bueno", "yo"),
+// la frase empieza con un verbo en primera persona del presente, con o sin pronombre átono ("me escondo").
+const ARRANQUES = new Set(['che', 'bueno', 'ok', 'dale', 'listo', 'ahora', 'entonces', 'y', 'yo', 'primero', 'despacio', 'rapido', 'rápido']);
+const CLITICOS = new Set(['me', 'te', 'le', 'les', 'lo', 'la', 'los', 'las', 'se', 'nos']);
+const NO_VERBO_O = new Set(['como', 'pero', 'todo', 'algo', 'eso', 'esto', 'aquello', 'cuanto', 'tanto', 'mucho', 'poco', 'nuestro', 'vuestro', 'otro', 'mismo', 'luego', 'cuando', 'donde', 'adonde', 'medio', 'centro', 'libro', 'mercado', 'puerto', 'pueblo', 'camino', 'grupo', 'nuevo', 'viejo', 'cerro', 'barco', 'cielo', 'suelo', 'palo', 'tipo', 'caso', 'lado', 'cuarto', 'segundo', 'tercero', 'ultimo', 'último', 'ojo', 'banco', 'templo', 'precio', 'dinero', 'oro', 'puesto', 'sello', 'archivo', 'no', 'hmm']);
+const IRREGULARES = new Set(['voy', 'doy', 'estoy', 'soy']);
+export function esPrimeraPersonaAccion(frase) {
+  const t = String(frase).replace(/^\s*[A-ZÁÉÍÓÚÑ][\wáéíóúñ]*(\s+[A-ZÁÉÍÓÚÑ][\wáéíóúñ]*)?\s*,/, '');
+  const ws = palabras(t);
+  let i = 0;
+  while (i < ws.length && ARRANQUES.has(ws[i])) i++;
+  if (i < ws.length && CLITICOS.has(ws[i])) i++;
+  const w = ws[i];
+  if (!w) return false;
+  return IRREGULARES.has(w) || (w.length >= 3 && /o$/.test(w) && !NO_VERBO_O.has(w));
+}
+
+export function tipoFrase(frase) {
+  if (tieneVoseo(frase)) return 'voseo_dialogo';
+  if (esPrimeraPersonaAccion(frase)) return 'primera_persona_accion';
+  return 'no_valida';
 }
 
 const claveEstado = (d) => `${d.escena}|${d.npcs.map((n) => n.id).sort().join(',')}|${d.objetos.map((o) => o.id).sort().join(',')}`;
@@ -131,7 +163,7 @@ export function intencionesDisponibles(sim) {
 
 export function armarPedido(perfil, sim, frases) {
   const lista = intencionesDisponibles(sim);
-  const user = `${describirPerfil(perfil)}\n${describirEstado(sim.detalle(), sim.estado().hora)}\nIntenciones disponibles (id: forma de ejemplo):\n${lista.map((i) => `- ${i.id}: ${i.ejemplo}`).join('\n')}\nEscribí ${frases} frases de jugador repartidas entre esas intenciones. ${INSTRUCCION_VOSEO} Incluso si la frase es una acción, que tenga alguna forma de vos (por ejemplo dirigiéndote al NPC: "mirá", "fijate", "decime"). ${PEDIDO}`;
+  const user = `${describirPerfil(perfil)}\n${describirEstado(sim.detalle(), sim.estado().hora)}\nIntenciones disponibles (id: forma de ejemplo):\n${lista.map((i) => `- ${i.id}: ${i.ejemplo}`).join('\n')}\nEscribí ${frases} frases de jugador repartidas entre esas intenciones. ${INSTRUCCION_VOSEO} ${PEDIDO}`;
   return { system: SYSTEM_CORPUS, user, intenciones: lista.map((i) => i.id) };
 }
 
@@ -198,23 +230,27 @@ export async function ejecutarCorpus(cli = {}, { config = leerConfig(), raiz = R
       const validas = lista.map((x) => ({ ...x, frase: validarFrase(x.frase) })).filter((x) => { if (!x.frase) invalidas++; return x.frase; });
       const motor = await enEstado(e, async (sim) => validas.map((x) => { const c = sim.clasificar(x.frase); return { intencion: c.intencionId, regla: c.motivo, resultado: c.resultado }; }));
       for (const [i, x] of validas.entries()) {
-        const fila = { id: `f${String(++idFrase).padStart(5, '0')}`, frase: x.frase, validacion: tieneVoseo(x.frase) ? 'ok' : 'no_voseo', perfil: pid, estadoJuego: { escena: e.escena, npcs: e.npcs, objetos: e.objetos }, intencionObjetivo: x.intencion, motor: motor[i], modelo, seed: e.seed, fecha: new Date().toISOString(), versionNarrador: versionNarrador.version, estado: 'pendiente' };
+        const fila = { id: `f${String(++idFrase).padStart(5, '0')}`, frase: x.frase, tipo: tipoFrase(x.frase), perfil: pid, estadoJuego: { escena: e.escena, npcs: e.npcs, objetos: e.objetos }, intencionObjetivo: x.intencion, motor: motor[i], modelo, seed: e.seed, fecha: new Date().toISOString(), versionNarrador: versionNarrador.version, estado: 'pendiente' };
         todas.push(fila);
         fs.appendFileSync(archivo, `${JSON.stringify(fila)}\n`);
       }
     }
   }
   if (!fs.existsSync(archivo)) fs.writeFileSync(archivo, '');
-  const conVoseo = todas.filter((f) => f.validacion === 'ok');
-  const agrupadas = agrupar(conVoseo);
+  const validasTodas = todas.filter((f) => f.tipo !== 'no_valida');
+  const agrupadas = agrupar(validasTodas);
   fs.writeFileSync(path.join(dirC, 'frases-agrupadas.json'), JSON.stringify(agrupadas, null, 2));
   const pct = (a, b) => (b ? Math.round((1000 * a) / b) / 10 : 0);
-  const noEnt = conVoseo.filter((f) => NO_ENTENDIDAS.has(f.motor.resultado)).length;
+  const cuenta = (t) => todas.filter((f) => f.tipo === t).length;
+  const noEnt = validasTodas.filter((f) => NO_ENTENDIDAS.has(f.motor.resultado)).length;
   const resumen = {
     loteId, modelo, estados: estados.length, llamadas: ia.cliente.llamadas, tokens: ia.cliente.tokens, tokensEntrada: ia.cliente.tokensEntrada, tokensSalida: ia.cliente.tokensSalida,
-    frasesPedidas: pedidas, frasesFormato: todas.length, invalidas, noVoseo: todas.length - conVoseo.length, pctVoseo: pct(conVoseo.length, todas.length),
-    frasesValidas: conVoseo.length, pctValidas: pct(conVoseo.length, pedidas), noEntendidas: noEnt, pctNoEntendidas: pct(noEnt, conVoseo.length),
-    distintaDeObjetivo: conVoseo.filter((f) => !coincide(f.intencionObjetivo, f.motor)).length, gruposCandidatos: Object.values(agrupadas).reduce((a, g) => a + g.length, 0),
+    frasesPedidas: pedidas, frasesFormato: todas.length, invalidas,
+    voseoDialogo: cuenta('voseo_dialogo'), pctVoseo: pct(cuenta('voseo_dialogo'), todas.length),
+    primeraPersonaAccion: cuenta('primera_persona_accion'), pctPrimeraPersona: pct(cuenta('primera_persona_accion'), todas.length),
+    noValidas: cuenta('no_valida'), frasesValidas: validasTodas.length, pctValidas: pct(validasTodas.length, pedidas),
+    noEntendidas: noEnt, pctNoEntendidas: pct(noEnt, validasTodas.length),
+    distintaDeObjetivo: validasTodas.filter((f) => !coincide(f.intencionObjetivo, f.motor)).length, gruposCandidatos: Object.values(agrupadas).reduce((a, g) => a + g.length, 0),
     fallasParseo, corte, keys: ia.pool.resumen(), estimacion: est,
   };
   fs.writeFileSync(path.join(dir, 'corpus.json'), JSON.stringify(resumen, null, 2));
