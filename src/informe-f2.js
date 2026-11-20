@@ -64,14 +64,17 @@ export function metricasF2(runs, turnos) {
   const escritosTipo = new Set(); const borradosTipo = new Set();
   const graves = [];
   for (const r of runs) {
-    const vivos = new Map();
+    // Grave = nivel 3 de rencor/desconfianza/miedo; solo se repara si el tag (tipo|objetivo, cualquier nivel) desaparece.
+    const vivos = new Map(); const activos = new Set();
     for (const t of deRun(r)) {
-      for (const k of t.tagsBorrados) { borradosTipo.add(k.split('|')[0]); vivos.delete(k); }
+      for (const k of t.tagsBorrados) { borradosTipo.add(k.split('|')[0]); activos.delete(k); }
+      for (const k of t.tagsEscritos) activos.add(k);
+      for (const g of [...vivos.keys()]) if (![...activos].some((k) => k.startsWith(`${g}|`))) vivos.delete(g);
       for (const k of t.tagsEscritos) {
         const [tipo, objetivo, nivel] = k.split('|');
         escritosTipo.add(tipo);
         frecuencia[tipo] ??= {}; frecuencia[tipo][nivel] = (frecuencia[tipo][nivel] ?? 0) + 1;
-        if (TAGS_REPARABLES.has(tipo) && nivel === '3') vivos.set(k, { runId: r.runId, tipo, objetivo, turno: t.turno });
+        if (TAGS_REPARABLES.has(tipo) && nivel === '3') vivos.set(`${tipo}|${objetivo}`, { runId: r.runId, tipo, objetivo, turno: t.turno });
       }
     }
     graves.push(...vivos.values());

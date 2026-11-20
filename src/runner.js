@@ -3,6 +3,8 @@ import { crearPartida } from './adaptador.js';
 import { crearPoliticaPerfil } from './politicas.js';
 
 const FALLOS = new Set(['reformula', 'no_entendido']);
+// Negativa por falta de relación: respuesta válida, no suma ni reinicia la paciencia.
+export const siguientesFallos = (n, resultado) => (resultado === 'negativa_relacion' ? n : FALLOS.has(resultado) ? n + 1 : 0);
 const resumenEntrada = (e) => (e.tipo === 'boton' ? `[${e.intencion}] ${JSON.stringify(e.parametros ?? {})}` : e.texto);
 
 // Un run: bucle de turnos hasta el primer cierre.
@@ -37,7 +39,7 @@ export async function correrRun({ idx, seed, casoId, perfil, modo, trabada, maxT
         run.iaLlamadas += r.iaLlamadas;
         run.iaTokens += r.iaTokens;
         if (r.hito) { run.hitos.push(r.hito); sinHito = 0; } else sinHito += 1;
-        fallosSeguidos = FALLOS.has(r.resultado) ? fallosSeguidos + 1 : 0;
+        fallosSeguidos = siguientesFallos(fallosSeguidos, r.resultado);
         alTurno({
           runId, turno: run.turnos, hora: est.hora, escena: est.escena,
           entrada: entrada.tipo === 'boton'
