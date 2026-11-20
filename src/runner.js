@@ -66,6 +66,7 @@ export async function correrRun({ idx, seed, casoId, perfil, modo, trabada, maxT
           decision: { intencion: r.intencion, regla: r.regla, resultado: r.resultado },
           salida: { texto: r.texto, textoId: r.textoId, tipo: r.tipoSalida ?? null },
           npcs: (r.npcsPresentes ?? []).map((n) => n.id),
+          ...(r.consulta ? { consulta: r.consulta } : {}),
           tagsEscritos: r.tagsEscritos, tagsBorrados: r.tagsBorrados, hito: r.hito,
           iaLlamadas: r.iaLlamadas, iaTokens: r.iaTokens,
           ...(entrada.sinAccion ? { sinAccion: true } : {}),

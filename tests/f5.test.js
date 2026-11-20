@@ -32,7 +32,8 @@ function groqFalso(modo = () => 'ok') {
 }
 const politica = () => ({ tipo: 'texto', texto: 'qwerty zzz' });
 const base = (cli) => ({ salida: path.join(tmp, 'sim'), perfiles: 'directo:3', maxTurnos: '6', trabada: '50', mezcla: '0/100', ...cli });
-const opciones = (fetch, extra = {}) => ({ config: { groq: { limiteDiarioPorKey: 250 }, modelos: { groq: 'openai/gpt-oss-120b' } }, politica, fetch, env: {}, archivoKeys, esperarIa: async () => {}, avisar: () => {}, ...extra });
+// raiz temporal: el uso diario de keys falsas no tiene que ir a simulaciones/ del repo.
+const opciones = (fetch, extra = {}) => ({ raiz: tmp, config: { groq: { limiteDiarioPorKey: 250 }, modelos: { groq: 'openai/gpt-oss-120b' } }, politica, fetch, env: {}, archivoKeys, esperarIa: async () => {}, avisar: () => {}, ...extra });
 
 test('keys: varias variables de entorno y rotación por la menos usada', () => {
   assert.deepEqual(leerKeysGroq({ env: { GROQ_API_KEY: K1, GROQ_API_KEY_2: K2 }, archivo: SIN }).map((k) => k.nombre), ['env', 'env2']);

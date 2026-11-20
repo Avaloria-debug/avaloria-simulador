@@ -67,7 +67,7 @@ export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}`, ia
   const clasificar = (entrada) => {
     const partida = cargarPartida(e);
     const t = ejecutarTurno(partida, typeof entrada === 'string' ? { tipo: 'texto', texto: entrada } : entrada, { contenido, rng: crearRng(partida.semilla), diccionarios });
-    return { tipo: t.tipo, intencionId: t.intencionId ?? t.accion?.intencionId ?? null, parametros: t.accion?.parametros ?? {}, motivo: t.motivo ?? null, resultado: t.consulta?.motivo === 'umbral' ? 'negativa_relacion' : (RESULTADO[t.tipo] ?? 'no_entendido') };
+    return { tipo: t.tipo, intencionId: t.intencionId ?? t.accion?.intencionId ?? null, parametros: t.accion?.parametros ?? {}, motivo: t.motivo ?? null, consulta: t.consulta ? { npcId: t.consulta.npcId, conocimientoId: t.consulta.conocimientoId, resultado: t.consulta.resultado, motivo: t.consulta.motivo ?? null } : null, resultado: t.consulta?.motivo === 'umbral' ? 'negativa_relacion' : (RESULTADO[t.tipo] ?? 'no_entendido') };
   };
 
   return {
@@ -162,6 +162,7 @@ export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}`, ia
         iaTokens: turnoIa.tokens,
         iaLimitada: turnoIa.limitada,
         tipoSalida: r.tipo,
+        consulta: d.consulta,
         npcsPresentes,
         errores: r.errores,
       };
