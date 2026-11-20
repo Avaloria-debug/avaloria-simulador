@@ -42,6 +42,8 @@ export function calcularInforme(runs, turnos) {
     topNoEntendidas: Object.entries(noEntendidas).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 20).map(([frase, veces]) => ({ frase, veces })),
     motivosDecidir: Object.entries(contar(turnos.filter((x) => x.decision.regla), (x) => x.decision.regla)).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([motivo, veces]) => ({ motivo, veces })),
     ia: runs.map((r) => ({ runId: r.runId, llamadas: r.iaLlamadas, tokens: r.iaTokens })),
+    origenFalla: contar(turnos.filter((x) => x.origenFalla), (x) => x.origenFalla),
+    jugadorIa: { frases: runs.reduce((a, r) => a + (r.jugadorIa?.frases ?? 0), 0), tokens: runs.reduce((a, r) => a + (r.jugadorIa?.tokens ?? 0), 0) },
     errores: runs.filter((r) => r.error).map((r) => ({ runId: r.runId, error: r.error.split('\n')[0] })),
   };
 }

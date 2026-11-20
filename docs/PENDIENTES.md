@@ -25,3 +25,6 @@ Todos cortan por trabada en el turno 15 (umbral 15). Muestra chica: hallazgo a c
 
 ## Verificación pendiente de F2
 - Paciencia con negativa por relación: el test actual (`tests/decisiones.test.js`) prueba el contador `siguientesFallos` con una secuencia armada a mano. Falta un test con un run real en el que un NPC se niegue por relación (motivo `umbral` del narrador) y el run no cierre por abandono.
+
+## F4: tanda real con Groq (fase 2)
+- Pendiente: no hay `GROQ_API_KEY` ni `config/keys.json` en el entorno. Cuando haya key: verificar que `openai/gpt-oss-120b` exista en `GET https://api.groq.com/openai/v1/models` y correr `npm run corpus -- --perfiles curioso,torpe,primerizo --frases 30 --max-estados 3 --max-llamadas-ia 20` (estimación: 9 llamadas, ~14.300 tokens). Reportar llamadas, tokens, % de frases válidas, % no entendidas por el motor y una muestra de 10 frases.

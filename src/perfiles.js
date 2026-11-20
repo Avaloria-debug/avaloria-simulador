@@ -41,11 +41,12 @@ export function validarPerfil(p, archivo = '(perfil)') {
     if (!esNum(ev.pBoton) || ev.pBoton < -1 || ev.pBoton > 1) falla('evolucion.pBoton', 'número entre -1 y 1');
     if (!esProb(ev.minPBoton)) falla('evolucion.minPBoton', 'probabilidad fuera de 0..1');
   }
-  if (p.haiku !== undefined && p.haiku !== null && !esProb(p.haiku.p)) falla('haiku.p', 'probabilidad fuera de 0..1');
+  if (p.haiku !== undefined) falla('haiku', 'el campo se llama ia desde F4 (proveedor Groq)');
+  if (p.ia !== undefined && p.ia !== null && !esProb(p.ia.p)) falla('ia.p', 'probabilidad fuera de 0..1');
   return {
     id: p.id, nombre: p.nombre ?? p.id, descripcion: p.descripcion ?? '',
     pesos: { ...p.pesos }, objetivo: { tipo: objetivo.tipo, sesgo: objetivo.sesgo ?? 1 },
-    entrada, ruido, paciencia, repiteSiFalla, aprendeDeRespuestas: p.aprendeDeRespuestas === true, evolucion: ev, haiku: p.haiku ?? null,
+    entrada, ruido, paciencia, repiteSiFalla, aprendeDeRespuestas: p.aprendeDeRespuestas === true, evolucion: ev, ia: p.ia ?? null,
   };
 }
 

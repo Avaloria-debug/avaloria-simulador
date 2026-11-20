@@ -1,0 +1,33 @@
+// Jugador simulado con Groq: arma el pedido, valida la frase.
+import { SYSTEM_JUGADOR } from './groq.js';
+import { nombreDe } from '../adaptador.js';
+
+// 1–200 caracteres, una línea, no vacía. Devuelve la frase limpia o null.
+export function validarFrase(t) {
+  if (typeof t !== 'string') return null;
+  const f = t.trim().replace(/^["'“”«»]+|["'“”«»]+$/g, '').trim();
+  if (!f || f.length > 200 || /[\r\n]/.test(f)) return null;
+  return f;
+}
+
+export function describirPerfil(p) {
+  const pesos = Object.entries(p.pesos).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).map(([k]) => k).join(', ');
+  return `Perfil de jugador: ${p.nombre ?? p.id}. ${p.descripcion ?? ''} Acciones que más usa: ${pesos}.`.replace(/\s+/g, ' ').trim();
+}
+
+export function describirEstado(d, hora) {
+  const npcs = d.npcs.map((n) => n.nombre ?? nombreDe(n.id)).join(', ') || 'nadie';
+  const objetos = d.objetos.map((o) => o.nombre ?? nombreDe(o.id)).join(', ') || 'ninguno';
+  return `Escena: ${nombreDe(d.escena) ?? d.escena}. Hora: ${hora}. Personajes presentes: ${npcs}. Objetos: ${objetos}.`;
+}
+
+export function crearJugadorIa(cliente) {
+  return {
+    async pedirFrase(perfil, sim, ultimas) {
+      const historial = ultimas.length ? ultimas.map((u) => `- ${u.frase} → ${String(u.respuesta ?? '').slice(0, 200)}`).join('\n') : '(sin interacciones todavía)';
+      const user = `${describirPerfil(perfil)}\n${describirEstado(sim.detalle(), sim.estado().hora)}\nÚltimas interacciones:\n${historial}\n¿Qué escribís ahora?`;
+      const r = await cliente.llamar({ system: SYSTEM_JUGADOR, user, maxTokens: 400 });
+      return { frase: validarFrase(r.texto), crudo: r.texto, tokens: r.usage?.total_tokens ?? 0 };
+    },
+  };
+}

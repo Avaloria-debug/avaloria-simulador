@@ -7,12 +7,14 @@ import { abrirRegistro } from './registro.js';
 import { generarInforme } from './informe.js';
 import { mulberry32 } from './rng.js';
 import { PERFIL_POR_DEFECTO, cargarPerfiles } from './perfiles.js';
+import { prepararIa } from './ia/preparar.js';
+import { crearJugadorIa } from './ia/jugador.js';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const DEFAULTS = Object.freeze({ runs: 20, mezcla: { codigo: 100, ia: 0 }, trabada: 15, maxTurnos: 400, seedBase: 1, casos: 'todos', salida: 'simulaciones' });
 const VERSION = JSON.parse(fs.readFileSync(path.join(RAIZ, 'package.json'), 'utf8')).version;
 
-const FLAGS = { '--runs': 'runs', '--mezcla': 'mezcla', '--trabada': 'trabada', '--max-turnos': 'maxTurnos', '--seed-base': 'seedBase', '--casos': 'casos', '--salida': 'salida', '--reanudar': 'reanudar', '--perfiles': 'perfiles' };
+const FLAGS = { '--runs': 'runs', '--mezcla': 'mezcla', '--trabada': 'trabada', '--max-turnos': 'maxTurnos', '--seed-base': 'seedBase', '--casos': 'casos', '--salida': 'salida', '--reanudar': 'reanudar', '--perfiles': 'perfiles', '--jugador-ia': 'jugadorIa', '--max-llamadas-ia': 'maxLlamadasIa' };
 
 export function leerArgs(argv) {
   const out = {};
@@ -76,6 +78,10 @@ export function resolverParametros(cli = {}, config = {}, disponibles = cargarPe
   if (casos.length === 0 || malos.length) throw new Error(`casos inexistentes: ${malos.join(', ') || '(vacío)'}. Disponibles: ${idsCasos.join(', ')}`);
   p.casos = casos;
   if (typeof p.salida !== 'string' || !p.salida) throw new Error('salida inválida');
+  p.maxLlamadasIa = entero('max-llamadas-ia', p.maxLlamadasIa ?? 300);
+  const j = p.jugadorIa ?? 'no';
+  if (![true, false, 'si', 'no'].includes(j)) throw new Error('jugador-ia inválido: si o no');
+  p.jugadorIa = j === true || j === 'si';
   return p;
 }
 
@@ -96,7 +102,7 @@ export function nuevoLoteId(seedBase, fecha = new Date()) {
   return `${f.getFullYear()}${dos(f.getMonth() + 1)}${dos(f.getDate())}-${dos(f.getHours())}${dos(f.getMinutes())}${dos(f.getSeconds())}-${seedBase}`;
 }
 
-export async function ejecutarLote(cli = {}, { config = leerConfig(), politica = null, progreso = () => {}, raiz = RAIZ } = {}) {
+export async function ejecutarLote(cli = {}, { config = leerConfig(), politica = null, progreso = () => {}, raiz = RAIZ, fetch: f, env, archivoKeys, avisar = (m) => process.stderr.write(`Aviso: ${m}\n`) } = {}) {
   let p;
   let loteId;
   let dir;
@@ -120,13 +126,18 @@ export async function ejecutarLote(cli = {}, { config = leerConfig(), politica =
   const modos = asignarModos(p.runs, p.mezcla, p.seedBase);
   const perfiles = cargarPerfiles();
   const perfilDe = p.perfiles.flatMap((x) => Array(x.agentes).fill(perfiles.get(x.id)));
+  let jugadorIa = null;
+  if (p.jugadorIa) {
+    const ia = prepararIa({ config, maxLlamadas: p.maxLlamadasIa, fetch: f, env, archivoKeys, raiz, log: avisar });
+    if (ia) jugadorIa = crearJugadorIa(ia.cliente); else avisar('jugador IA pedido sin keys de Groq: todos los perfiles usan reglas');
+  }
   const inicio = performance.now();
   let hechos = reg.completados.size;
   for (let i = 0; i < p.runs; i++) {
     if (reg.completados.has(i)) continue;
     const run = await correrRun({
       idx: i, seed: p.seedBase + i, casoId: p.casos[i % p.casos.length], perfil: perfilDe[i], modo: modos[i],
-      trabada: p.trabada, maxTurnos: p.maxTurnos, politica, alTurno: reg.turno,
+      trabada: p.trabada, maxTurnos: p.maxTurnos, politica, alTurno: reg.turno, jugadorIa, avisar,
     });
     reg.run(run);
     progreso(++hechos, p.runs, run);

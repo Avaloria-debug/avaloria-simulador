@@ -11,6 +11,7 @@ import { VERSION } from 'narrador/narrador/version.js';
 import { escenasDeEntrega } from 'narrador/narrador/casos/hitos.js';
 import { TIPOS_TAG } from 'narrador/narrador/casos/tags.js';
 import { posicionesDeNpcs } from 'narrador/narrador/movimientoNpcs.js';
+import { normalizar } from 'narrador/narrador/comprension.js';
 
 const requerir = createRequire(import.meta.url);
 const archivoCasos = requerir('narrador/data/contenido/casos.json');
@@ -19,6 +20,9 @@ const lock = (() => { try { return requerir('../package-lock.json'); } catch { r
 export const casos = archivoCasos.casos;
 export const idsCasos = casos.map((c) => c.id);
 export const intenciones = contenido.intenciones;
+export { normalizar };
+// Formas ya conocidas por el narrador (normalizadas): las del contenido y las del léxico de comprensión.
+export const formasConocidas = new Set([...contenido.intenciones, ...(diccionarios.intencionesLexico ?? [])].flatMap((i) => i.formas ?? []).map(normalizar));
 export const versionNarrador = {
   version: VERSION,
   contenido: contenido.version,

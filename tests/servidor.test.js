@@ -25,7 +25,7 @@ before(async () => {
   fs.mkdirSync(dirPerfiles);
   for (const f of fs.readdirSync(DIR_PERFILES)) fs.copyFileSync(path.join(DIR_PERFILES, f), path.join(dirPerfiles, f));
   fs.writeFileSync(archivoKeys, JSON.stringify(KEYS));
-  srv = crearServidor({ dirSim, dirPerfiles, archivoKeys });
+  srv = crearServidor({ dirSim, dirPerfiles, archivoKeys, env: {} });
   await new Promise((ok) => srv.listen(0, '127.0.0.1', ok));
   base = `http://127.0.0.1:${srv.address().port}`;
 });
@@ -106,6 +106,26 @@ test('parar un lote en curso', { timeout: 60000 }, async () => {
   assert.equal(r.estado, 202);
   const p = await pedir('/api/lote/parar', { method: 'POST' });
   assert.equal(p.estado, 200);
+});
+
+test('corpus: estimación, 400 sin perfiles, lista vacía', { timeout: 60000 }, async () => {
+  const e = await pedir('/api/corpus/estimar', { method: 'POST', body: JSON.stringify({ perfiles: ['curioso', 'torpe'], frases: 10, maxEstados: 2 }) });
+  assert.equal(e.estado, 200);
+  assert.equal(e.json.llamadas, 4);
+  assert.equal(e.json.keys[0].key, enmascarar(KEYS.groq[0].key));
+  assert.equal((await pedir('/api/corpus', { method: 'POST', body: JSON.stringify({ perfiles: [] }) })).estado, 400);
+  assert.equal((await pedir('/api/corpus', { method: 'POST', body: JSON.stringify({ perfiles: ['curioso'], frases: 500 }) })).estado, 400);
+  assert.deepEqual((await pedir('/api/corpus')).json, []);
+  assert.equal((await pedir('/api/corpus/nada/agrupadas')).estado, 404);
+});
+
+test('corpus sin keys de Groq da 400', async () => {
+  const s2 = crearServidor({ dirSim, dirPerfiles, archivoKeys: path.join(tmp, 'no-hay.json'), env: {} });
+  await new Promise((ok) => s2.listen(0, '127.0.0.1', ok));
+  const r = await fetch(`http://127.0.0.1:${s2.address().port}/api/corpus`, { method: 'POST', body: JSON.stringify({ perfiles: ['curioso'] }) });
+  assert.equal(r.status, 400);
+  assert.match((await r.json()).error, /no hay keys de Groq/);
+  await new Promise((ok) => s2.close(ok));
 });
 
 test('la UI se sirve y no hay rutas fuera de ui/', async () => {

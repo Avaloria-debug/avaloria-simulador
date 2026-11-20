@@ -14,7 +14,7 @@ async function api(ruta, opciones = {}) {
 
 // Navegación
 $('#menu').addEventListener('click', () => { const n = $('#nav'); n.classList.toggle('abierto'); $('#menu').setAttribute('aria-expanded', n.classList.contains('abierto')); });
-const PANTALLAS = { nueva, vivo, informes, perfiles };
+const PANTALLAS = { nueva, vivo, informes, perfiles, corpus };
 let salir = () => {};
 function ruta() {
   salir(); salir = () => {};
@@ -91,11 +91,12 @@ async function vivo() {
     $('.progreso').setAttribute('aria-valuenow', Math.round(p));
     const estados = { corriendo: 'Corriendo', terminado: 'Terminado', parado: 'Parado', error: 'Con error' };
     $('#est').textContent = `${estados[d.estado] ?? d.estado}${d.loteId ? ` · lote ${d.loteId}` : ''}${d.mensaje ? ` · ${d.mensaje}` : ''}`;
-    $('#cifras').innerHTML = [[`${d.hechos} / ${d.total}`, 'runs hechos'], [num(d.runsPorSeg, 2), 'runs/seg'], [d.estado === 'corriendo' ? duracion(d.etaSeg) : '—', 'tiempo restante']]
+    const u = d.modo === 'corpus' ? 'llamadas' : 'runs';
+    $('#cifras').innerHTML = [[`${d.hechos} / ${d.total}`, `${u} hechas`.replace('runs hechas', 'runs hechos')], [num(d.runsPorSeg, 2), `${u}/seg`], [d.estado === 'corriendo' ? duracion(d.etaSeg) : '—', 'tiempo restante']]
       .map(([v, e]) => `<div class="tarjeta"><div class="cifra">${esc(v)}</div><div class="etiqueta">${e}</div></div>`).join('');
     $('#cierres').innerHTML = barras(d.cierres, d.total);
     $('#parar').disabled = d.estado !== 'corriendo';
-    $('#fin').innerHTML = d.estado === 'terminado' && d.loteId ? `<a href="#informes/${encodeURIComponent(d.loteId)}">Ver informe</a>` : '';
+    $('#fin').innerHTML = d.estado === 'terminado' && d.loteId ? `<a href="#${d.modo === 'corpus' ? 'corpus' : 'informes'}/${encodeURIComponent(d.loteId)}">${d.modo === 'corpus' ? 'Ver frases del corpus' : 'Ver informe'}</a>` : '';
   };
   $('#parar').addEventListener('click', async () => { try { await api('/api/lote/parar', { method: 'POST' }); } catch (e) { $('#msg').textContent = e.message; } });
 }
@@ -197,6 +198,58 @@ function leerCampos() {
     o[partes.at(-1)] = v;
   }
   return out;
+}
+
+// Corpus
+async function corpus(sel) {
+  const [perfs, cfg, lotes] = await Promise.all([api('/api/perfiles'), api('/api/config'), api('/api/corpus')]);
+  vista.innerHTML = `<h1>Corpus</h1>
+  <form id="f" class="tarjeta">
+    <h2 style="margin-top:0">Perfiles</h2><div class="grilla">${perfs.map((p) => `<label title="${esc(p.descripcion)}"><input type="checkbox" name="perfil" value="${esc(p.id)}" ${['curioso', 'torpe', 'primerizo'].includes(p.id) ? 'checked' : ''}> ${esc(p.nombre ?? p.id)}</label>`).join('')}</div>
+    <div class="fila" style="margin-top:12px">
+      <label class="campo">Frases por estado<input type="number" name="frases" min="1" max="100" value="30"></label>
+      <label class="campo">Máximo de estados<input type="number" name="maxEstados" min="1" value="200"></label>
+      <label class="campo">Tope de llamadas<input type="number" name="maxLlamadasIa" min="1" value="300"></label>
+      <label class="campo">Seed base<input type="number" name="seedBase" min="1" value="${esc(cfg.config.seedBase ?? 1)}"></label>
+    </div>
+    <p class="fila"><button type="button" id="estimar">Estimar</button> <button class="primario" type="submit">Generar</button></p>
+    <div id="est"></div><p id="msg" class="error" role="alert"></p>
+  </form>
+  <div class="tarjeta"><h2 style="margin-top:0">Corpus generados</h2>${lotes.length ? tabla(['Corpus', 'Fecha', 'Modelo', 'Llamadas', 'Tokens', '% válidas', '% no entendidas', 'Grupos'], lotes.map((l) => [l.id, new Date(l.fecha).toLocaleString('es-AR'), l.resumen?.modelo ?? '—', l.resumen?.llamadas ?? '—', l.resumen?.tokens ?? '—', pct(l.resumen?.pctValidas), pct(l.resumen?.pctNoEntendidas), l.resumen?.gruposCandidatos ?? '—'])) : '<p class="suave">Todavía no hay corpus.</p>'}</div>
+  <div id="detalle"></div>`;
+  vista.querySelectorAll('tbody tr').forEach((tr, i) => { tr.classList.add('clic'); tr.tabIndex = 0; const ir = () => { location.hash = `corpus/${encodeURIComponent(lotes[i].id)}`; }; tr.addEventListener('click', ir); tr.addEventListener('keydown', (e) => { if (e.key === 'Enter') ir(); }); });
+  const f = $('#f');
+  const leer = () => ({ perfiles: [...f.querySelectorAll('input[name=perfil]:checked')].map((x) => x.value), frases: Number(f.frases.value), maxEstados: Number(f.maxEstados.value), maxLlamadasIa: Number(f.maxLlamadasIa.value), seedBase: Number(f.seedBase.value) });
+  $('#estimar').addEventListener('click', async () => {
+    $('#msg').textContent = ''; $('#est').innerHTML = '<p class="suave">Muestreando estados…</p>';
+    try {
+      const e = await api('/api/corpus/estimar', { method: 'POST', body: JSON.stringify(leer()) });
+      $('#est').innerHTML = `<div class="tarjetas">${[[e.estados, 'estados distintos'], [e.llamadasEfectivas, `llamadas${e.superaTope ? ` (de ${e.llamadas}, corta el tope)` : ''}`], [num(e.tokens, 0), `tokens estimados (~${num(e.tokensPorLlamada, 0)} por llamada)`]]
+        .map(([v, t]) => `<div class="tarjeta"><div class="cifra">${esc(v)}</div><div class="etiqueta">${esc(t)}</div></div>`).join('')}</div>
+        <p class="suave">Modelo: ${esc(e.modelo ?? '—')} · Keys de Groq: ${e.keys.length ? esc(e.keys.map((k) => `${k.nombre} ${k.key}`).join(', ')) : 'ninguna (no se puede generar)'}</p>`;
+    } catch (err) { $('#est').innerHTML = ''; $('#msg').textContent = err.message; }
+  });
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault(); $('#msg').textContent = '';
+    try { await api('/api/corpus', { method: 'POST', body: JSON.stringify(leer()) }); location.hash = 'vivo'; } catch (err) { $('#msg').textContent = err.message; }
+  });
+  if (sel) await verAgrupadas(sel);
+}
+
+async function verAgrupadas(id) {
+  const g = await api(`/api/corpus/${encodeURIComponent(id)}/agrupadas`);
+  const ints = Object.keys(g);
+  $('#detalle').innerHTML = `<div class="tarjeta"><h2 style="margin-top:0">Frases candidatas de ${esc(id)}</h2>
+    <p class="suave">No entendidas, reformuladas o resueltas a otra intención. Todas quedan pendientes de aprobación.</p>
+    <div class="fila"><label class="campo">Intención<select id="fi"><option value="">Todas</option>${ints.map((i) => `<option>${esc(i)}</option>`).join('')}</select></label>
+    <label class="campo">Frecuencia mínima<input type="number" id="ff" min="1" value="1"></label></div><div id="lista" style="margin-top:12px"></div></div>`;
+  const pintar = () => {
+    const i = $('#fi').value; const min = Number($('#ff').value) || 1;
+    const filas = Object.entries(g).filter(([k]) => !i || k === i).flatMap(([k, xs]) => xs.filter((x) => x.frecuencia >= min).map((x) => [k, x.ejemplos[0], x.frecuencia, Object.entries(x.resultados).map(([r, n]) => `${r} ×${n}`).join(', '), x.perfiles.join(', ')]));
+    $('#lista').innerHTML = filas.length ? tabla(['Intención objetivo', 'Frase', 'Frecuencia', 'Motor', 'Perfiles'], filas) : '<p class="suave">Sin frases con ese filtro.</p>';
+  };
+  $('#fi').addEventListener('change', pintar); $('#ff').addEventListener('input', pintar);
+  pintar();
 }
 
 ruta();

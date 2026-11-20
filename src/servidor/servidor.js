@@ -7,6 +7,8 @@ import { leerConfig, resolverParametros } from '../lote.js';
 import { cargarPerfiles, validarPerfil, DIR_PERFILES } from '../perfiles.js';
 import { leerJsonl } from '../registro.js';
 import { idsCasos, versionNarrador } from '../adaptador.js';
+import { ejecutarCorpus, resolverCorpus } from '../corpus.js';
+import { leerKeysGroq, ultimos4 } from '../ia/keys.js';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DIR_UI = path.join(RAIZ, 'ui');
@@ -27,7 +29,7 @@ function secretos(keys) {
 
 class ErrorHttp extends Error { constructor(estado, msg) { super(msg); this.estado = estado; } }
 
-export function crearServidor({ dirSim = path.join(RAIZ, 'simulaciones'), dirPerfiles = DIR_PERFILES, archivoKeys = path.join(RAIZ, 'config', 'keys.json'), archivoConfig = path.join(RAIZ, 'config', 'config.json') } = {}) {
+export function crearServidor({ dirSim = path.join(RAIZ, 'simulaciones'), dirPerfiles = DIR_PERFILES, archivoKeys = path.join(RAIZ, 'config', 'keys.json'), archivoConfig = path.join(RAIZ, 'config', 'config.json'), env = process.env } = {}) {
   let lote = null; // { hijo, loteId, total, hechos, cierres, inicio, estado, mensaje }
   const clientes = new Set();
 
@@ -36,13 +38,13 @@ export function crearServidor({ dirSim = path.join(RAIZ, 'simulaciones'), dirPer
     const seg = (Date.now() - lote.inicio) / 1000;
     const rps = seg > 0 ? lote.hechos / seg : 0;
     return {
-      estado: lote.estado, loteId: lote.loteId, hechos: lote.hechos, total: lote.total, cierres: lote.cierres,
+      estado: lote.estado, modo: lote.modo, loteId: lote.loteId, hechos: lote.hechos, total: lote.total, cierres: lote.cierres,
       runsPorSeg: Number(rps.toFixed(2)), etaSeg: rps > 0 ? Math.round((lote.total - lote.hechos) / rps) : null, mensaje: lote.mensaje ?? null,
     };
   };
   const emitir = () => { const d = `data: ${JSON.stringify(progreso())}\n\n`; for (const c of clientes) c.write(d); };
 
-  const limpiar = (texto) => { for (const s of secretos(leerKeys(archivoKeys))) texto = texto.split(s).join(enmascarar(s)); return texto; };
+  const limpiar = (texto) => { for (const s of [...secretos(leerKeys(archivoKeys)), ...(env.GROQ_API_KEY ? [env.GROQ_API_KEY.trim()] : [])]) texto = texto.split(s).join(enmascarar(s)); return texto; };
   const json = (res, estado, obj) => {
     res.writeHead(estado, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' });
     res.end(limpiar(JSON.stringify(obj)));
@@ -66,7 +68,7 @@ export function crearServidor({ dirSim = path.join(RAIZ, 'simulaciones'), dirPer
       const c = leer(path.join(dirSim, id, 'config.json'));
       const t = fs.existsSync(path.join(dirSim, id, 'tiempo.json')) ? leer(path.join(dirSim, id, 'tiempo.json')) : null;
       return {
-        id, fecha: c.fecha, runs: c.parametros?.runs ?? null, versionSimulador: c.version, versionNarrador: c.narrador?.version ?? null,
+        id, tipo: c.tipo ?? 'lote', fecha: c.fecha, runs: c.parametros?.runs ?? null, versionSimulador: c.version, versionNarrador: c.narrador?.version ?? null,
         perfiles: c.parametros?.perfiles ?? [], conInforme: fs.existsSync(path.join(dirSim, id, 'informe.json')),
         runsPorSeg: t && t.segundos > 0 ? Number((t.runs / t.segundos).toFixed(2)) : null,
       };
@@ -79,6 +81,7 @@ export function crearServidor({ dirSim = path.join(RAIZ, 'simulaciones'), dirPer
 
   function lanzar(body) {
     if (lote && lote.estado === 'corriendo') throw new ErrorHttp(409, 'ya hay un lote corriendo');
+    if (body.modo === 'corpus') return lanzarCorpus(body);
     const cli = {};
     if (body.perfiles !== undefined) {
       if (!Array.isArray(body.perfiles)) throw new ErrorHttp(400, 'perfiles tiene que ser una lista de {id, agentes}');
@@ -92,18 +95,34 @@ export function crearServidor({ dirSim = path.join(RAIZ, 'simulaciones'), dirPer
     cli.salida = dirSim;
     let p;
     try { p = resolverParametros(cli, leerConfig(archivoConfig), cargarPerfiles(dirPerfiles)); } catch (e) { throw new ErrorHttp(400, e.message); }
-    const hijo = fork(path.join(path.dirname(fileURLToPath(import.meta.url)), 'hijo.js'), [JSON.stringify(cli)], { stdio: ['ignore', 'ignore', 'pipe', 'ipc'] });
-    lote = { hijo, loteId: null, total: p.runs, hechos: 0, cierres: {}, inicio: Date.now(), estado: 'corriendo' };
+    arrancar('lote', cli, p.runs);
+    return { runs: p.runs, perfiles: p.perfiles, casos: p.casos };
+  }
+  const cliCorpus = (body) => {
+    const cli = { perfiles: Array.isArray(body.perfiles) ? body.perfiles.join(',') : body.perfiles, salida: dirSim };
+    for (const k of ['frases', 'maxEstados', 'maxLlamadasIa', 'seedBase']) if (body[k] !== undefined) cli[k] = String(body[k]);
+    if (body.casos !== undefined) cli.casos = Array.isArray(body.casos) ? body.casos.join(',') : String(body.casos);
+    try { return { cli, p: resolverCorpus(cli, leerConfig(archivoConfig), cargarPerfiles(dirPerfiles)) }; } catch (e) { throw new ErrorHttp(400, e.message); }
+  };
+  function lanzarCorpus(body) {
+    const { cli, p } = cliCorpus(body);
+    if (!leerKeysGroq({ env, archivo: archivoKeys }).length) throw new ErrorHttp(400, 'no hay keys de Groq (GROQ_API_KEY o config/keys.json): el corpus necesita la IA');
+    arrancar('corpus', cli, p.maxEstados * p.perfiles.length);
+    return { modo: 'corpus', perfiles: p.perfiles, frases: p.frases, maxEstados: p.maxEstados };
+  }
+  function arrancar(modo, cli, total) {
+    const hijo = fork(path.join(path.dirname(fileURLToPath(import.meta.url)), 'hijo.js'), [JSON.stringify({ modo, cli })], { stdio: ['ignore', 'ignore', 'pipe', 'ipc'] });
+    lote = { hijo, modo, loteId: null, total, hechos: 0, cierres: {}, inicio: Date.now(), estado: 'corriendo' };
     const este = lote;
     hijo.on('message', (m) => {
-      if (m.tipo === 'run') { este.hechos = m.n; este.cierres[m.cierre] = (este.cierres[m.cierre] ?? 0) + 1; }
-      else if (m.tipo === 'fin') { este.estado = 'terminado'; este.loteId = m.loteId; }
+      if (m.tipo === 'run') { este.hechos = m.n; este.total = m.total; este.cierres[m.cierre] = (este.cierres[m.cierre] ?? 0) + 1; }
+      else if (m.tipo === 'aviso') este.mensaje = m.mensaje;
+      else if (m.tipo === 'fin') { este.estado = 'terminado'; este.loteId = m.loteId; if (m.mensaje) este.mensaje = m.mensaje; }
       else if (m.tipo === 'error') { este.estado = 'error'; este.mensaje = m.mensaje; }
       if (!este.loteId) este.loteId = ultimoLoteDesde(este.inicio);
       emitir();
     });
     hijo.on('exit', () => { if (este.estado === 'corriendo') este.estado = este.parado ? 'parado' : 'error'; este.loteId ??= ultimoLoteDesde(este.inicio); emitir(); });
-    return { runs: p.runs, perfiles: p.perfiles, casos: p.casos };
   }
   const ultimoLoteDesde = (ms) => listarLotes().find((l) => Date.parse(l.fecha) >= ms - 2000)?.id ?? null;
 
@@ -142,7 +161,26 @@ export function crearServidor({ dirSim = path.join(RAIZ, 'simulaciones'), dirPer
       req.on('close', () => clientes.delete(res));
       return;
     }
-    if (m === 'GET' && r === '/api/lotes') return json(res, 200, listarLotes());
+    if (m === 'GET' && r === '/api/lotes') return json(res, 200, listarLotes().filter((l) => l.tipo === 'lote'));
+    if (m === 'POST' && r === '/api/corpus/estimar') {
+      const { cli } = cliCorpus(await cuerpo(req));
+      const r2 = await ejecutarCorpus({ ...cli, estimar: true }, { config: leerConfig(archivoConfig) });
+      const keys = leerKeysGroq({ env, archivo: archivoKeys });
+      return json(res, 200, { ...r2.estimacion, keys: keys.map((k) => ({ nombre: k.nombre, key: ultimos4(k.key) })), modelo: leerConfig(archivoConfig).modelos?.groq ?? null });
+    }
+    if (m === 'POST' && r === '/api/corpus') return json(res, 202, lanzarCorpus(await cuerpo(req)));
+    if (m === 'GET' && r === '/api/corpus') {
+      return json(res, 200, listarLotes().filter((l) => l.tipo === 'corpus').map((l) => {
+        const f = path.join(dirSim, l.id, 'corpus.json');
+        const s = fs.existsSync(f) ? leer(f) : null;
+        return { ...l, resumen: s && { modelo: s.modelo, estados: s.estados, llamadas: s.llamadas, tokens: s.tokens, pctValidas: s.pctValidas, pctNoEntendidas: s.pctNoEntendidas, gruposCandidatos: s.gruposCandidatos, corte: s.corte } };
+      }));
+    }
+    if (m === 'GET' && (x = r.match(/^\/api\/corpus\/([^/]+)\/agrupadas$/))) {
+      const f = path.join(dirLote(x[1]), 'candidatos', 'frases-agrupadas.json');
+      if (!fs.existsSync(f)) throw new ErrorHttp(404, 'el corpus no tiene frases agrupadas');
+      return json(res, 200, leer(f));
+    }
     if (m === 'GET' && (x = r.match(/^\/api\/lotes\/([^/]+)\/informe$/))) {
       const d = dirLote(x[1]);
       if (!fs.existsSync(path.join(d, 'informe.json'))) throw new ErrorHttp(404, 'el lote todavía no tiene informe');

@@ -28,7 +28,7 @@ test('el validador rechaza cada caso inválido con archivo y campo', () => {
     [(p) => { p.ruido.typos = 2; }, /campo ruido\.typos/],
     [(p) => { p.ruido.nombraNpc = -1; }, /campo ruido\.nombraNpc/],
     [(p) => { p.repiteSiFalla = 3; }, /campo repiteSiFalla/],
-    [(p) => { p.haiku.p = 9; }, /campo haiku\.p/],
+    [(p) => { p.ia.p = 9; }, /campo ia\.p/],
     [(p) => { p.objetivo.tipo = 'ganar'; }, /campo objetivo\.tipo/],
     [(p) => { p.paciencia = 0; }, /campo paciencia/],
     [(p) => { p.evolucion = { cadaTurnos: 10, pBoton: -0.1, minPBoton: 2 }; }, /campo evolucion\.minPBoton/],
