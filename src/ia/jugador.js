@@ -2,11 +2,14 @@
 import { SYSTEM_JUGADOR } from './groq.js';
 import { nombreDe } from '../adaptador.js';
 
-// 1–200 caracteres, una línea, no vacía. Devuelve la frase limpia o null.
+// Token de catálogo al inicio (hablar_con, consultar_tema, [intencion_x]): salida rota, no es una frase de jugador.
+export const TOKEN_CATALOGO = /^\[?[a-záéíóúñ]+_[a-záéíóúñ_]*/i;
+
+// 1–200 caracteres, una línea, no vacía, sin token de catálogo al inicio. Devuelve la frase limpia o null.
 export function validarFrase(t) {
   if (typeof t !== 'string') return null;
   const f = t.trim().replace(/^["'“”«»]+|["'“”«»]+$/g, '').trim();
-  if (!f || f.length > 200 || /[\r\n]/.test(f)) return null;
+  if (!f || f.length > 200 || /[\r\n]/.test(f) || TOKEN_CATALOGO.test(f)) return null;
   return f;
 }
 

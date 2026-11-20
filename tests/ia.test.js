@@ -208,3 +208,13 @@ test('corpus: prompt con primera persona para acciones; tipos registrados; no v�
   const agrupadas = fs.readFileSync(path.join(r.dir, 'candidatos', 'frases-agrupadas.json'), 'utf8');
   assert.ok(!agrupadas.includes('Aquí hay huellas raras'));
 });
+
+test('validación de frases: descarta las que empiezan con un token del catálogo (casos reales de los lotes 300-500)', () => {
+  for (const rota of ['hablar_con Serel Norlen', 'hablar_con Serel Norlen.', 'hablar_con Brenn Holt', 'consultar_tema sello del Archivo Real', 'consultar_tema sobre el proveedor.',
+    'consulta_tema mapa de la posada escondida', 'consulto_tema mapa de la posada escondida', 'consulta_tema coonas', 'hablar_con {"npcId":"serel_panadero"}', '[intencion_examinar] {"objeto":"sello_del_archivo"}']) {
+    assert.equal(validarFrase(rota), null, rota);
+  }
+  for (const ok of ['Serel, pasame el pliego de precios, por favor.', 'Me llevo un pan fresco y un trozo de queso curado, por favor.', 'Voy a Brenn Holt y le hablo.', 'Hablá con Serel']) {
+    assert.equal(validarFrase(ok), ok, ok);
+  }
+});

@@ -129,10 +129,15 @@ export function pesosDelTurno(perfil, d, mem) {
         if (!pista) break;
         if (d.escena === pista.escena) {
           const temas = conocimientos.filter((k) => k.npcId === pista.npcId).flatMap((k) => k.palabrasClave);
-          if (d.npcs.some((n) => n.id === pista.npcId)) {
-            pref.npcId = pista.npcId;
-            if (temas.length) pref.temas = temas;
+          const presente = d.npcs.some((n) => n.id === pista.npcId);
+          if (presente) pref.npcId = pista.npcId;
+          // alLlegar "relacion": primero ayuda y calma al NPC; consulta el tema después de N favores.
+          if (perfil.objetivo.alLlegar === 'relacion' && presente && (mem.favores?.get(pista.npcId) ?? 0) < perfil.objetivo.favoresAntes) {
+            delete pesos.consulta_tema;
+            por('ayudar'); por('calmar_la_situacion'); por('hablar_con');
+            break;
           }
+          if (presente && temas.length) pref.temas = temas;
           por('consulta_tema'); por('hablar_con'); por('ayudar');
         } else {
           const paso = siguientePaso(d.escena, [pista.escena]);
@@ -217,7 +222,7 @@ const claveAccion = (e) => `${e.intencion}|${JSON.stringify(e.parametros ?? {})}
 
 // Política con memoria para un run. `elegir(sim, rng, ctx)` y `observar(entrada, resultado)`.
 export function crearPoliticaPerfil(perfil) {
-  const mem = { visitadas: new Set(), preguntadas: new Set(), aprendidas: new Set(), ultimas: [], ultimoFallo: null, pistaCamino: null };
+  const mem = { visitadas: new Set(), preguntadas: new Set(), aprendidas: new Set(), ultimas: [], ultimoFallo: null, pistaCamino: null, favores: new Map() };
   return {
     elegir(sim, rng, { turno }) {
       const d = sim.detalle();
@@ -260,6 +265,10 @@ export function crearPoliticaPerfil(perfil) {
       if (mem.ultimas.length > 3) mem.ultimas.shift();
       mem.ultimoFallo = FALLOS.has(r.resultado) && entrada.verbo ? entrada.verbo : null;
       if (perfil.objetivo.fuente === 'narracion') mem.pistaCamino = leerPistaCamino(r.texto) ?? mem.pistaCamino;
+      const npcFavor = entrada.parametros?.npcId;
+      if (mem.pistaCamino && npcFavor === mem.pistaCamino.npcId && ['ayudar', 'calmar_la_situacion'].includes(entrada.verbo) && !FALLOS.has(r.resultado)) {
+        mem.favores.set(npcFavor, (mem.favores.get(npcFavor) ?? 0) + 1);
+      }
       if (perfil.aprendeDeRespuestas && typeof r.texto === 'string') {
         const palabras = r.texto.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').split(/[^a-zñ]+/);
         for (const w of palabras) if (palabrasClave.has(w)) mem.aprendidas.add(w);
