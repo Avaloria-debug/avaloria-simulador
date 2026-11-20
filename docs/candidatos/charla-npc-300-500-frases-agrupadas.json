@@ -1,0 +1,373 @@
+{
+  "generado": "2026-11-20T22:45:55.843Z",
+  "fuente": [
+    "20261120-193218-300",
+    "20261120-193756-400",
+    "20261120-194300-400",
+    "20261120-194310-400",
+    "20261120-222945-400",
+    "20261120-224407-400",
+    "20261120-224440-500"
+  ],
+  "excluidas": {
+    "yaEnCandidatos": 94,
+    "salidaRotaJugadorIa": 58
+  },
+  "resumen": {
+    "entradas": 17,
+    "yaConocidas": 0,
+    "candidatos": 17,
+    "apariciones": 17,
+    "marcadas": 0,
+    "conjugacionDudosa": 0,
+    "revisar": 0,
+    "porIntencion": {
+      "(sin intención)": 17
+    }
+  },
+  "candidatos": {
+    "(sin intención)": [
+      {
+        "id": "c0001",
+        "frase": "Acercome a Serel Norlen, le saludo con una sonrisa y le digo: «Che, vi que tenés la espada rota. ¿Te doy una mano a repararla mientras te compro un pan fresco y un poco de queso?».",
+        "normalizada": "acercome a serel norlen le saludo con una sonrisa y le digo che vi que tenes la espada rota te doy una mano a repararla mientras te compro un pan fresco y un poco de queso",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_comprar",
+        "motorRegla": "objeto_ambiguo",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-224407-400"
+        ],
+        "perfiles": [
+          "amable"
+        ],
+        "ejemplos": [
+          "Acercome a Serel Norlen, le saludo con una sonrisa y le digo: «Che, vi que tenés la espada rota. ¿Te doy una mano a repararla mientras te compro un pan fresco y un poco de queso?»."
+        ]
+      },
+      {
+        "id": "c0002",
+        "frase": "Che, ¿querés que vaya a la molinería a confirmar el pedido y dejar el pago?",
+        "normalizada": "che queres que vaya a la molineria a confirmar el pedido y dejar el pago",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_comprar",
+        "motorRegla": "falta_objeto",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-193756-400"
+        ],
+        "perfiles": [
+          "amable"
+        ],
+        "ejemplos": [
+          "Che, ¿querés que vaya a la molinería a confirmar el pedido y dejar el pago?"
+        ]
+      },
+      {
+        "id": "c0003",
+        "frase": "consulto el pliego de precios de la panadería para ver si puedo conseguirle a Serel un mejor trato.",
+        "normalizada": "consulto el pliego de precios de la panaderia para ver si puedo conseguirle a serel un mejor trato",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-193756-400"
+        ],
+        "perfiles": [
+          "amable"
+        ],
+        "ejemplos": [
+          "consulto el pliego de precios de la panadería para ver si puedo conseguirle a Serel un mejor trato."
+        ]
+      },
+      {
+        "id": "c0004",
+        "frase": "Me compro el pan fresco y el queso curado.",
+        "normalizada": "me compro el pan fresco y el queso curado",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_comprar",
+        "motorRegla": "objeto_ambiguo",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-194310-400"
+        ],
+        "perfiles": [
+          "directo"
+        ],
+        "ejemplos": [
+          "Me compro el pan fresco y el queso curado."
+        ]
+      },
+      {
+        "id": "c0005",
+        "frase": "Me llevo un pan fresco y un trozo de queso curado, por favor.",
+        "normalizada": "me llevo un pan fresco y un trozo de queso curado por favor",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_comprar",
+        "motorRegla": "objeto_ambiguo",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-224440-500"
+        ],
+        "perfiles": [
+          "amable"
+        ],
+        "ejemplos": [
+          "Me llevo un pan fresco y un trozo de queso curado, por favor."
+        ]
+      },
+      {
+        "id": "c0006",
+        "frase": "Me quedo cerca por si surge algo y sigo mirando los puestos.",
+        "normalizada": "me quedo cerca por si surge algo y sigo mirando los puestos",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-194310-400"
+        ],
+        "perfiles": [
+          "amable"
+        ],
+        "ejemplos": [
+          "Me quedo cerca por si surge algo y sigo mirando los puestos."
+        ]
+      },
+      {
+        "id": "c0007",
+        "frase": "Serel, pasame el pliego de precios, por favor.",
+        "normalizada": "serel pasame el pliego de precios por favor",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-193756-400"
+        ],
+        "perfiles": [
+          "directo"
+        ],
+        "ejemplos": [
+          "Serel, pasame el pliego de precios, por favor."
+        ]
+      },
+      {
+        "id": "c0008",
+        "frase": "Tomo el pan fresco y el queso curado, y le paso la plata a Serel.",
+        "normalizada": "tomo el pan fresco y el queso curado y le paso la plata a serel",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-222945-400"
+        ],
+        "perfiles": [
+          "directo"
+        ],
+        "ejemplos": [
+          "Tomo el pan fresco y el queso curado, y le paso la plata a Serel."
+        ]
+      },
+      {
+        "id": "c0009",
+        "frase": "viajar a donde está Sarin Tolle",
+        "normalizada": "viajar a donde esta sarin tolle",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-224440-500"
+        ],
+        "perfiles": [
+          "seguidor_pistas"
+        ],
+        "ejemplos": [
+          "viajar a donde está Sarin Tolle"
+        ]
+      },
+      {
+        "id": "c0010",
+        "frase": "viajar a Elia Miren",
+        "normalizada": "viajar a elia miren",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-224440-500"
+        ],
+        "perfiles": [
+          "seguidor_pistas"
+        ],
+        "ejemplos": [
+          "viajar a Elia Miren"
+        ]
+      },
+      {
+        "id": "c0011",
+        "frase": "Viajo a Ysolde Varn para buscarla y preguntarle.",
+        "normalizada": "viajo a ysolde varn para buscarla y preguntarle",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-224440-500"
+        ],
+        "perfiles": [
+          "seguidor_pistas"
+        ],
+        "ejemplos": [
+          "Viajo a Ysolde Varn para buscarla y preguntarle."
+        ]
+      },
+      {
+        "id": "c0012",
+        "frase": "Viajo al puesto de la panadería y compro pan fresco.",
+        "normalizada": "viajo al puesto de la panaderia y compro pan fresco",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-194310-400"
+        ],
+        "perfiles": [
+          "directo"
+        ],
+        "ejemplos": [
+          "Viajo al puesto de la panadería y compro pan fresco."
+        ]
+      },
+      {
+        "id": "c0013",
+        "frase": "Viajo al puesto de Serel Norlen y le pregunto si necesita ayuda.",
+        "normalizada": "viajo al puesto de serel norlen y le pregunto si necesita ayuda",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-224440-500"
+        ],
+        "perfiles": [
+          "seguidor_pistas"
+        ],
+        "ejemplos": [
+          "Viajo al puesto de Serel Norlen y le pregunto si necesita ayuda."
+        ]
+      },
+      {
+        "id": "c0014",
+        "frase": "Viajo hacia Maren de Orst, la saludo y le pregunto en qué puedo ayudarla.",
+        "normalizada": "viajo hacia maren de orst la saludo y le pregunto en que puedo ayudarla",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-224407-400"
+        ],
+        "perfiles": [
+          "seguidor_pistas"
+        ],
+        "ejemplos": [
+          "Viajo hacia Maren de Orst, la saludo y le pregunto en qué puedo ayudarla."
+        ]
+      },
+      {
+        "id": "c0015",
+        "frase": "Viajo hacia Sarin Tolle y le pregunto qué necesita.",
+        "normalizada": "viajo hacia sarin tolle y le pregunto que necesita",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-224440-500"
+        ],
+        "perfiles": [
+          "seguidor_pistas"
+        ],
+        "ejemplos": [
+          "Viajo hacia Sarin Tolle y le pregunto qué necesita."
+        ]
+      },
+      {
+        "id": "c0016",
+        "frase": "Voy a Brenn Holt y le hablo.",
+        "normalizada": "voy a brenn holt y le hablo",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-224440-500"
+        ],
+        "perfiles": [
+          "seguidor_pistas"
+        ],
+        "ejemplos": [
+          "Voy a Brenn Holt y le hablo."
+        ]
+      },
+      {
+        "id": "c0017",
+        "frase": "Voy hacia Maren de Orst y le pregunto qué necesita.",
+        "normalizada": "voy hacia maren de orst y le pregunto que necesita",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-224407-400"
+        ],
+        "perfiles": [
+          "seguidor_pistas"
+        ],
+        "ejemplos": [
+          "Voy hacia Maren de Orst y le pregunto qué necesita."
+        ]
+      }
+    ]
+  },
+  "marcadas": []
+}

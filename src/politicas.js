@@ -20,7 +20,7 @@ export const politicas = { aleatoria };
 // ---- F2: política por perfil ----
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { verbos, intencionDeVerbo, escenas, conocimientos, palabrasClave } from './adaptador.js';
+import { verbos, intencionDeVerbo, escenas, conocimientos, palabrasClave, leerPistaCamino } from './adaptador.js';
 
 const leerConfig = (n) => JSON.parse(fs.readFileSync(fileURLToPath(new URL(`../config/${n}`, import.meta.url)), 'utf8'));
 export const FRASES_PRIMERIZO = leerConfig('frases-primerizo.json');
@@ -123,6 +123,24 @@ export function pesosDelTurno(perfil, d, mem) {
       break;
     }
     case 'seguir_pistas':
+      // Fuente "narracion": solo sigue la pista de camino leída en el texto narrado; no mira el estado del caso.
+      if (perfil.objetivo.fuente === 'narracion') {
+        const pista = mem.pistaCamino;
+        if (!pista) break;
+        if (d.escena === pista.escena) {
+          const temas = conocimientos.filter((k) => k.npcId === pista.npcId).flatMap((k) => k.palabrasClave);
+          if (d.npcs.some((n) => n.id === pista.npcId)) {
+            pref.npcId = pista.npcId;
+            if (temas.length) pref.temas = temas;
+          }
+          por('consulta_tema'); por('hablar_con'); por('ayudar');
+        } else {
+          const paso = siguientePaso(d.escena, [pista.escena]);
+          if (paso && d.destinos.includes(paso)) { por('viajar'); pref.destino = [paso]; }
+        }
+        break;
+      }
+    // falls through
     case 'desenlace_directo': {
       const metas = perfil.objetivo.tipo === 'seguir_pistas'
         ? [...d.escenasPendientes, ...d.pistas.filter((p) => !p.revelado && p.escena).map((p) => p.escena)]
@@ -199,7 +217,7 @@ const claveAccion = (e) => `${e.intencion}|${JSON.stringify(e.parametros ?? {})}
 
 // Política con memoria para un run. `elegir(sim, rng, ctx)` y `observar(entrada, resultado)`.
 export function crearPoliticaPerfil(perfil) {
-  const mem = { visitadas: new Set(), preguntadas: new Set(), aprendidas: new Set(), ultimas: [], ultimoFallo: null };
+  const mem = { visitadas: new Set(), preguntadas: new Set(), aprendidas: new Set(), ultimas: [], ultimoFallo: null, pistaCamino: null };
   return {
     elegir(sim, rng, { turno }) {
       const d = sim.detalle();
@@ -241,6 +259,7 @@ export function crearPoliticaPerfil(perfil) {
       mem.ultimas.push(claveAccion(entrada));
       if (mem.ultimas.length > 3) mem.ultimas.shift();
       mem.ultimoFallo = FALLOS.has(r.resultado) && entrada.verbo ? entrada.verbo : null;
+      if (perfil.objetivo.fuente === 'narracion') mem.pistaCamino = leerPistaCamino(r.texto) ?? mem.pistaCamino;
       if (perfil.aprendeDeRespuestas && typeof r.texto === 'string') {
         const palabras = r.texto.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').split(/[^a-zñ]+/);
         for (const w of palabras) if (palabrasClave.has(w)) mem.aprendidas.add(w);
