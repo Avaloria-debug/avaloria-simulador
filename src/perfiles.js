@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { verbos } from './adaptador.js';
 
 export const DIR_PERFILES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'config', 'perfiles');
-export const OBJETIVOS = ['ninguno', 'agotar_conocimientos', 'visitar_todas_las_escenas', 'seguir_pistas', 'desenlace_directo', 'reparar_relaciones'];
+export const OBJETIVOS = ['ninguno', 'agotar_conocimientos', 'visitar_todas_las_escenas', 'seguir_pistas', 'buscar_dueno_p1', 'desenlace_directo', 'reparar_relaciones'];
 export const PERFIL_POR_DEFECTO = 'aleatorio';
 
 const esNum = (v) => typeof v === 'number' && Number.isFinite(v);
@@ -26,7 +26,8 @@ export function validarPerfil(p, archivo = '(perfil)') {
   if (!OBJETIVOS.includes(objetivo.tipo)) falla('objetivo.tipo', `desconocido "${objetivo.tipo}"`);
   if (objetivo.sesgo !== undefined && (!esNum(objetivo.sesgo) || objetivo.sesgo < 0)) falla('objetivo.sesgo', 'número >= 0');
   if (objetivo.fuente !== undefined && !['estado', 'narracion'].includes(objetivo.fuente)) falla('objetivo.fuente', 'estado o narracion');
-  if (objetivo.fuente === 'narracion' && objetivo.tipo !== 'seguir_pistas') falla('objetivo.fuente', 'narracion solo con seguir_pistas');
+  if (objetivo.fuente === 'narracion' && !['seguir_pistas', 'buscar_dueno_p1'].includes(objetivo.tipo)) falla('objetivo.fuente', 'narracion solo con seguir_pistas o buscar_dueno_p1');
+  if (objetivo.tipo === 'buscar_dueno_p1' && objetivo.fuente !== 'narracion') falla('objetivo.fuente', 'buscar_dueno_p1 pide fuente narracion');
   const entrada = { pBoton: 0.5, pGenerico: 0, genericoHastaTurno: 0, ...(p.entrada ?? {}) };
   for (const k of ['pBoton', 'pGenerico']) if (!esProb(entrada[k])) falla(`entrada.${k}`, 'probabilidad fuera de 0..1');
   if (!Number.isInteger(entrada.genericoHastaTurno) || entrada.genericoHastaTurno < 0) falla('entrada.genericoHastaTurno', 'entero >= 0');

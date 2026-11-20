@@ -185,3 +185,17 @@ El h1 de cada caso pide la pista del NPC de la ranura p1 (Brenn, Sarin, Ysolde o
 - Tomás aprobó la [PR #10 del narrador](https://github.com/Avaloria-debug/Avaloria-narrador/pull/10) con umbral 0 (`UMBRAL_PRIMER_CONTACTO_PISTA = 0`). Se mergeó a main del narrador: `0a9b9158ff91d74b455c493416084cdb3858ef99`, VERSION 0.0.41, `npm test` en verde (1753 tests).
 - Simulador: narrador fijado a `0a9b9158ff91d74b455c493416084cdb3858ef99` (reemplaza el sha de la rama de la PR, `313a175`). El lock solo cambia el narrador; la versión del simulador sigue en 0.5.5. El sha de main del simulador queda en el merge de la PR que trae este cambio.
 - Pendiente del simulador: el lote 700 no ejercitó el umbral reducido. Para medirlo, la política de `seguidor_pistas` tiene que buscar al dueño de p1 donde esté (los NPC se mueven por horario, la escena de la pista puede quedar vieja) y preguntarle con una palabra clave de su `_1`. Sin implementar.
+
+## Buscar al dueño de p1 (2026-11-20, rama claude/perfil-busca-dueno-p1)
+- Implementado (decisión de Opus en nombre de Tomás; el motivo está en SUPUESTOS):
+  - El adaptador expone, de solo lectura, `detalle().posicionesNpcs` (escena de cada NPC en el turno) y `palabrasClaveDel1(npcId)`.
+  - La política suma el modo `buscar_dueno_p1`: con la pista narrada viaja a donde está ese NPC en ese turno. Ya con él, le hace una consulta por texto, nombrándolo, con una palabra clave de su `_1`, una sola vez; después sigue como `seguir_pistas`.
+  - Perfil gemelo `seguidor_pistas_dueno`, para no cambiar el esperado de los tests de `seguidor_pistas`.
+  - Tests en `tests/buscar-dueno.test.js`.
+- Medido (lote `20261120-234103-800`, 15 runs, 22 llamadas IA; detalle en `docs/charla-npc/lote-800/buscar-dueno.md`):
+  - Pistas narradas 1 (en el turno 14), seguidas 0.
+  - Consultas al dueño de p1 después de la pista: 0.
+  - h1 en 4 runs, `_1` en 2, `_2` en 0.
+  - Contra el lote 700: consultas al dueño 0 y 0; `_1` 0 y 2; `_2` 0 y 0.
+- **El umbral 0 no se ejerció en juego simulado.** La pista se narra tarde (turnos 9 a 14) para una trabada de 15. Pregunta para Tomás: ¿se mide con `--trabada 25` solo para este caso? Sería un lote chico; el costo de subir `--trabada` ya está medido.
+- Contador IA del día: 587 de 800.

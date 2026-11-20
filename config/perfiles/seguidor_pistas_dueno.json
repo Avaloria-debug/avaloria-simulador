@@ -1,0 +1,36 @@
+{
+  "id": "seguidor_pistas_dueno",
+  "nombre": "Seguidor de pistas (busca al dueño)",
+  "descripcion": "Como el seguidor de pistas, pero busca al NPC nombrado donde esté en ese momento y le pregunta por lo primero que sabe.",
+  "pesos": {
+    "viajar": 30,
+    "consulta_tema": 25,
+    "hablar_con": 20,
+    "ayudar": 15,
+    "examinar": 10
+  },
+  "objetivo": {
+    "tipo": "buscar_dueno_p1",
+    "fuente": "narracion",
+    "sesgo": 3
+  },
+  "entrada": {
+    "pBoton": 0.2,
+    "pGenerico": 0,
+    "genericoHastaTurno": 0
+  },
+  "ruido": {
+    "typos": 0.02,
+    "mayusculas": 0,
+    "incompletas": 0,
+    "nombraNpc": 0.8,
+    "adversarial": 0
+  },
+  "paciencia": 12,
+  "repiteSiFalla": 0.2,
+  "aprendeDeRespuestas": false,
+  "evolucion": null,
+  "ia": {
+    "p": 0.1
+  }
+}
