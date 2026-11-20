@@ -180,3 +180,8 @@ El h1 de cada caso pide la pista del NPC de la ranura p1 (Brenn, Sarin, Ysolde o
   - seguidor_pistas: pistas seguidas 2 de 3 en los dos lotes; h1 de 4 a 3; runs con `_1` de 1 a 0; runs con `_2` de 2 a 0.
   - amable: h1 0 en los dos; `_1` de 3 a 7 y `_2` de 2 a 7, por variación entre seeds y no por el cambio.
 - El umbral reducido no se activó en ningún run: ninguna consulta con tema llegó al dueño de p1 después de la pista. El cambio no queda probado ni refutado; la medición no lo ejercitó. 37 llamadas IA (contador del día: 565 de 800).
+
+## Umbral de primer contacto aprobado y en main (2026-11-20)
+- Tomás aprobó la [PR #10 del narrador](https://github.com/Avaloria-debug/Avaloria-narrador/pull/10) con umbral 0 (`UMBRAL_PRIMER_CONTACTO_PISTA = 0`). Se mergeó a main del narrador: `0a9b9158ff91d74b455c493416084cdb3858ef99`, VERSION 0.0.41, `npm test` en verde (1753 tests).
+- Simulador: narrador fijado a `0a9b9158ff91d74b455c493416084cdb3858ef99` (reemplaza el sha de la rama de la PR, `313a175`). El lock solo cambia el narrador; la versión del simulador sigue en 0.5.5. El sha de main del simulador queda en el merge de la PR que trae este cambio.
+- Pendiente del simulador: el lote 700 no ejercitó el umbral reducido. Para medirlo, la política de `seguidor_pistas` tiene que buscar al dueño de p1 donde esté (los NPC se mueven por horario, la escena de la pista puede quedar vieja) y preguntarle con una palabra clave de su `_1`. Sin implementar.
