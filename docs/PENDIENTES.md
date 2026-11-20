@@ -109,3 +109,19 @@ El h1 de cada caso pide la pista del NPC de la ranura p1 (Brenn, Sarin, Ysolde o
 - **a) El juego indica el camino** (una pista visible cerca del primer hito). Costo para el simulador: un perfil o una política nueva que siga pistas (leer la pista, viajar a la escena indicada, construir relación con ese NPC) y un lote para medir cuántos runs llegan al h1. Requiere el cambio de contenido en el narrador, aprobado por Tomás.
 - **b) El juego no cambia.** Costo para el simulador: ninguno. Se prueban los perfiles tal cual, y el resultado esperado es que los perfiles de charla sigan cortando por trabada sin h1, salvo el caso_03 con investigador o directo.
 - No se implementó ninguna de las dos.
+
+## Pista de camino a p1: medición con la PR del narrador (2026-11-20)
+- Narrador en la rama `fix/pista-camino-p1` (sha `719ba5d`, VERSION 0.0.40, [PR #9](https://github.com/Avaloria-debug/Avaloria-narrador/pull/9), sin mergear). La dependencia apunta a ese sha solo para medir; esta rama no se mergea a main hasta que la PR #9 esté aprobada y mergeada. En ese momento hay que pasar el sha a main del narrador y verificar con instalación limpia.
+- Lote `20261120-222945-400`: amable:5, directo:5, modo `ia`, jugador IA, seed-base 400, tope de 60 llamadas. Comparación con el lote sin la pista (`20261120-194300-400`):
+
+| | Sin pista (0.0.39) | Con pista (0.0.40) |
+|---|---|---|
+| Pistas de camino narradas | — | 5 (los 5 amable, turnos 10 a 14; 0 en directo) |
+| Runs con h1 | 0 | 0 |
+| Runs con conocimiento revelado | 7 | 5 |
+| Llamadas IA | 20 | 20 |
+
+- Ejemplo (r0002-s402, turno 11): "Alguien comenta al pasar que Hollis Dren anda por Camino del sur. Tal vez valga la pena ir hasta allá."
+- **La pista no alcanza para el h1 con los perfiles actuales.** La causa es la del diagnóstico (`docs/charla-npc/diagnostico-trabada.md`): los perfiles no van hacia el NPC de p1. amable sigue con Serel en el Mercado aunque la narración nombre el lugar, porque las políticas del simulador eligen por pesos y no leen la narración. Además, la pista llega en los turnos 10 a 14 y la trabada corta en el 15, así que queda poco margen para viajar. En directo no apareció: se mueve de escena y no llega a 8 turnos de caso seguidos fuera de la escena del dueño, o el caso todavía no arrancó.
+- No se corrió el lote de 30 (seed-base 500), porque estaba condicionado a que hubiera hitos h1.
+- Para medir la opción A completa falta, en el simulador, un perfil o política que siga pistas (leer la narración, viajar a la escena nombrada, construir relación con ese NPC). Queda pendiente de decisión.
