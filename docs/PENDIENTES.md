@@ -149,7 +149,7 @@ El h1 de cada caso pide la pista del NPC de la ranura p1 (Brenn, Sarin, Ysolde o
 - Se armó `config/perfiles/seguidor_relacional.json`: sigue la pista narrada y, al llegar, hace 2 favores (ayudar o calmar) al NPC antes de consultar. El motivo está en SUPUESTOS.
 - Medición (lote `20261120-225453-600`, 10 runs por perfil, 50 llamadas IA; detalle en `docs/charla-npc/lote-600/comparacion-perfiles.md`):
   - seguidor_relacional: 0 pistas seguidas, h1 en 1 run, _1 en 2, _2 en 2.
-  - seguidor_pistas: 2 pistas seguidas, h1 en 4, _1 en 1, _2 en 2.
+  - seguidor_pistas: 2 de 3 pistas seguidas (corregido: eran 3 narradas, no 4), h1 en 4, _1 en 1, _2 en 2.
   - amable: 0 pistas seguidas, h1 en 0, _1 en 3, _2 en 2.
 - Resultado: seguidor_relacional **no mejora** a seguidor_pistas ni en h1 ni en runs con conocimiento revelado. La pista se narra entre los turnos 9 y 12 y la trabada corta en el 15; con menos viaje y más favores, el perfil no llega a tiempo.
 - Para Tomás: conservar, ajustar (más peso de viaje o 1 favor) o quitar el perfil. Medirlo con `--trabada 25` daría margen para llegar, pero subir `--trabada` ya mostró costo en la medición anterior. No se lanzó nada más (contador del día: 528 de 800).
@@ -166,7 +166,7 @@ El h1 de cada caso pide la pista del NPC de la ranura p1 (Brenn, Sarin, Ysolde o
 - No es solo un efecto del número de consultas, así que no queda como hallazgo puro de pesos. Ya se probó en el lote 600 un perfil que construye relación antes de consultar, y no mejoró en el margen de 15 turnos de la trabada. El perfil ya se quitó.
 
 ## Estado de la etapa de perfiles (2026-11-20)
-- Quedan: los 13 perfiles de F2 y `seguidor_pistas` (sigue la pista de camino leída en la narración; en los lotes 400, 500 y 600 la siguió 5 de 7 veces que apareció, y las 2 restantes las cortó la trabada). El test de perfiles exige que estén los 13 de F2, sin cantidad exacta.
+- Quedan: los 13 perfiles de F2 y `seguidor_pistas` (sigue la pista de camino leída en la narración; en los lotes 400, 500 y 600 la siguió 5 de 6 veces que apareció; la restante la cortó la trabada). El test de perfiles exige que estén los 13 de F2, sin cantidad exacta.
 - Se quitó: `seguidor_relacional` (y el modo `objetivo.alLlegar`), porque no mejoró en el lote 600.
 - Se agregó: `validarFrase` descarta frases del jugador IA que empiezan con un token del catálogo, y el adaptador expone `relaciones()` (solo lectura, para análisis).
 - Preguntas abiertas para Tomás (decisiones de diseño del juego):

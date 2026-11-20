@@ -5,7 +5,7 @@ Lote `20261120-225453-600`: `--perfiles seguidor_relacional:10,seguidor_pistas:1
 | Perfil | Runs | Pista narrada | Pista seguida (llegó a la escena) | h1 | Conocimiento _1 revelado | Conocimiento _2 revelado | Algún conocimiento |
 |---|---|---|---|---|---|---|---|
 | seguidor_relacional | 10 | 3 | 0 | 1 | 2 | 2 | 2 |
-| seguidor_pistas | 10 | 4 | 2 | 4 | 1 | 2 | 3 |
+| seguidor_pistas | 10 | 3 | 2 | 4 | 1 | 2 | 3 |
 | amable | 10 | 10 | 0 | 0 | 3 | 2 | 4 |
 
 ## Resultado según el criterio
