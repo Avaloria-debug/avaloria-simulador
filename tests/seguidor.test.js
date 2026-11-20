@@ -75,3 +75,18 @@ test('en la escena de la pista busca al NPC: consulta, habla o ayuda con él', (
   assert.equal(pesos.ayudar, 45);
   assert.equal(pref.destino, null);
 });
+
+test('no adivina la escena: sin pista en el texto, el estado del caso no cambia ninguna elección', () => {
+  const conEstado = detalle(MERCADO, { pistas: [{ conocimientoId: 'conocimiento_sendero_sin_vigilancia', npcId: 'hollis_pastor', escena: 'escena_camino_sur', revelado: false }], escenasPendientes: ['escena_camino_sur'], tagsCaso: [{ tipo: 'pista_conocida', objetivo: 'conocimiento_sendero_sin_vigilancia', nivel: 1 }] });
+  const jugar = (d) => {
+    const pol = crearPoliticaPerfil(perfil());
+    pol.observar({ tipo: 'boton', intencion: 'intencion_ayudar', verbo: 'ayudar' }, { resultado: 'ejecuta', texto: 'Le das una mano a Serel Norlen y te lo agradece.' });
+    const rng = mulberry32(11);
+    return Array.from({ length: 60 }, (_, i) => pol.elegir(sim(d), rng, { turno: i + 1 }));
+  };
+  const con = jugar(conEstado);
+  assert.deepEqual(con, jugar(detalle()));
+  const mem = { visitadas: new Set(), preguntadas: new Set(), aprendidas: new Set(), ultimas: [], ultimoFallo: null, pistaCamino: null };
+  assert.equal(pesosDelTurno(perfil(), conEstado, mem).pref.destino, null);
+  assert.equal(pesosDelTurno(perfil(), conEstado, mem).pesos.viajar, 30, 'sin sesgo de viaje');
+});

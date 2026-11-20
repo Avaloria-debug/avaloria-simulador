@@ -16,7 +16,7 @@ const base = () => JSON.parse(fs.readFileSync(new URL('../config/perfiles/curios
 
 test('carga los 13 perfiles', () => {
   const p = cargarPerfiles();
-  assert.equal(p.size, 13);
+  // Contiene al menos los 13 de F2; se pueden agregar perfiles (decisión de Tomás, 2026-11-20).
   for (const id of ['curioso', 'aventurero', 'investigador', 'comerciante', 'amable', 'agresivo', 'sigiloso', 'pasivo', 'directo', 'torpe', 'adversarial', 'primerizo', 'aleatorio']) assert.ok(p.has(id), id);
 });
 
