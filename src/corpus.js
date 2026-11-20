@@ -98,15 +98,30 @@ const ARRANQUES = new Set(['che', 'bueno', 'ok', 'dale', 'listo', 'ahora', 'ento
 const CLITICOS = new Set(['me', 'te', 'le', 'les', 'lo', 'la', 'los', 'las', 'se', 'nos']);
 const NO_VERBO_O = new Set(['como', 'pero', 'todo', 'algo', 'eso', 'esto', 'aquello', 'cuanto', 'tanto', 'mucho', 'poco', 'nuestro', 'vuestro', 'otro', 'mismo', 'luego', 'cuando', 'donde', 'adonde', 'medio', 'centro', 'libro', 'mercado', 'puerto', 'pueblo', 'camino', 'grupo', 'nuevo', 'viejo', 'cerro', 'barco', 'cielo', 'suelo', 'palo', 'tipo', 'caso', 'lado', 'cuarto', 'segundo', 'tercero', 'ultimo', 'último', 'ojo', 'banco', 'templo', 'precio', 'dinero', 'oro', 'puesto', 'sello', 'archivo', 'no', 'hmm']);
 const IRREGULARES = new Set(['voy', 'doy', 'estoy', 'soy']);
-export function esPrimeraPersonaAccion(frase) {
+// Palabra en posición de verbo: la primera después de un vocativo ("Maren,"), muletillas y un pronombre átono.
+export function palabraDeVerbo(frase) {
   const t = String(frase).replace(/^\s*[A-ZÁÉÍÓÚÑ][\wáéíóúñ]*(\s+[A-ZÁÉÍÓÚÑ][\wáéíóúñ]*)?\s*,/, '');
   const ws = palabras(t);
   let i = 0;
   while (i < ws.length && ARRANQUES.has(ws[i])) i++;
   if (i < ws.length && CLITICOS.has(ws[i])) i++;
-  const w = ws[i];
+  return ws[i] ?? null;
+}
+
+export function esPrimeraPersonaAccion(frase) {
+  const w = palabraDeVerbo(frase);
   if (!w) return false;
   return IRREGULARES.has(w) || (w.length >= 3 && /o$/.test(w) && !NO_VERBO_O.has(w));
+}
+
+// Conjugación dudosa: el verbo en primera persona lleva tilde donde no va.
+// Presente regular de primera persona: termina en -o sin tilde, salvo í/ú justo antes de la -o (envío, actúo).
+// Se marca si termina en -ó ("avanzó") o si lleva á/é/ó en cualquier lugar ("leéo").
+export function conjugacionDudosa(frase) {
+  const w = palabraDeVerbo(frase);
+  if (!w || w.length < 3 || NO_VERBO_O.has(w)) return false;
+  if (/ó$/.test(w)) return true;
+  return /o$/.test(w) && /[áéó]/.test(w);
 }
 
 export function tipoFrase(frase) {

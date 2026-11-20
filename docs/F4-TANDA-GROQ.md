@@ -149,3 +149,52 @@ Observaciones:
 - f00148: "leo un libro … que habla de …" se va a hablar_con por la palabra "habla". Es candidato para el narrador.
 - f00185: "defiendo" reformula; el motor no reconoce la primera persona de defender.
 - Total del día contra Groq: 50 llamadas y 50.024 tokens.
+
+---
+
+# Frases agrupadas para revisión (2026-11-20)
+
+Archivo: `docs/candidatos/F4-frases-agrupadas.json`, con una copia en `simulaciones/f4-consolidado/candidatos/`. Se genera con `node scripts/consolidar-f4.js`, sin llamar a la IA. **Todo queda `pendiente`; no se aprobó nada.**
+
+Fuente: frases que el motor no entendió o reformuló en las tres tandas válidas:
+- 1.ª tanda: las 29.
+- 2.ª tanda: las 24 con voseo según el criterio de esa tanda.
+- 3.ª tanda: las 37 válidas más 4 no entendidas de frases `no_valida` que el reporte no había listado.
+- La corrida cortada (`20261120-061905-1-corpus`) no entra.
+
+| Paso | Cantidad |
+|---|---|
+| Frases de entrada | 94 |
+| Ya eran forma del narrador (normalizador del narrador) | 0 |
+| Marcadas fuera del lote | 2: 1 `conjugacion_dudosa` ("abortó la compra, mejor no"), 1 `revisar` ("leё el pergamino…", con una "ё" cirílica) |
+| **Candidatos (después de dedupe)** | **91** (92 apariciones; solo "comprar queso curado y pan fresco" se repite, ×2) |
+
+Tipo de validación de los 91 candidatos: 39 `primera_persona_accion`, 31 `voseo_dialogo`, 21 `no_valida` (casi todas infinitivos, de la 1.ª tanda o de las 4 agregadas).
+
+| Intención objetivo | Candidatos | Apariciones |
+|---|---|---|
+| intencion_retirarse | 11 | 11 |
+| intencion_viajar | 11 | 11 |
+| intencion_examinar | 9 | 9 |
+| intencion_hablar_con | 9 | 9 |
+| consulta_tema | 7 | 7 |
+| intencion_comprar | 6 | 7 |
+| intencion_distraer | 6 | 6 |
+| intencion_observar | 6 | 6 |
+| intencion_avanzar_cautela | 4 | 4 |
+| intencion_explorar | 4 | 4 |
+| intencion_negociar | 4 | 4 |
+| intencion_leer | 3 | 3 |
+| intencion_abortar | 2 | 2 |
+| intencion_defender | 2 | 2 |
+| intencion_rendirse | 2 | 2 |
+| intencion_usar | 2 | 2 |
+| intencion_atacar | 1 | 1 |
+| intencion_ayudar | 1 | 1 |
+| intencion_huir | 1 | 1 |
+
+Para la revisión (observaciones, no decisiones):
+- La frase "mirá, Maren, tenés que ayudarme con esto" es uno de los ejemplos fijos del prompt: el modelo la copió textual. Conviene descartarla.
+- Muchas `voseo_dialogo` de viajar y explorar son órdenes del tipo "andá a buscar…" dirigidas a otro personaje; el motor las manda a viajar con `falta_destino`.
+- Hay typos del perfil torpe que conviene revisar uno por uno ("Exameno", "Huuyo", "abortarr", "renederme").
+- "leéo el libro viejo" no aparece porque el motor la ejecutó (no está entre las no entendidas).

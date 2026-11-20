@@ -1,0 +1,1943 @@
+{
+  "generado": "2026-11-20T06:38:36.394Z",
+  "fuente": [
+    "20261120-061945-1-corpus",
+    "20261120-062635-1-corpus",
+    "20261120-063343-1-corpus"
+  ],
+  "resumen": {
+    "entradas": 94,
+    "yaConocidas": 0,
+    "candidatos": 91,
+    "apariciones": 92,
+    "marcadas": 2,
+    "conjugacionDudosa": 1,
+    "revisar": 1,
+    "porIntencion": {
+      "intencion_retirarse": 11,
+      "intencion_viajar": 11,
+      "intencion_examinar": 9,
+      "intencion_hablar_con": 9,
+      "consulta_tema": 7,
+      "intencion_comprar": 6,
+      "intencion_distraer": 6,
+      "intencion_observar": 6,
+      "intencion_avanzar_cautela": 4,
+      "intencion_explorar": 4,
+      "intencion_negociar": 4,
+      "intencion_leer": 3,
+      "intencion_abortar": 2,
+      "intencion_defender": 2,
+      "intencion_rendirse": 2,
+      "intencion_usar": 2,
+      "intencion_atacar": 1,
+      "intencion_ayudar": 1,
+      "intencion_huir": 1
+    }
+  },
+  "candidatos": {
+    "intencion_retirarse": [
+      {
+        "id": "c0001",
+        "frase": "me retiro a la biblioteca para pensar mejor",
+        "normalizada": "me retiro a la biblioteca para pensar mejor",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_retirarse",
+        "motorIntencion": "intencion_retirarse",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "me retiro a la biblioteca para pensar mejor"
+        ]
+      },
+      {
+        "id": "c0002",
+        "frase": "me retiro a la sombra",
+        "normalizada": "me retiro a la sombra",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_retirarse",
+        "motorIntencion": "intencion_retirarse",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "me retiro a la sombra"
+        ]
+      },
+      {
+        "id": "c0003",
+        "frase": "me retiro al salón principal para repasar lo visto",
+        "normalizada": "me retiro al salon principal para repasar lo visto",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_retirarse",
+        "motorIntencion": "intencion_retirarse",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "me retiro al salón principal para repasar lo visto"
+        ]
+      },
+      {
+        "id": "c0004",
+        "frase": "Me retiro del grupo, necesito pensar solo",
+        "normalizada": "me retiro del grupo necesito pensar solo",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_retirarse",
+        "motorIntencion": "intencion_retirarse",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "Me retiro del grupo, necesito pensar solo"
+        ]
+      },
+      {
+        "id": "c0005",
+        "frase": "me retiro del puesto de la espadita rota, no me interesa",
+        "normalizada": "me retiro del puesto de la espadita rota no me interesa",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_retirarse",
+        "motorIntencion": "intencion_retirarse",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "me retiro del puesto de la espadita rota, no me interesa"
+        ]
+      },
+      {
+        "id": "c0006",
+        "frase": "Me retiro un poco para no molestar a los demas",
+        "normalizada": "me retiro un poco para no molestar a los demas",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_retirarse",
+        "motorIntencion": "intencion_retirarse",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "Me retiro un poco para no molestar a los demas"
+        ]
+      },
+      {
+        "id": "c0007",
+        "frase": "retirarme al campamento para revisar el mapa",
+        "normalizada": "retirarme al campamento para revisar el mapa",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_retirarse",
+        "motorIntencion": "intencion_retirarse",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "retirarme al campamento para revisar el mapa"
+        ]
+      },
+      {
+        "id": "c0008",
+        "frase": "retirarme al final del pasillo para observar mejor",
+        "normalizada": "retirarme al final del pasillo para observar mejor",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_retirarse",
+        "motorIntencion": "intencion_retirarse",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "retirarme al final del pasillo para observar mejor"
+        ]
+      },
+      {
+        "id": "c0009",
+        "frase": "retirarme al refugio cuando la tormenta llega",
+        "normalizada": "retirarme al refugio cuando la tormenta llega",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_retirarse",
+        "motorIntencion": "intencion_retirarse",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "retirarme al refugio cuando la tormenta llega"
+        ]
+      },
+      {
+        "id": "c0010",
+        "frase": "retirarse del pasillo si hay peligro",
+        "normalizada": "retirarse del pasillo si hay peligro",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_retirarse",
+        "motorIntencion": "intencion_retirarse",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "retirarse del pasillo si hay peligro"
+        ]
+      },
+      {
+        "id": "c0011",
+        "frase": "retiro del mercado antes del mediodía",
+        "normalizada": "retiro del mercado antes del mediodia",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_retirarse",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "retiro del mercado antes del mediodía"
+        ]
+      }
+    ],
+    "intencion_viajar": [
+      {
+        "id": "c0012",
+        "frase": "andá a buscar al capitán para informarle",
+        "normalizada": "anda a buscar al capitan para informarle",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_viajar",
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "andá a buscar al capitán para informarle"
+        ]
+      },
+      {
+        "id": "c0013",
+        "frase": "andá a buscar una antorcha, la necesito para la noche",
+        "normalizada": "anda a buscar una antorcha la necesito para la noche",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_viajar",
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "andá a buscar una antorcha, la necesito para la noche"
+        ]
+      },
+      {
+        "id": "c0014",
+        "frase": "viajar a la Sala de los Pergaminos",
+        "normalizada": "viajar a la sala de los pergaminos",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_viajar",
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "viajar a la Sala de los Pergaminos"
+        ]
+      },
+      {
+        "id": "c0015",
+        "frase": "viajar al ala norte del archivo",
+        "normalizada": "viajar al ala norte del archivo",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_viajar",
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "viajar al ala norte del archivo"
+        ]
+      },
+      {
+        "id": "c0016",
+        "frase": "Viajar al ala oeste del edificio para buscar más información",
+        "normalizada": "viajar al ala oeste del edificio para buscar mas informacion",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_viajar",
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "Viajar al ala oeste del edificio para buscar más información"
+        ]
+      },
+      {
+        "id": "c0017",
+        "frase": "viajemos al norte del mercado, hay más puestos",
+        "normalizada": "viajemos al norte del mercado hay mas puestos",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_viajar",
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "viajemos al norte del mercado, hay más puestos"
+        ]
+      },
+      {
+        "id": "c0018",
+        "frase": "viajo al ala norte del archivo antes de que llegue la guardia",
+        "normalizada": "viajo al ala norte del archivo antes de que llegue la guardia",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_viajar",
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "viajo al ala norte del archivo antes de que llegue la guardia"
+        ]
+      },
+      {
+        "id": "c0019",
+        "frase": "viajo al norte del mercado",
+        "normalizada": "viajo al norte del mercado",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_viajar",
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "viajo al norte del mercado"
+        ]
+      },
+      {
+        "id": "c0020",
+        "frase": "viajo al norte del mercado para buscar armas",
+        "normalizada": "viajo al norte del mercado para buscar armas",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_viajar",
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "destino_ambiguo",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "viajo al norte del mercado para buscar armas"
+        ]
+      },
+      {
+        "id": "c0021",
+        "frase": "viajo al puesto de la antorcha para ver si hay más",
+        "normalizada": "viajo al puesto de la antorcha para ver si hay mas",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_viajar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "viajo al puesto de la antorcha para ver si hay más"
+        ]
+      },
+      {
+        "id": "c0022",
+        "frase": "viajo al puesto de la panadería antes de que abra",
+        "normalizada": "viajo al puesto de la panaderia antes de que abra",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_viajar",
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "viajo al puesto de la panadería antes de que abra"
+        ]
+      }
+    ],
+    "intencion_examinar": [
+      {
+        "id": "c0023",
+        "frase": "Exameno el suelo, parece que hay huellas frescas",
+        "normalizada": "exameno el suelo parece que hay huellas frescas",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_examinar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "Exameno el suelo, parece que hay huellas frescas"
+        ]
+      },
+      {
+        "id": "c0024",
+        "frase": "fijate bien el sello, parece tener una marca extraña",
+        "normalizada": "fijate bien el sello parece tener una marca extrana",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_examinar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "fijate bien el sello, parece tener una marca extraña"
+        ]
+      },
+      {
+        "id": "c0025",
+        "frase": "fijate el pliego de precios de la panaderia",
+        "normalizada": "fijate el pliego de precios de la panaderia",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_examinar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "fijate el pliego de precios de la panaderia"
+        ]
+      },
+      {
+        "id": "c0026",
+        "frase": "fijate si el mapa tiene alguna anotación extra",
+        "normalizada": "fijate si el mapa tiene alguna anotacion extra",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_examinar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "fijate si el mapa tiene alguna anotación extra"
+        ]
+      },
+      {
+        "id": "c0027",
+        "frase": "fijate si el pliego de precios tiene errores de tipeo",
+        "normalizada": "fijate si el pliego de precios tiene errores de tipeo",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_examinar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "fijate si el pliego de precios tiene errores de tipeo"
+        ]
+      },
+      {
+        "id": "c0028",
+        "frase": "fijate si el queso curado está bueno o está malo",
+        "normalizada": "fijate si el queso curado esta bueno o esta malo",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_examinar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "fijate si el queso curado está bueno o está malo"
+        ]
+      },
+      {
+        "id": "c0029",
+        "frase": "fijate si hay algo raro en el hacha de leñador",
+        "normalizada": "fijate si hay algo raro en el hacha de lenador",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_examinar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "fijate si hay algo raro en el hacha de leñador"
+        ]
+      },
+      {
+        "id": "c0030",
+        "frase": "fijate si la espada rota está aún afilada",
+        "normalizada": "fijate si la espada rota esta aun afilada",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_examinar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "fijate si la espada rota está aún afilada"
+        ]
+      },
+      {
+        "id": "c0031",
+        "frase": "fijate si la espada rota está todavía afilada",
+        "normalizada": "fijate si la espada rota esta todavia afilada",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_examinar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "fijate si la espada rota está todavía afilada"
+        ]
+      }
+    ],
+    "intencion_hablar_con": [
+      {
+        "id": "c0032",
+        "frase": "Brenn, decime si el hacha tiene alguna magia",
+        "normalizada": "brenn decime si el hacha tiene alguna magia",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_hablar_con",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "Brenn, decime si el hacha tiene alguna magia"
+        ]
+      },
+      {
+        "id": "c0033",
+        "frase": "hablar con el guardia de la puerta",
+        "normalizada": "hablar con el guardia de la puerta",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_hablar_con",
+        "motorIntencion": "intencion_hablar_con",
+        "motorRegla": "npc_ausente",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "hablar con el guardia de la puerta"
+        ]
+      },
+      {
+        "id": "c0034",
+        "frase": "hablo con el guardia de turno sobre la seguridad",
+        "normalizada": "hablo con el guardia de turno sobre la seguridad",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_hablar_con",
+        "motorIntencion": "intencion_hablar_con",
+        "motorRegla": "npc_ausente",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "hablo con el guardia de turno sobre la seguridad"
+        ]
+      },
+      {
+        "id": "c0035",
+        "frase": "hablo con un guardia y le pregunto si vio algo raro",
+        "normalizada": "hablo con un guardia y le pregunto si vio algo raro",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_hablar_con",
+        "motorIntencion": "intencion_hablar_con",
+        "motorRegla": "npc_ausente",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "hablo con un guardia y le pregunto si vio algo raro"
+        ]
+      },
+      {
+        "id": "c0036",
+        "frase": "hacé lugar, andá a buscar al guardia",
+        "normalizada": "hace lugar anda a buscar al guardia",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_hablar_con",
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "hacé lugar, andá a buscar al guardia"
+        ]
+      },
+      {
+        "id": "c0037",
+        "frase": "Maren, decime si el sello tiene alguna inscripción",
+        "normalizada": "maren decime si el sello tiene alguna inscripcion",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_hablar_con",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "Maren, decime si el sello tiene alguna inscripción"
+        ]
+      },
+      {
+        "id": "c0038",
+        "frase": "Maren, decime si hay alguna pista sobre el robo del sello",
+        "normalizada": "maren decime si hay alguna pista sobre el robo del sello",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_hablar_con",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "Maren, decime si hay alguna pista sobre el robo del sello"
+        ]
+      },
+      {
+        "id": "c0039",
+        "frase": "Maren, tenés que mostrárme el sello original",
+        "normalizada": "maren tenes que mostrarme el sello original",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_hablar_con",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "Maren, tenés que mostrárme el sello original"
+        ]
+      },
+      {
+        "id": "c0040",
+        "frase": "observa, Maren, tenés que ayudarme a contar los panes",
+        "normalizada": "observa maren tenes que ayudarme a contar los panes",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_hablar_con",
+        "motorIntencion": "intencion_observar",
+        "motorRegla": "npc_ausente",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "observa, Maren, tenés que ayudarme a contar los panes"
+        ]
+      }
+    ],
+    "consulta_tema": [
+      {
+        "id": "c0041",
+        "frase": "consulto el registro de sellos antiguos",
+        "normalizada": "consulto el registro de sellos antiguos",
+        "frecuencia": 1,
+        "intencionObjetivo": "consulta_tema",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "consulto el registro de sellos antiguos"
+        ]
+      },
+      {
+        "id": "c0042",
+        "frase": "consulto el tema de la historia del norte",
+        "normalizada": "consulto el tema de la historia del norte",
+        "frecuencia": 1,
+        "intencionObjetivo": "consulta_tema",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "consulto el tema de la historia del norte"
+        ]
+      },
+      {
+        "id": "c0043",
+        "frase": "consulto el tema de los antiguos rituales",
+        "normalizada": "consulto el tema de los antiguos rituales",
+        "frecuencia": 1,
+        "intencionObjetivo": "consulta_tema",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "consulto el tema de los antiguos rituales"
+        ]
+      },
+      {
+        "id": "c0044",
+        "frase": "consulto sobre la historia del Archivo Real en la biblioteca",
+        "normalizada": "consulto sobre la historia del archivo real en la biblioteca",
+        "frecuencia": 1,
+        "intencionObjetivo": "consulta_tema",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "consulto sobre la historia del Archivo Real en la biblioteca"
+        ]
+      },
+      {
+        "id": "c0045",
+        "frase": "consulto tema: historia de la espada rota",
+        "normalizada": "consulto tema historia de la espada rota",
+        "frecuencia": 1,
+        "intencionObjetivo": "consulta_tema",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "consulto tema: historia de la espada rota"
+        ]
+      },
+      {
+        "id": "c0046",
+        "frase": "consulto tema: historia del hacha de leñador",
+        "normalizada": "consulto tema historia del hacha de lenador",
+        "frecuencia": 1,
+        "intencionObjetivo": "consulta_tema",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "consulto tema: historia del hacha de leñador"
+        ]
+      },
+      {
+        "id": "c0047",
+        "frase": "consulto tema: precios de pan en la ciudad",
+        "normalizada": "consulto tema precios de pan en la ciudad",
+        "frecuencia": 1,
+        "intencionObjetivo": "consulta_tema",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "consulto tema: precios de pan en la ciudad"
+        ]
+      }
+    ],
+    "intencion_comprar": [
+      {
+        "id": "c0048",
+        "frase": "comprar queso curado y pan fresco",
+        "normalizada": "comprar queso curado y pan fresco",
+        "frecuencia": 2,
+        "intencionObjetivo": "intencion_comprar",
+        "motorIntencion": "intencion_comprar",
+        "motorRegla": "objeto_ambiguo",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1",
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "comprar queso curado y pan fresco"
+        ]
+      },
+      {
+        "id": "c0049",
+        "frase": "comprar pan duro y pan fresc",
+        "normalizada": "comprar pan duro y pan fresc",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_comprar",
+        "motorIntencion": "intencion_comprar",
+        "motorRegla": "objeto_ambiguo",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "comprar pan duro y pan fresc"
+        ]
+      },
+      {
+        "id": "c0050",
+        "frase": "comprar una linterna en la tienda",
+        "normalizada": "comprar una linterna en la tienda",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_comprar",
+        "motorIntencion": "intencion_comprar",
+        "motorRegla": "sin_objetos",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "comprar una linterna en la tienda"
+        ]
+      },
+      {
+        "id": "c0051",
+        "frase": "compro pan duro y pan fresco, ¿cuanto sale?",
+        "normalizada": "compro pan duro y pan fresco cuanto sale",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_comprar",
+        "motorIntencion": "intencion_comprar",
+        "motorRegla": "objeto_ambiguo",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "compro pan duro y pan fresco, ¿cuanto sale?"
+        ]
+      },
+      {
+        "id": "c0052",
+        "frase": "compro una pluma de tinta negra en la tienda cerca",
+        "normalizada": "compro una pluma de tinta negra en la tienda cerca",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_comprar",
+        "motorIntencion": "intencion_comprar",
+        "motorRegla": "sin_objetos",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "compro una pluma de tinta negra en la tienda cerca"
+        ]
+      },
+      {
+        "id": "c0053",
+        "frase": "¿querés comprar ese mapa del archivo?",
+        "normalizada": "queres comprar ese mapa del archivo",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_comprar",
+        "motorIntencion": "intencion_comprar",
+        "motorRegla": "sin_objetos",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "¿querés comprar ese mapa del archivo?"
+        ]
+      }
+    ],
+    "intencion_distraer": [
+      {
+        "id": "c0054",
+        "frase": "distraer al guardia con un trozo de pan",
+        "normalizada": "distraer al guardia con un trozo de pan",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_distraer",
+        "motorIntencion": "intencion_distraer",
+        "motorRegla": "npc_ausente",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "distraer al guardia con un trozo de pan"
+        ]
+      },
+      {
+        "id": "c0055",
+        "frase": "distraer al guardia con una piedra",
+        "normalizada": "distraer al guardia con una piedra",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_distraer",
+        "motorIntencion": "intencion_distraer",
+        "motorRegla": "npc_ausente",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "distraer al guardia con una piedra"
+        ]
+      },
+      {
+        "id": "c0056",
+        "frase": "distraigo al guardia con una moneda",
+        "normalizada": "distraigo al guardia con una moneda",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_distraer",
+        "motorIntencion": "intencion_distraer",
+        "motorRegla": "npc_ausente",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "distraigo al guardia con una moneda"
+        ]
+      },
+      {
+        "id": "c0057",
+        "frase": "intento distraer al guardia con una moneda brillante",
+        "normalizada": "intento distraer al guardia con una moneda brillante",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_distraer",
+        "motorIntencion": "intencion_distraer",
+        "motorRegla": "npc_ausente",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "intento distraer al guardia con una moneda brillante"
+        ]
+      },
+      {
+        "id": "c0058",
+        "frase": "Intento distraer al guardia con una piedra lanzada",
+        "normalizada": "intento distraer al guardia con una piedra lanzada",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_distraer",
+        "motorIntencion": "intencion_distraer",
+        "motorRegla": "npc_ausente",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "Intento distraer al guardia con una piedra lanzada"
+        ]
+      },
+      {
+        "id": "c0059",
+        "frase": "¿podés distraer al guardia mientras robo?",
+        "normalizada": "podes distraer al guardia mientras robo",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_distraer",
+        "motorIntencion": "intencion_distraer",
+        "motorRegla": "npc_ausente",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "¿podés distraer al guardia mientras robo?"
+        ]
+      }
+    ],
+    "intencion_observar": [
+      {
+        "id": "c0060",
+        "frase": "fijate bien el grabado del sello",
+        "normalizada": "fijate bien el grabado del sello",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_observar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "fijate bien el grabado del sello"
+        ]
+      },
+      {
+        "id": "c0061",
+        "frase": "fijate bien en esas marcas del árbol, parece una señal",
+        "normalizada": "fijate bien en esas marcas del arbol parece una senal",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_observar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "fijate bien en esas marcas del árbol, parece una señal"
+        ]
+      },
+      {
+        "id": "c0062",
+        "frase": "fijate si hay algo raro en la mesa del archivo",
+        "normalizada": "fijate si hay algo raro en la mesa del archivo",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_observar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "fijate si hay algo raro en la mesa del archivo"
+        ]
+      },
+      {
+        "id": "c0063",
+        "frase": "fijate si hay algua cosa rara en la mesa del queso",
+        "normalizada": "fijate si hay algua cosa rara en la mesa del queso",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_observar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "fijate si hay algua cosa rara en la mesa del queso"
+        ]
+      },
+      {
+        "id": "c0064",
+        "frase": "fijate si hay huellas raras en el suelo",
+        "normalizada": "fijate si hay huellas raras en el suelo",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_observar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "fijate si hay huellas raras en el suelo"
+        ]
+      },
+      {
+        "id": "c0065",
+        "frase": "Miren ese sello brillante",
+        "normalizada": "miren ese sello brillante",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_observar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "Miren ese sello brillante"
+        ]
+      }
+    ],
+    "intencion_avanzar_cautela": [
+      {
+        "id": "c0066",
+        "frase": "atajo el camino por la colina, aunque esté resbaladizo",
+        "normalizada": "atajo el camino por la colina aunque este resbaladizo",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_avanzar_cautela",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "atajo el camino por la colina, aunque esté resbaladizo"
+        ]
+      },
+      {
+        "id": "c0067",
+        "frase": "hace calor, andá a ventilar la ventana",
+        "normalizada": "hace calor anda a ventilar la ventana",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_avanzar_cautela",
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "hace calor, andá a ventilar la ventana"
+        ]
+      },
+      {
+        "id": "c0068",
+        "frase": "hacé lugar, que vengo con la antorcha encendida",
+        "normalizada": "hace lugar que vengo con la antorcha encendida",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_avanzar_cautela",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "hacé lugar, que vengo con la antorcha encendida"
+        ]
+      },
+      {
+        "id": "c0069",
+        "frase": "Viajo con cautela, no quiero asustar a los animales",
+        "normalizada": "viajo con cautela no quiero asustar a los animales",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_avanzar_cautela",
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "Viajo con cautela, no quiero asustar a los animales"
+        ]
+      }
+    ],
+    "intencion_explorar": [
+      {
+        "id": "c0070",
+        "frase": "andá a buscar a Serel Norlen, necesito información",
+        "normalizada": "anda a buscar a serel norlen necesito informacion",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_explorar",
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "andá a buscar a Serel Norlen, necesito información"
+        ]
+      },
+      {
+        "id": "c0071",
+        "frase": "andá a buscar al guardia que vigila la puerta",
+        "normalizada": "anda a buscar al guardia que vigila la puerta",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_explorar",
+        "motorIntencion": "intencion_observar",
+        "motorRegla": "npc_ausente",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "andá a buscar al guardia que vigila la puerta"
+        ]
+      },
+      {
+        "id": "c0072",
+        "frase": "atajo un atajo por el pasillo lateral",
+        "normalizada": "atajo un atajo por el pasillo lateral",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_explorar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "atajo un atajo por el pasillo lateral"
+        ]
+      },
+      {
+        "id": "c0073",
+        "frase": "fijate si hay algun libro viejo que hable de la fundación",
+        "normalizada": "fijate si hay algun libro viejo que hable de la fundacion",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_explorar",
+        "motorIntencion": "intencion_hablar_con",
+        "motorRegla": "falta_npc",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "fijate si hay algun libro viejo que hable de la fundación"
+        ]
+      }
+    ],
+    "intencion_negociar": [
+      {
+        "id": "c0074",
+        "frase": "intento negociar con el guardia de la puerta",
+        "normalizada": "intento negociar con el guardia de la puerta",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_negociar",
+        "motorIntencion": "intencion_negociar",
+        "motorRegla": "npc_ausente",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "intento negociar con el guardia de la puerta"
+        ]
+      },
+      {
+        "id": "c0075",
+        "frase": "mirá, ¿podés negociar con el guardia para pasar?",
+        "normalizada": "mira podes negociar con el guardia para pasar",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_negociar",
+        "motorIntencion": "intencion_observar",
+        "motorRegla": "npc_ausente",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda2"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "mirá, ¿podés negociar con el guardia para pasar?"
+        ]
+      },
+      {
+        "id": "c0076",
+        "frase": "negociar con el guardia que cuida la entrada",
+        "normalizada": "negociar con el guardia que cuida la entrada",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_negociar",
+        "motorIntencion": "intencion_negociar",
+        "motorRegla": "npc_ausente",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "negociar con el guardia que cuida la entrada"
+        ]
+      },
+      {
+        "id": "c0077",
+        "frase": "negocio con el guardia para que me deje pasar sin inspeccion",
+        "normalizada": "negocio con el guardia para que me deje pasar sin inspeccion",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_negociar",
+        "motorIntencion": "intencion_negociar",
+        "motorRegla": "npc_ausente",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "negocio con el guardia para que me deje pasar sin inspeccion"
+        ]
+      }
+    ],
+    "intencion_leer": [
+      {
+        "id": "c0078",
+        "frase": "consulto el registro de entradas del día de hoy",
+        "normalizada": "consulto el registro de entradas del dia de hoy",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_leer",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "consulto el registro de entradas del día de hoy"
+        ]
+      },
+      {
+        "id": "c0079",
+        "frase": "leo un libro viejo que habla de sellos antiguos",
+        "normalizada": "leo un libro viejo que habla de sellos antiguos",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_leer",
+        "motorIntencion": "intencion_hablar_con",
+        "motorRegla": "falta_npc",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "leo un libro viejo que habla de sellos antiguos"
+        ]
+      },
+      {
+        "id": "c0080",
+        "frase": "retrato el mapa en mi cuaderno",
+        "normalizada": "retrato el mapa en mi cuaderno",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_leer",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "retrato el mapa en mi cuaderno"
+        ]
+      }
+    ],
+    "intencion_abortar": [
+      {
+        "id": "c0081",
+        "frase": "abortarr la compra porque se me cayó la moneda",
+        "normalizada": "abortarr la compra porque se me cayo la moneda",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_abortar",
+        "motorIntencion": "intencion_comprar",
+        "motorRegla": "falta_objeto",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "abortarr la compra porque se me cayó la moneda"
+        ]
+      },
+      {
+        "id": "c0082",
+        "frase": "abortarr la misión, no vale la pena",
+        "normalizada": "abortarr la mision no vale la pena",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_abortar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "abortarr la misión, no vale la pena"
+        ]
+      }
+    ],
+    "intencion_defender": [
+      {
+        "id": "c0083",
+        "frase": "defendo el campamento con el hacha",
+        "normalizada": "defendo el campamento con el hacha",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_defender",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "defendo el campamento con el hacha"
+        ]
+      },
+      {
+        "id": "c0084",
+        "frase": "defiendo el puesto de guardia del norte",
+        "normalizada": "defiendo el puesto de guardia del norte",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_defender",
+        "motorIntencion": "intencion_defender",
+        "motorRegla": "npc_ausente",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "defiendo el puesto de guardia del norte"
+        ]
+      }
+    ],
+    "intencion_rendirse": [
+      {
+        "id": "c0085",
+        "frase": "rendirnos al jefe no es opción",
+        "normalizada": "rendirnos al jefe no es opcion",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_rendirse",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "rendirnos al jefe no es opción"
+        ]
+      },
+      {
+        "id": "c0086",
+        "frase": "renederme al capitán, no hay salida",
+        "normalizada": "renederme al capitan no hay salida",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_rendirse",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "renederme al capitán, no hay salida"
+        ]
+      }
+    ],
+    "intencion_usar": [
+      {
+        "id": "c0087",
+        "frase": "muevo la espadita rota para inspeccionarla mejor",
+        "normalizada": "muevo la espadita rota para inspeccionarla mejor",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_usar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "muevo la espadita rota para inspeccionarla mejor"
+        ]
+      },
+      {
+        "id": "c0088",
+        "frase": "recojo el pergamino roto que está en el suelo",
+        "normalizada": "recojo el pergamino roto que esta en el suelo",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_usar",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "curioso"
+        ],
+        "ejemplos": [
+          "recojo el pergamino roto que está en el suelo"
+        ]
+      }
+    ],
+    "intencion_atacar": [
+      {
+        "id": "c0089",
+        "frase": "atacar al guardia con mi espada",
+        "normalizada": "atacar al guardia con mi espada",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_atacar",
+        "motorIntencion": "intencion_atacar",
+        "motorRegla": "npc_ausente",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "atacar al guardia con mi espada"
+        ]
+      }
+    ],
+    "intencion_ayudar": [
+      {
+        "id": "c0090",
+        "frase": "mirá, Maren, tenés que ayudarme con esto",
+        "normalizada": "mira maren tenes que ayudarme con esto",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_ayudar",
+        "motorIntencion": "intencion_observar",
+        "motorRegla": "npc_ausente",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda3"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "mirá, Maren, tenés que ayudarme con esto"
+        ]
+      }
+    ],
+    "intencion_huir": [
+      {
+        "id": "c0091",
+        "frase": "Huuyo cuando escucho un ruido raro detrás de la arboleda",
+        "normalizada": "huuyo cuando escucho un ruido raro detras de la arboleda",
+        "frecuencia": 1,
+        "intencionObjetivo": "intencion_huir",
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "tanda1"
+        ],
+        "perfiles": [
+          "torpe"
+        ],
+        "ejemplos": [
+          "Huuyo cuando escucho un ruido raro detrás de la arboleda"
+        ]
+      }
+    ]
+  },
+  "marcadas": [
+    {
+      "id": "c0092",
+      "frase": "abortó la compra, mejor no",
+      "normalizada": "aborto la compra mejor no",
+      "frecuencia": 1,
+      "intencionObjetivo": "intencion_abortar",
+      "motorIntencion": "intencion_comprar",
+      "motorRegla": "falta_objeto",
+      "tipo": "no_valida",
+      "marca": "conjugacion_dudosa",
+      "estado": "pendiente",
+      "tandas": [
+        "tanda1"
+      ],
+      "perfiles": [
+        "primerizo"
+      ],
+      "ejemplos": [
+        "abortó la compra, mejor no"
+      ]
+    },
+    {
+      "id": "c0093",
+      "frase": "leё el pergamino que encontré bajo la piedra",
+      "normalizada": "le el pergamino que encontre bajo la piedra",
+      "frecuencia": 1,
+      "intencionObjetivo": "intencion_leer",
+      "motorIntencion": null,
+      "motorRegla": "no_entendido",
+      "tipo": "voseo_dialogo",
+      "marca": "revisar",
+      "estado": "pendiente",
+      "tandas": [
+        "tanda3"
+      ],
+      "perfiles": [
+        "primerizo"
+      ],
+      "ejemplos": [
+        "leё el pergamino que encontré bajo la piedra"
+      ]
+    }
+  ]
+}
