@@ -149,7 +149,26 @@ El h1 de cada caso pide la pista del NPC de la ranura p1 (Brenn, Sarin, Ysolde o
 - Se armó `config/perfiles/seguidor_relacional.json`: sigue la pista narrada y, al llegar, hace 2 favores (ayudar o calmar) al NPC antes de consultar. El motivo está en SUPUESTOS.
 - Medición (lote `20261120-225453-600`, 10 runs por perfil, 50 llamadas IA; detalle en `docs/charla-npc/lote-600/comparacion-perfiles.md`):
   - seguidor_relacional: 0 pistas seguidas, h1 en 1 run, _1 en 2, _2 en 2.
-  - seguidor_pistas: 2 pistas seguidas, h1 en 4, _1 en 1, _2 en 2.
+  - seguidor_pistas: 2 de 3 pistas seguidas (corregido: eran 3 narradas, no 4), h1 en 4, _1 en 1, _2 en 2.
   - amable: 0 pistas seguidas, h1 en 0, _1 en 3, _2 en 2.
 - Resultado: seguidor_relacional **no mejora** a seguidor_pistas ni en h1 ni en runs con conocimiento revelado. La pista se narra entre los turnos 9 y 12 y la trabada corta en el 15; con menos viaje y más favores, el perfil no llega a tiempo.
 - Para Tomás: conservar, ajustar (más peso de viaje o 1 favor) o quitar el perfil. Medirlo con `--trabada 25` daría margen para llegar, pero subir `--trabada` ya mostró costo en la medición anterior. No se lanzó nada más (contador del día: 528 de 800).
+- Actualización (2026-11-20): `seguidor_relacional` se quitó (perfil, test y modo `alLlegar`). Motivo en SUPUESTOS. Para recuperarlo: commit a9d8a48.
+
+## Brecha de conocimientos amable vs seguidor_pistas: verificación con datos existentes (2026-11-20, sin llamadas IA)
+- Datos: los lotes donde corrieron los dos perfiles con el narrador 0.0.40 (`20261120-224407-400`, `20261120-224440-500`, `20261120-225453-600`), 30 runs por perfil. Consulta de tema a Serel = turno con `consulta.npcId = serel_panadero`; revela = `resultado: exito`.
+- a) amable: 54 consultas a Serel en 25 de 30 runs; 13 revelaron (en 11 runs). 23 negativas por relación (`umbral`) y 7 `no_se`.
+- b) seguidor_pistas: 15 consultas a Serel en 9 de 30 runs; 0 revelaron. Las 15 fueron negativas por relación.
+- c) Relación con Serel en la primera consulta (rejuego, 34 de 34 runs coinciden):
+  - amable: mediana 15, media 16,4, rango -15 a 50; positiva en 19 de 25 runs; primera consulta en el turno 6 (mediana).
+  - seguidor_pistas: mediana 0, media 1,1, rango -5 a 10; positiva en 2 de 9 runs; primera consulta en el turno 1 (mediana).
+- Conclusión: la brecha se explica por las dos cosas. seguidor_pistas consulta a Serel unas 3,6 veces menos (15 contra 54). Además consulta antes de construir relación: el 100 % de sus consultas choca con el umbral, contra el 43 % de amable. Aunque consultara lo mismo, con relación 0 no revelaría nada. La relación al consultar es la causa decisiva; el número de consultas la amplifica.
+- No es solo un efecto del número de consultas, así que no queda como hallazgo puro de pesos. Ya se probó en el lote 600 un perfil que construye relación antes de consultar, y no mejoró en el margen de 15 turnos de la trabada. El perfil ya se quitó.
+
+## Estado de la etapa de perfiles (2026-11-20)
+- Quedan: los 13 perfiles de F2 y `seguidor_pistas` (sigue la pista de camino leída en la narración; en los lotes 400, 500 y 600 la siguió 5 de 6 veces que apareció; la restante la cortó la trabada). El test de perfiles exige que estén los 13 de F2, sin cantidad exacta.
+- Se quitó: `seguidor_relacional` (y el modo `objetivo.alLlegar`), porque no mejoró en el lote 600.
+- Se agregó: `validarFrase` descarta frases del jugador IA que empiezan con un token del catálogo, y el adaptador expone `relaciones()` (solo lectura, para análisis).
+- Preguntas abiertas para Tomás (decisiones de diseño del juego):
+  1. Relación contra pista: la pista de camino lleva al jugador al dueño de p1, pero ese NPC no revela con relación baja (umbral 30 a 50 para `_1`), y en 15 turnos no da el tiempo para construirla. ¿El h1 alcanzado por la pista debería bajar el umbral de ese NPC o dar relación, o se espera que el jugador vuelva más tarde?
+  2. Momento de la pista: se narra a los 8 turnos sin avance (turnos 9 a 12 en los lotes), y deja pocos turnos antes de los 15 de trabada. ¿El valor 8 es el buscado para un jugador real, que suele tener más paciencia que el simulador?

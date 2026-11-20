@@ -117,6 +117,10 @@ export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}`, ia
       return lista;
     },
     clasificar,
+    // Relación numérica con cada NPC (solo lectura, para análisis).
+    relaciones() {
+      return Object.fromEntries(Object.entries(e.npcs).map(([id, n]) => [id, n.relacion ?? 0]));
+    },
     // Lo que necesitan las políticas con objetivo. Lectura pura del estado.
     detalle() {
       const o = opcionesDeEscena(e, contenido);
