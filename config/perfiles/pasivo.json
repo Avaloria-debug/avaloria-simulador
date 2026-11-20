@@ -1,0 +1,36 @@
+{
+  "id": "pasivo",
+  "nombre": "Pasivo",
+  "descripcion": "Descansa y mira.",
+  "pesos": {
+    "descansar": 40,
+    "observar": 20,
+    "hablar_con": 15,
+    "examinar": 10,
+    "retirarse": 10,
+    "viajar": 5
+  },
+  "objetivo": {
+    "tipo": "ninguno",
+    "sesgo": 1
+  },
+  "entrada": {
+    "pBoton": 0.4,
+    "pGenerico": 0,
+    "genericoHastaTurno": 0
+  },
+  "ruido": {
+    "typos": 0.02,
+    "mayusculas": 0,
+    "incompletas": 0,
+    "nombraNpc": 0.3,
+    "adversarial": 0
+  },
+  "paciencia": 15,
+  "repiteSiFalla": 0.2,
+  "aprendeDeRespuestas": false,
+  "evolucion": null,
+  "haiku": {
+    "p": 0.1
+  }
+}

@@ -8,6 +8,9 @@ import { armarInstancia } from 'narrador/narrador/casos/instancias.js';
 import { abrirPersistenciaCasos } from 'narrador/narrador/casos/persistencia.js';
 import { opcionesDeEscena } from 'narrador/narrador/prueba/panel.js';
 import { VERSION } from 'narrador/narrador/version.js';
+import { escenasDeEntrega } from 'narrador/narrador/casos/hitos.js';
+import { TIPOS_TAG } from 'narrador/narrador/casos/tags.js';
+import { posicionesDeNpcs } from 'narrador/narrador/movimientoNpcs.js';
 
 const requerir = createRequire(import.meta.url);
 const archivoCasos = requerir('narrador/data/contenido/casos.json');
@@ -22,6 +25,15 @@ export const versionNarrador = {
   casos: archivoCasos.version,
   commit: (lock?.packages?.['node_modules/narrador']?.resolved ?? '').split('#')[1] ?? null,
 };
+
+export const tiposTag = [...TIPOS_TAG];
+export const idsEscenas = contenido.escenas.map((x) => x.id);
+export const verbos = contenido.intenciones.map((i) => i.verbo);
+export const intencionDeVerbo = new Map(contenido.intenciones.map((i) => [i.verbo, i]));
+export const escenas = new Map(contenido.escenas.map((x) => [x.id, { id: x.id, nombre: x.nombre, salidas: x.salidas ?? [] }]));
+export const npcsDef = new Map(contenido.npcs.map((n) => [n.id, n]));
+export const conocimientos = contenido.npcs.flatMap((n) => (n.conocimientos ?? []).map((k) => ({ id: k.id, npcId: n.id, palabrasClave: k.palabrasClave ?? [] })));
+export const palabrasClave = new Set(conocimientos.flatMap((k) => k.palabrasClave));
 
 const nombres = new Map([...contenido.npcs, ...contenido.objetos, ...contenido.escenas].map((x) => [x.id, x.nombre]));
 export const nombreDe = (id) => nombres.get(id) ?? id;
@@ -82,6 +94,31 @@ export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}` }) 
       return lista;
     },
     clasificar,
+    // Lo que necesitan las políticas con objetivo. Lectura pura del estado.
+    detalle() {
+      const o = opcionesDeEscena(e, contenido);
+      const revelados = new Set(Object.values(e.npcs).flatMap((n) => n.conocimientosRevelados ?? []));
+      const posiciones = posicionesDeNpcs(e.reloj, contenido);
+      const c = e.caso ?? {};
+      const caso = casos.find((x) => x.id === c.casoId);
+      const mundo = { escena: e.jugador.escenaId, npcs: Object.fromEntries(Object.entries(posiciones).map(([id, escena]) => [id, { escena }])) };
+      const alcanzados = new Set(c.hitosAlcanzados ?? []);
+      const escenasPendientes = new Set();
+      for (const h of caso?.hitos ?? []) {
+        if (alcanzados.has(h.id)) continue;
+        try { for (const x of escenasDeEntrega(h, c, mundo) ?? []) if (x) escenasPendientes.add(x); } catch { /* ranura ausente */ }
+      }
+      return {
+        escena: e.jugador.escenaId,
+        destinos: o.destinos.map((d) => d.id),
+        npcs: o.npcs.map((n) => ({ id: n.id, nombre: n.nombre })),
+        objetos: o.objetos.map((x) => ({ id: x.id, nombre: x.nombre })),
+        revelados: [...revelados],
+        tagsCaso: (c.tags ?? []).map(({ tipo, objetivo, nivel }) => ({ tipo, objetivo, nivel })),
+        pistas: (c.instancia?.pistas ?? []).map((p) => ({ conocimientoId: p.conocimientoId, npcId: p.npcId, escena: posiciones[p.npcId] ?? null, revelado: revelados.has(p.conocimientoId) })),
+        escenasPendientes: [...escenasPendientes],
+      };
+    },
     async aplicar(entrada) {
       const ent = entrada.tipo === 'boton'
         ? { tipo: 'boton', intencionId: entrada.intencion, parametros: entrada.parametros ?? {} }

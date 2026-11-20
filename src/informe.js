@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { leerJsonl } from './registro.js';
+import { metricasF2, markdownF2 } from './informe-f2.js';
 
 const pct = (a, b) => (b ? Math.round((1000 * a) / b) / 10 : 0);
 const contar = (lista, f) => lista.reduce((m, x) => { const k = f(x); m[k] = (m[k] ?? 0) + 1; return m; }, {});
@@ -28,6 +29,7 @@ export function calcularInforme(runs, turnos) {
   return {
     runs: runs.length,
     porModo: contar(runs, (r) => r.modo),
+    porPerfil: contar(runs, (r) => r.perfil),
     porCierre,
     pctTrabada: pct(porCierre.trabada ?? 0, runs.length),
     turnos: {
@@ -50,6 +52,7 @@ function markdown(i) {
     '# Informe del lote', '',
     `Runs: ${i.runs}. Cortes por trabada: ${i.pctTrabada}%.`, '',
     '## Runs por modo', '| Modo | Runs |', '|---|---|', filas(i.porModo), '',
+    '## Runs por perfil', '| Perfil | Runs |', '|---|---|', filas(i.porPerfil), '',
     '## Runs por cierre', '| Cierre | Runs |', '|---|---|', filas(i.porCierre), '',
     '## Turnos', `Media ${i.turnos.media} · mediana ${i.turnos.mediana} · p90 ${i.turnos.p90}`, '',
     '## Hitos y desenlaces por caso',
@@ -68,8 +71,17 @@ function markdown(i) {
 }
 
 export function generarInforme(dir) {
-  const i = calcularInforme(leerJsonl(path.join(dir, 'runs.jsonl')), leerJsonl(path.join(dir, 'turnos.jsonl')));
+  const runs = leerJsonl(path.join(dir, 'runs.jsonl'));
+  const turnos = leerJsonl(path.join(dir, 'turnos.jsonl'));
+  const ids = new Set(runs.map((r) => r.perfil));
+  const i = { ...calcularInforme(runs, turnos), ...metricasF2(runs, turnos) };
+  i.basicoPorPerfil = Object.fromEntries([...ids].sort().map((id) => {
+    const rs = runs.filter((r) => r.perfil === id);
+    const set = new Set(rs.map((r) => r.runId));
+    return [id, calcularInforme(rs, turnos.filter((t) => set.has(t.runId)))];
+  }));
   fs.writeFileSync(path.join(dir, 'informe.json'), JSON.stringify(i, null, 2));
-  fs.writeFileSync(path.join(dir, 'informe.md'), markdown(i));
+  const porPerfil = Object.entries(i.basicoPorPerfil).map(([id, b]) => markdown(b).replace('# Informe del lote', `## Básico: perfil ${id}`).replace(/\n## /g, '\n### ').replace(/\n### (?=Básico)/, '\n## '));
+  fs.writeFileSync(path.join(dir, 'informe.md'), [markdown(i), markdownF2(i), ...porPerfil].join('\n'));
   return i;
 }

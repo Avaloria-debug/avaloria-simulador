@@ -1,0 +1,41 @@
+{
+  "id": "primerizo",
+  "nombre": "Primerizo",
+  "descripcion": "Primera vez que juega.",
+  "pesos": {
+    "hablar_con": 25,
+    "examinar": 15,
+    "observar": 15,
+    "explorar": 15,
+    "viajar": 10,
+    "leer": 10,
+    "consulta_tema": 10
+  },
+  "objetivo": {
+    "tipo": "ninguno",
+    "sesgo": 1
+  },
+  "entrada": {
+    "pBoton": 0.7,
+    "pGenerico": 0.4,
+    "genericoHastaTurno": 20
+  },
+  "ruido": {
+    "typos": 0.05,
+    "mayusculas": 0,
+    "incompletas": 0,
+    "nombraNpc": 0.1,
+    "adversarial": 0
+  },
+  "paciencia": 6,
+  "repiteSiFalla": 0.6,
+  "aprendeDeRespuestas": true,
+  "evolucion": {
+    "cadaTurnos": 10,
+    "pBoton": -0.1,
+    "minPBoton": 0.2
+  },
+  "haiku": {
+    "p": 0.1
+  }
+}

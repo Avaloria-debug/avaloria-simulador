@@ -1,0 +1,54 @@
+{
+  "id": "aleatorio",
+  "nombre": "Aleatorio",
+  "descripcion": "Elige al azar.",
+  "pesos": {
+    "hablar_con": 1,
+    "examinar": 1,
+    "usar": 1,
+    "explorar": 1,
+    "descansar": 1,
+    "observar": 1,
+    "trabajar": 1,
+    "comprar": 1,
+    "leer": 1,
+    "ayudar": 1,
+    "negociar": 1,
+    "presionar": 1,
+    "retirarse": 1,
+    "huir": 1,
+    "atacar": 1,
+    "emboscar": 1,
+    "calmar_la_situacion": 1,
+    "ocultarse": 1,
+    "avanzar_cautela": 1,
+    "distraer": 1,
+    "abortar": 1,
+    "defender": 1,
+    "rendirse": 1,
+    "viajar": 1
+  },
+  "objetivo": {
+    "tipo": "ninguno",
+    "sesgo": 1
+  },
+  "entrada": {
+    "pBoton": 0.5,
+    "pGenerico": 0,
+    "genericoHastaTurno": 0
+  },
+  "ruido": {
+    "typos": 0,
+    "mayusculas": 0,
+    "incompletas": 0,
+    "nombraNpc": 0.5,
+    "adversarial": 0
+  },
+  "paciencia": null,
+  "repiteSiFalla": 0.2,
+  "aprendeDeRespuestas": false,
+  "evolucion": null,
+  "haiku": {
+    "p": 0.1
+  }
+}

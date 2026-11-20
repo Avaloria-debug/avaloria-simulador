@@ -6,13 +6,13 @@ import { correrRun } from './runner.js';
 import { abrirRegistro } from './registro.js';
 import { generarInforme } from './informe.js';
 import { mulberry32 } from './rng.js';
-import { PERFIL_POR_DEFECTO } from './perfiles.js';
+import { PERFIL_POR_DEFECTO, cargarPerfiles } from './perfiles.js';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const DEFAULTS = Object.freeze({ runs: 20, mezcla: { codigo: 100, ia: 0 }, trabada: 15, maxTurnos: 400, seedBase: 1, casos: 'todos', salida: 'simulaciones' });
 const VERSION = JSON.parse(fs.readFileSync(path.join(RAIZ, 'package.json'), 'utf8')).version;
 
-const FLAGS = { '--runs': 'runs', '--mezcla': 'mezcla', '--trabada': 'trabada', '--max-turnos': 'maxTurnos', '--seed-base': 'seedBase', '--casos': 'casos', '--salida': 'salida', '--reanudar': 'reanudar' };
+const FLAGS = { '--runs': 'runs', '--mezcla': 'mezcla', '--trabada': 'trabada', '--max-turnos': 'maxTurnos', '--seed-base': 'seedBase', '--casos': 'casos', '--salida': 'salida', '--reanudar': 'reanudar', '--perfiles': 'perfiles' };
 
 export function leerArgs(argv) {
   const out = {};
@@ -37,8 +37,30 @@ function entero(nombre, v) {
 }
 
 // Precedencia: CLI > config.json > defaults.
-export function resolverParametros(cli = {}, config = {}) {
+export function resolverPerfiles(texto, disponibles) {
+  const lista = String(texto).split(',').map((x) => x.trim()).filter(Boolean).map((x) => {
+    const [id, n, ...resto] = x.split(':');
+    if (resto.length || !id) throw new Error(`perfiles inválido: "${x}" (formato id:cantidad)`);
+    if (!disponibles.has(id)) throw new Error(`perfil inexistente: "${id}". Disponibles: ${[...disponibles.keys()].join(', ')}`);
+    return { id, agentes: entero(`agentes de ${id}`, n ?? '') };
+  });
+  if (!lista.length) throw new Error('perfiles vacío');
+  const ids = lista.map((x) => x.id);
+  if (new Set(ids).size !== ids.length) throw new Error('perfiles: un perfil aparece dos veces');
+  return lista;
+}
+
+export function resolverParametros(cli = {}, config = {}, disponibles = cargarPerfiles()) {
   const p = { ...DEFAULTS, ...config, ...cli };
+  if (p.perfiles !== undefined && p.perfiles !== null) {
+    p.perfiles = Array.isArray(p.perfiles) ? p.perfiles : resolverPerfiles(p.perfiles, disponibles);
+    const suma = p.perfiles.reduce((a, x) => a + x.agentes, 0);
+    if (cli.runs !== undefined && entero('runs', cli.runs) !== suma) throw new Error(`--runs ${cli.runs} no coincide con la suma de --perfiles (${suma})`);
+    p.runs = suma;
+  } else {
+    p.perfiles = [{ id: PERFIL_POR_DEFECTO, agentes: entero('runs', p.runs) }];
+  }
+  for (const x of p.perfiles) if (!disponibles.has(x.id)) throw new Error(`perfil inexistente: "${x.id}"`);
   for (const k of ['runs', 'trabada', 'maxTurnos', 'seedBase']) p[k] = entero(k, p[k]);
   let m = p.mezcla;
   if (typeof m === 'string') {
@@ -96,12 +118,14 @@ export async function ejecutarLote(cli = {}, { config = leerConfig(), politica =
   const reg = abrirRegistro(dir, { reanudar: Boolean(cli.reanudar) });
   if (!cli.reanudar) reg.config({ loteId, version: VERSION, narrador: versionNarrador, fecha: new Date().toISOString(), parametros: p });
   const modos = asignarModos(p.runs, p.mezcla, p.seedBase);
+  const perfiles = cargarPerfiles();
+  const perfilDe = p.perfiles.flatMap((x) => Array(x.agentes).fill(perfiles.get(x.id)));
   const inicio = performance.now();
   let hechos = reg.completados.size;
   for (let i = 0; i < p.runs; i++) {
     if (reg.completados.has(i)) continue;
     const run = await correrRun({
-      idx: i, seed: p.seedBase + i, casoId: p.casos[i % p.casos.length], perfil: PERFIL_POR_DEFECTO, modo: modos[i],
+      idx: i, seed: p.seedBase + i, casoId: p.casos[i % p.casos.length], perfil: perfilDe[i], modo: modos[i],
       trabada: p.trabada, maxTurnos: p.maxTurnos, politica, alTurno: reg.turno,
     });
     reg.run(run);

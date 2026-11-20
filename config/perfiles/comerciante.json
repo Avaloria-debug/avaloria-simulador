@@ -1,0 +1,36 @@
+{
+  "id": "comerciante",
+  "nombre": "Comerciante",
+  "descripcion": "Compra, vende y negocia.",
+  "pesos": {
+    "comprar": 30,
+    "negociar": 20,
+    "hablar_con": 15,
+    "viajar": 15,
+    "usar": 10,
+    "trabajar": 10
+  },
+  "objetivo": {
+    "tipo": "ninguno",
+    "sesgo": 1
+  },
+  "entrada": {
+    "pBoton": 0.3,
+    "pGenerico": 0,
+    "genericoHastaTurno": 0
+  },
+  "ruido": {
+    "typos": 0.03,
+    "mayusculas": 0,
+    "incompletas": 0,
+    "nombraNpc": 0.6,
+    "adversarial": 0
+  },
+  "paciencia": 10,
+  "repiteSiFalla": 0.2,
+  "aprendeDeRespuestas": false,
+  "evolucion": null,
+  "haiku": {
+    "p": 0.1
+  }
+}

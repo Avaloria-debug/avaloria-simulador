@@ -2,7 +2,7 @@ import { ejecutarLote, leerArgs } from './lote.js';
 
 try {
   const r = await ejecutarLote(leerArgs(process.argv.slice(2)), {
-    progreso: (n, total, run) => process.stderr.write(`\rRuns ${n}/${total} · último: ${run.runId} ${run.cierre} (${run.turnos} turnos)   `),
+    progreso: (n, total, run) => process.stderr.write(`\rRuns ${n}/${total} · último: ${run.runId} [${run.perfil}] ${run.cierre} (${run.turnos} turnos)   `),
   });
   process.stderr.write('\n');
   console.log(`Lote ${r.loteId} en ${r.dir}`);
