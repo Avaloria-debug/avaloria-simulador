@@ -38,6 +38,7 @@ export function calcularInforme(runs, turnos) {
     porCaso,
     resultadosMotor: Object.fromEntries(['ejecuta', 'consulta', 'reformula', 'no_entendido', 'ia'].map((k) => [k, pct(resultados[k] ?? 0, turnos.length)])),
     topNoEntendidas: Object.entries(noEntendidas).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 20).map(([frase, veces]) => ({ frase, veces })),
+    motivosDecidir: Object.entries(contar(turnos.filter((x) => x.decision.regla), (x) => x.decision.regla)).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([motivo, veces]) => ({ motivo, veces })),
     ia: runs.map((r) => ({ runId: r.runId, llamadas: r.iaLlamadas, tokens: r.iaTokens })),
     errores: runs.filter((r) => r.error).map((r) => ({ runId: r.runId, error: r.error.split('\n')[0] })),
   };
@@ -60,6 +61,7 @@ function markdown(i) {
   }
   l.push('## Resultados del motor (%)', '| Resultado | % |', '|---|---|', filas(i.resultadosMotor), '');
   l.push('## Top 20 frases no entendidas o reformuladas', '| Frase | Veces |', '|---|---|', ...i.topNoEntendidas.map((x) => `| ${x.frase} | ${x.veces} |`), '');
+  l.push('## Motivos de decidir()', '| Motivo | Veces |', '|---|---|', ...i.motivosDecidir.map((x) => `| ${x.motivo} | ${x.veces} |`), '');
   l.push('## IA por run', `Llamadas totales: ${i.ia.reduce((a, x) => a + x.llamadas, 0)}. Tokens totales: ${i.ia.reduce((a, x) => a + x.tokens, 0)}.`, '');
   if (i.errores.length) l.push('## Excepciones', ...i.errores.map((e) => `- ${e.runId}: ${e.error}`), '');
   return l.join('\n');
