@@ -143,3 +143,13 @@ El h1 de cada caso pide la pista del NPC de la ranura p1 (Brenn, Sarin, Ysolde o
   - `docs/candidatos/charla-npc-300-500-textos.jsonl`: 51 textos (47 del lote 300, 1 del `193756-400`, 1 del `224407-400`, 2 del 500). Sin duplicados ni repetidos de los decididos. Cada uno lleva `lote` e `idOriginal`.
   - `docs/candidatos/charla-npc-300-500-frases-agrupadas.json`: 17 frases del jugador IA de los 5 lotes 400 y del 500. Contra todas las frases agrupadas existentes, se excluyeron 58 salidas rotas del jugador IA (tokens de catálogo como `hablar_con Serel Norlen` o `consulta_tema …`, ids o JSON).
   - Reemplazan para la revisión a `charla-npc-300-textos.jsonl`, `charla-npc-400-textos.jsonl` y `charla-npc-400-frases-agrupadas.json`. Esos archivos no se borraron (quedan como fuente); su c0002 rechazado (`consulta_tema coonas`) no pasa al consolidado.
+
+## seguidor_relacional y limpieza del jugador IA (2026-11-20, decisiones de Opus en nombre de Tomás; Tomás puede revertirlas)
+- `validarFrase` (`src/ia/jugador.js`) descarta las frases que empiezan con un token del catálogo (`hablar_con …`, `consultar_tema …`, `[intencion_x] …`). En las 221 frases de los lotes 300-500, las válidas pasan de 100 % a 72,9 %. Quedan 3 frases con el token en el medio (por ejemplo "Voy a hablar_con Serel Norlen."), fuera del criterio pedido.
+- Se armó `config/perfiles/seguidor_relacional.json`: sigue la pista narrada y, al llegar, hace 2 favores (ayudar o calmar) al NPC antes de consultar. El motivo está en SUPUESTOS.
+- Medición (lote `20261120-225453-600`, 10 runs por perfil, 50 llamadas IA; detalle en `docs/charla-npc/lote-600/comparacion-perfiles.md`):
+  - seguidor_relacional: 0 pistas seguidas, h1 en 1 run, _1 en 2, _2 en 2.
+  - seguidor_pistas: 2 pistas seguidas, h1 en 4, _1 en 1, _2 en 2.
+  - amable: 0 pistas seguidas, h1 en 0, _1 en 3, _2 en 2.
+- Resultado: seguidor_relacional **no mejora** a seguidor_pistas ni en h1 ni en runs con conocimiento revelado. La pista se narra entre los turnos 9 y 12 y la trabada corta en el 15; con menos viaje y más favores, el perfil no llega a tiempo.
+- Para Tomás: conservar, ajustar (más peso de viaje o 1 favor) o quitar el perfil. Medirlo con `--trabada 25` daría margen para llegar, pero subir `--trabada` ya mostró costo en la medición anterior. No se lanzó nada más (contador del día: 528 de 800).
