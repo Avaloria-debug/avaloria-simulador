@@ -1,0 +1,301 @@
+{
+  "runs": 24,
+  "runsCompletados": 24,
+  "cierres": {
+    "desenlace": 0,
+    "trabada": 24,
+    "maxTurnos": 0,
+    "abandono": 0,
+    "cuota": 0,
+    "excepcion": 0
+  },
+  "ia": {
+    "llamadas": 6,
+    "tokens": 2862,
+    "frasesJugador": 29
+  },
+  "npcs": [
+    {
+      "npc": "serel_panadero",
+      "nombre": "Serel Norlen",
+      "consultas": 65,
+      "consultasQueRevelaron": 1,
+      "temasRevelados": 2,
+      "temas": [
+        "conocimiento_serel_1",
+        "conocimiento_serel_2"
+      ],
+      "respuestasIaUnicas": 5,
+      "pctNoSe": 10.8,
+      "negativasPorRelacion": 51,
+      "turnosPresente": 317,
+      "pctReformula": 5.4
+    },
+    {
+      "npc": "brenn_arriero",
+      "nombre": "Brenn Holt",
+      "consultas": 3,
+      "consultasQueRevelaron": 0,
+      "temasRevelados": 0,
+      "temas": [],
+      "respuestasIaUnicas": 0,
+      "pctNoSe": 66.7,
+      "negativasPorRelacion": 1,
+      "turnosPresente": 35,
+      "pctReformula": 8.6
+    },
+    {
+      "npc": "elia_bibliotecaria",
+      "nombre": "Elia Miren",
+      "consultas": 0,
+      "consultasQueRevelaron": 0,
+      "temasRevelados": 0,
+      "temas": [],
+      "respuestasIaUnicas": 0,
+      "pctNoSe": 0,
+      "negativasPorRelacion": 0,
+      "turnosPresente": 1,
+      "pctReformula": 0
+    },
+    {
+      "npc": "hollis_pastor",
+      "nombre": "Hollis Dren",
+      "consultas": 4,
+      "consultasQueRevelaron": 0,
+      "temasRevelados": 0,
+      "temas": [],
+      "respuestasIaUnicas": 0,
+      "pctNoSe": 0,
+      "negativasPorRelacion": 4,
+      "turnosPresente": 14,
+      "pctReformula": 7.1
+    },
+    {
+      "npc": "maren_archivista",
+      "nombre": "Maren de Orst",
+      "consultas": 2,
+      "consultasQueRevelaron": 0,
+      "temasRevelados": 0,
+      "temas": [],
+      "respuestasIaUnicas": 0,
+      "pctNoSe": 0,
+      "negativasPorRelacion": 2,
+      "turnosPresente": 8,
+      "pctReformula": 0
+    },
+    {
+      "npc": "oren_peregrino",
+      "nombre": "Oren Basil",
+      "consultas": 0,
+      "consultasQueRevelaron": 0,
+      "temasRevelados": 0,
+      "temas": [],
+      "respuestasIaUnicas": 0,
+      "pctNoSe": 0,
+      "negativasPorRelacion": 0,
+      "turnosPresente": 1,
+      "pctReformula": 0
+    },
+    {
+      "npc": "sarin_mensajera",
+      "nombre": "Sarin Tolle",
+      "consultas": 3,
+      "consultasQueRevelaron": 0,
+      "temasRevelados": 0,
+      "temas": [],
+      "respuestasIaUnicas": 0,
+      "pctNoSe": 33.3,
+      "negativasPorRelacion": 2,
+      "turnosPresente": 28,
+      "pctReformula": 10.7
+    },
+    {
+      "npc": "ysolde_pescadora",
+      "nombre": "Ysolde Varn",
+      "consultas": 3,
+      "consultasQueRevelaron": 0,
+      "temasRevelados": 0,
+      "temas": [],
+      "respuestasIaUnicas": 0,
+      "pctNoSe": 33.3,
+      "negativasPorRelacion": 2,
+      "turnosPresente": 21,
+      "pctReformula": 9.5
+    }
+  ],
+  "conocimientos": {
+    "_1": {
+      "total": 11,
+      "revelados": [
+        {
+          "id": "conocimiento_serel_1",
+          "runs": 8
+        }
+      ],
+      "nunca": [
+        "conocimiento_maren_1",
+        "conocimiento_ivor_1",
+        "conocimiento_naela_1",
+        "conocimiento_tiren_1",
+        "conocimiento_elia_1",
+        "conocimiento_brenn_1",
+        "conocimiento_ysolde_1",
+        "conocimiento_dario_1",
+        "conocimiento_sarin_1",
+        "conocimiento_oren_1"
+      ]
+    },
+    "_2": {
+      "total": 12,
+      "revelados": [
+        {
+          "id": "conocimiento_serel_2",
+          "runs": 4
+        }
+      ],
+      "nunca": [
+        "conocimiento_maren_2",
+        "conocimiento_ivor_2",
+        "conocimiento_naela_2",
+        "conocimiento_tiren_2",
+        "conocimiento_elia_2",
+        "conocimiento_brenn_2",
+        "conocimiento_ysolde_2",
+        "conocimiento_dario_2",
+        "conocimiento_sarin_2",
+        "conocimiento_hollis_2",
+        "conocimiento_oren_2"
+      ]
+    },
+    "otro": {
+      "total": 1,
+      "revelados": [],
+      "nunca": [
+        "conocimiento_sendero_sin_vigilancia"
+      ]
+    }
+  },
+  "hitosPorPerfil": {
+    "curioso": {
+      "runs": 5,
+      "runsConHito": 0,
+      "hitos": 0,
+      "porHito": {}
+    },
+    "investigador": {
+      "runs": 5,
+      "runsConHito": 0,
+      "hitos": 0,
+      "porHito": {}
+    },
+    "amable": {
+      "runs": 8,
+      "runsConHito": 0,
+      "hitos": 0,
+      "porHito": {}
+    },
+    "primerizo": {
+      "runs": 4,
+      "runsConHito": 0,
+      "hitos": 0,
+      "porHito": {}
+    },
+    "directo": {
+      "runs": 2,
+      "runsConHito": 1,
+      "hitos": 1,
+      "porHito": {
+        "h1": 1
+      }
+    }
+  },
+  "relacionPorPerfil": {
+    "amable": {
+      "runs": 8,
+      "consultas": 8,
+      "negativasRelacion": 2,
+      "pctNegativasRelacion": 25,
+      "consultasQueRevelaron": 1,
+      "pctNoSe": 12.5,
+      "conocimientos_1": [
+        "conocimiento_serel_1"
+      ],
+      "runsCon_1": 7,
+      "conocimientos_2": [
+        "conocimiento_serel_2"
+      ],
+      "runsCon_2": 4
+    },
+    "curioso": {
+      "runs": 5,
+      "consultas": 37,
+      "negativasRelacion": 35,
+      "pctNegativasRelacion": 94.6,
+      "consultasQueRevelaron": 0,
+      "pctNoSe": 5.4,
+      "conocimientos_1": [],
+      "runsCon_1": 0,
+      "conocimientos_2": [],
+      "runsCon_2": 0
+    },
+    "directo": {
+      "runs": 2,
+      "consultas": 10,
+      "negativasRelacion": 6,
+      "pctNegativasRelacion": 60,
+      "consultasQueRevelaron": 0,
+      "pctNoSe": 20,
+      "conocimientos_1": [
+        "conocimiento_serel_1"
+      ],
+      "runsCon_1": 1,
+      "conocimientos_2": [],
+      "runsCon_2": 0
+    },
+    "investigador": {
+      "runs": 5,
+      "consultas": 23,
+      "negativasRelacion": 19,
+      "pctNegativasRelacion": 82.6,
+      "consultasQueRevelaron": 0,
+      "pctNoSe": 17.4,
+      "conocimientos_1": [],
+      "runsCon_1": 0,
+      "conocimientos_2": [],
+      "runsCon_2": 0
+    },
+    "primerizo": {
+      "runs": 4,
+      "consultas": 2,
+      "negativasRelacion": 0,
+      "pctNegativasRelacion": 0,
+      "consultasQueRevelaron": 0,
+      "pctNoSe": 100,
+      "conocimientos_1": [],
+      "runsCon_1": 0,
+      "conocimientos_2": [],
+      "runsCon_2": 0
+    }
+  },
+  "comparacion": {
+    "control": {
+      "perfiles": [
+        "curioso",
+        "investigador"
+      ],
+      "runs": 10,
+      "consultas": 60,
+      "negativasRelacion": 54,
+      "pctNegativasRelacion": 90
+    },
+    "relacionConstruida": {
+      "perfiles": [
+        "amable"
+      ],
+      "runs": 8,
+      "consultas": 8,
+      "negativasRelacion": 2,
+      "pctNegativasRelacion": 25
+    }
+  }
+}

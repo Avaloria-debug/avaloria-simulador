@@ -14,6 +14,8 @@ export function npcDelTurno(t) {
   return (t.npcs ?? []).find((id) => n && n.includes(normalizar(nombreDe(id)).split(' ')[0])) ?? (t.npcs ?? [])[0] ?? null;
 }
 
+const nivel = (id) => (/_1$/.test(id) ? '_1' : /_2$/.test(id) ? '_2' : 'otro');
+
 export function calcularCharla(runs, turnos) {
   const completos = runs.filter((r) => r.cierre !== 'cuota' || r.turnos > 0);
   const porNpc = {};
@@ -38,7 +40,6 @@ export function calcularCharla(runs, turnos) {
     temas: [...x.temasRevelados].sort(), respuestasIaUnicas: x.respuestasIa.size, pctNoSe: pct(x.noSe, x.consultas), negativasPorRelacion: x.negativaRelacion,
     turnosPresente: x.turnosPresente, pctReformula: pct(x.reformula, x.turnosPresente),
   })).sort((a, b) => b.temasRevelados - a.temasRevelados || b.consultasQueRevelaron - a.consultasQueRevelaron || a.npc.localeCompare(b.npc));
-  const nivel = (id) => (/_1$/.test(id) ? '_1' : /_2$/.test(id) ? '_2' : 'otro');
   const conoc = {};
   for (const c of conocimientos) {
     const g = (conoc[nivel(c.id)] ??= { total: 0, revelados: [], nunca: [] });
@@ -52,10 +53,36 @@ export function calcularCharla(runs, turnos) {
     for (const x of r.hitos ?? []) h.porHito[x] = (h.porHito[x] ?? 0) + 1;
   }
   const cierres = Object.fromEntries(CIERRES.map((c) => [c, runs.filter((r) => r.cierre === c).length]));
+  // Por perfil: consultas negativas por relación y conocimientos _1/_2 revelados (por cualquier vía, estado final del run).
+  const perfilDe = new Map(runs.map((r) => [r.runId, r.perfil]));
+  const porPerfil = {};
+  const pp = (p) => (porPerfil[p] ??= { runs: 0, consultas: 0, negativasRelacion: 0, consultasQueRevelaron: 0, noSe: 0, _1: new Set(), _2: new Set(), runsCon_1: 0, runsCon_2: 0 });
+  for (const r of completos) {
+    const x = pp(r.perfil); x.runs += 1;
+    const rev = r.conocimientosRevelados ?? [];
+    for (const c of rev) { if (nivel(c) === '_1') x._1.add(c); if (nivel(c) === '_2') x._2.add(c); }
+    if (rev.some((c) => nivel(c) === '_1')) x.runsCon_1 += 1;
+    if (rev.some((c) => nivel(c) === '_2')) x.runsCon_2 += 1;
+  }
+  for (const t of turnos) {
+    if (!t.consulta) continue;
+    const x = pp(perfilDe.get(t.runId) ?? '(sin perfil)');
+    x.consultas += 1;
+    if (t.consulta.motivo === 'umbral') x.negativasRelacion += 1;
+    if (t.consulta.resultado === 'exito') x.consultasQueRevelaron += 1;
+    if (t.consulta.resultado === 'no_se') x.noSe += 1;
+  }
+  const relacionPorPerfil = Object.fromEntries(Object.entries(porPerfil).sort().map(([p, x]) => [p, {
+    runs: x.runs, consultas: x.consultas, negativasRelacion: x.negativasRelacion, pctNegativasRelacion: pct(x.negativasRelacion, x.consultas),
+    consultasQueRevelaron: x.consultasQueRevelaron, pctNoSe: pct(x.noSe, x.consultas),
+    conocimientos_1: [...x._1].sort(), runsCon_1: x.runsCon_1, conocimientos_2: [...x._2].sort(), runsCon_2: x.runsCon_2,
+  }]));
+  const grupo = (ps) => { const xs = ps.map((p) => relacionPorPerfil[p]).filter(Boolean); const c = xs.reduce((a, x) => a + x.consultas, 0); const n = xs.reduce((a, x) => a + x.negativasRelacion, 0); return { perfiles: ps, runs: xs.reduce((a, x) => a + x.runs, 0), consultas: c, negativasRelacion: n, pctNegativasRelacion: pct(n, c) }; };
+  const comparacion = { control: grupo(['curioso', 'investigador']), relacionConstruida: grupo(['amable']) };
   return {
     runs: runs.length, runsCompletados: runs.filter((r) => r.cierre !== 'cuota').length, cierres,
     ia: { llamadas: runs.reduce((a, r) => a + (r.iaLlamadas ?? 0), 0), tokens: runs.reduce((a, r) => a + (r.iaTokens ?? 0), 0), frasesJugador: runs.reduce((a, r) => a + (r.jugadorIa?.frases ?? 0), 0) },
-    npcs, conocimientos: conoc, hitosPorPerfil,
+    npcs, conocimientos: conoc, hitosPorPerfil, relacionPorPerfil, comparacion,
   };
 }
 
@@ -69,6 +96,11 @@ export function markdownCharla(c, loteId) {
   }
   l.push('## Hitos por perfil', '| Perfil | Runs | Runs con hito | Hitos | Por hito |', '|---|---|---|---|---|',
     ...Object.entries(c.hitosPorPerfil).sort().map(([p, h]) => `| ${p} | ${h.runs} | ${h.runsConHito} | ${h.hitos} | ${Object.entries(h.porHito).sort().map(([k, v]) => `${k}: ${v}`).join(', ') || '—'} |`), '',
+    '## Relación: control contra relación construida',
+    `Control (${c.comparacion.control.perfiles.join(', ')}): ${c.comparacion.control.negativasRelacion} negativas por relación de ${c.comparacion.control.consultas} consultas (${c.comparacion.control.pctNegativasRelacion} %), ${c.comparacion.control.runs} runs.`,
+    `Relación construida (${c.comparacion.relacionConstruida.perfiles.join(', ')}): ${c.comparacion.relacionConstruida.negativasRelacion} de ${c.comparacion.relacionConstruida.consultas} (${c.comparacion.relacionConstruida.pctNegativasRelacion} %), ${c.comparacion.relacionConstruida.runs} runs.`, '',
+    '| Perfil | Runs | Consultas | Negativas por relación | % | Revelaron | % no_se | _1 revelados (runs) | _2 revelados (runs) |', '|---|---|---|---|---|---|---|---|---|',
+    ...Object.entries(c.relacionPorPerfil).map(([p, x]) => `| ${p} | ${x.runs} | ${x.consultas} | ${x.negativasRelacion} | ${x.pctNegativasRelacion} % | ${x.consultasQueRevelaron} | ${x.pctNoSe} % | ${x.conocimientos_1.join(', ') || '—'} (${x.runsCon_1}) | ${x.conocimientos_2.join(', ') || '—'} (${x.runsCon_2}) |`), '',
     '## Cierres', '| Cierre | Runs |', '|---|---|', ...Object.entries(c.cierres).map(([k, v]) => `| ${k} | ${v} |`), '');
   return l.join('\n');
 }

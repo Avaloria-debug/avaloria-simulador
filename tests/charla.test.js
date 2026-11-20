@@ -37,3 +37,18 @@ test('NPC del turno: consulta, nombrado o primero presente', () => {
   assert.equal(npcDelTurno({ npcs: ['serel_panadero'], entrada: { texto: 'algo' } }), 'serel_panadero');
   assert.equal(npcDelTurno({ npcs: [] }), null);
 });
+
+test('relación por perfil: negativas y conocimientos _1/_2, control contra amable', () => {
+  const tt = (runId, motivo, resultado = 'fallo') => ({ runId, turno: 1, npcs: [], entrada: { texto: 'x' }, decision: { resultado: 'consulta' }, salida: {}, consulta: { npcId: 'serel_panadero', conocimientoId: null, resultado, motivo } });
+  const runs = [
+    { runId: 'c1', perfil: 'curioso', cierre: 'trabada', turnos: 3, hitos: [], conocimientosRevelados: [] },
+    { runId: 'i1', perfil: 'investigador', cierre: 'trabada', turnos: 1, hitos: [], conocimientosRevelados: ['conocimiento_serel_1'] },
+    { runId: 'a1', perfil: 'amable', cierre: 'trabada', turnos: 2, hitos: [], conocimientosRevelados: ['conocimiento_serel_1', 'conocimiento_serel_2'] },
+  ];
+  const c = calcularCharla(runs, [tt('c1', 'umbral'), tt('c1', 'umbral'), tt('c1', null, 'no_se'), tt('i1', 'umbral'), tt('a1', null, 'exito'), tt('a1', 'umbral')]);
+  assert.deepEqual(c.comparacion.control, { perfiles: ['curioso', 'investigador'], runs: 2, consultas: 4, negativasRelacion: 3, pctNegativasRelacion: 75 });
+  assert.deepEqual(c.comparacion.relacionConstruida, { perfiles: ['amable'], runs: 1, consultas: 2, negativasRelacion: 1, pctNegativasRelacion: 50 });
+  assert.deepEqual(c.relacionPorPerfil.amable.conocimientos_2, ['conocimiento_serel_2']);
+  assert.equal(c.relacionPorPerfil.investigador.runsCon_1, 1);
+  assert.equal(c.relacionPorPerfil.curioso.pctNoSe, 33.3);
+});

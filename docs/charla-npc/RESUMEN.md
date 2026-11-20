@@ -9,3 +9,18 @@ Lote `20261120-070120-100` (copia del informe en esta carpeta; los registros com
 - **Candidatos:** 8 textos de diálogo IA en `docs/candidatos/charla-npc-textos.jsonl`, todos `pendiente`. 0 frases nuevas: el motor entendió las 43 frases del jugador IA (`docs/candidatos/charla-npc-frases-agrupadas.json` queda vacío).
 - **Temas revelados por NPC:** Serel Norlen 2, Maren de Orst 2; el resto 0. Conocimientos revelados: _1 2 de 11, _2 2 de 12.
 - **Hallazgo:** de 73 consultas a Serel, 46 fueron negativas por relación; en total hubo 71 negativas por relación sobre 106 consultas. El jugador pregunta antes de tener la relación que piden los conocimientos.
+
+---
+
+# Lote charla-npc con relación construida (2026-11-20)
+
+Lote `20261120-072125-200`. Informe en `docs/charla-npc/lote-200/`. Perfiles: curioso:5, investigador:5, amable:8, primerizo:4 y directo:2 (24 runs), casos todos, modo ia, jugador IA activo, seed-base 200, `--max-llamadas-ia 200`.
+
+- **Modo y motivo:** el lote pedido, completo. Estimación: 168 llamadas, unos 94.000 tokens, debajo de la capacidad de 800 (4 × 250 × 0,8).
+- **Keys:** 4 en `config/keys.json`, rotación verificada antes del lote (8 llamadas, 2 por key, todas 200).
+- **Llamadas y tokens reales:** 39 llamadas y 14.237 tokens: 6 del narrador (2.862 tokens), 29 frases del jugador IA y 4 llamadas con 429 por tokens por minuto (todas en ••••aVM6; pausaron y siguieron). Reparto: ••••aVM6 31, ••••5PEG 2, ••••gFfn 3, ••••M6BR 3. El pool elige la key menos usada del día, y las otras tres ya venían con unas 40 llamadas cada una de antes.
+- **Runs:** 24 de 24 completados, todos por trabada; 0 por cuota.
+- **Negativas por relación:** control (curioso + investigador) 54 de 60 consultas (90 %); relación construida (amable) 2 de 8 (25 %).
+- **Conocimientos revelados por perfil, en runs:** amable `serel_1` en 7 de 8 y `serel_2` en 4 de 8; directo `serel_1` en 1 de 2; curioso, investigador y primerizo ninguno.
+- **Candidatos:** 5 textos de diálogo IA (`docs/candidatos/charla-npc-200-textos.jsonl`) y 1 frase nueva no entendida (`docs/candidatos/charla-npc-200-frases-agrupadas.json`). Todo pendiente.
+- **Lectura:** amable casi no consulta (8 consultas en 8 runs) pero revela más que nadie. Los conocimientos le llegan conversando y ayudando, no preguntando. Curioso e investigador preguntan mucho y chocan con el umbral de relación.
