@@ -66,6 +66,15 @@ test('groq: 429 con retry-after corto rota de key; 5xx reintenta; 4xx no; errore
   assert.equal(f3.llamadas.length, 1);
 });
 
+test('groq: con una sola key en cooldown corto espera y sigue', async () => {
+  const p = crearPool({ keys: [{ nombre: 'k1', key: K1 }] });
+  const c = crearClienteGroq({ pool: p, fetch: fetchFalso([respuesta(429, 'tpm', { 'retry-after': '0.05' }), ok('sigue')]), backoffMs: 1 });
+  assert.equal((await c.llamar({ system: 's', user: 'u' })).texto, 'sigue');
+  const p2 = crearPool({ keys: [{ nombre: 'k1', key: K1 }] });
+  const c2 = crearClienteGroq({ pool: p2, fetch: fetchFalso([respuesta(429, 'día', { 'retry-after': '3600' }), ok('no')]), backoffMs: 1 });
+  await assert.rejects(c2.llamar({ system: 's', user: 'u' }), { name: 'SinKeys' });
+});
+
 test('groq: tope de llamadas y límite diario por key', async () => {
   const c = crearClienteGroq({ pool: pool2(), fetch: fetchFalso([ok('a'), ok('b'), ok('c')]), maxLlamadas: 2 });
   await c.llamar({ system: 's', user: 'u' }); await c.llamar({ system: 's', user: 'u' });

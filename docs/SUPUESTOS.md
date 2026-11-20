@@ -55,3 +55,5 @@
 - SUPUESTO: estimación: llamadas = estados × perfiles (acotadas por el tope); tokens por llamada = caracteres del pedido real ÷ 4 + 30 por frase pedida + 300 de razonamiento. `--estimar` solo muestra la estimación sin llamar a la IA.
 - SUPUESTO: normalización para dedupe = `normalizar` exportado por el narrador. Formas conocidas = las de `contenido.intenciones` y las de `diccionarios.intencionesLexico`.
 - SUPUESTO: el corpus se guarda en `simulaciones/<fecha>-<seed>-corpus/` con `config.json`, `corpus.json` (resumen) y `candidatos/`. No aparece en Informes; tiene su lista en la pantalla Corpus.
+- SUPUESTO (tanda F4): si todas las keys están en cooldown corto (429 con `retry-after` ≤ 120 s), el cliente espera a que se libere la primera en lugar de cortar con "sin keys". Con una sola key y el límite de 8.000 tokens por minuto de Groq, sin esa espera la tanda no se completaba.
+- SUPUESTO (entorno): en este contenedor el `fetch` de Node necesita `NODE_USE_ENV_PROXY=1` para salir por el proxy, y la key es un secreto de red que el proxy inyecta; se corre con `GROQ_API_KEY=proxy-injected` como marcador.

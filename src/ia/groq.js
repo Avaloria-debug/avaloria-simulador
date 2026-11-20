@@ -18,7 +18,8 @@ export function crearClienteGroq({ pool, modelo = MODELO_POR_DEFECTO, maxLlamada
     let ultimoError = null;
     for (let intento = 0; intento <= reintentos; intento++) {
       if (c.llamadas >= maxLlamadas) throw new TopeAlcanzado(maxLlamadas);
-      const k = pool.elegir();
+      let k = pool.elegir();
+      if (!k) { const ms = pool.esperaMinima?.(); if (ms != null) { await esperar(ms + 250); k = pool.elegir(); } }
       if (!k) throw new SinKeys();
       c.llamadas += 1; pool.contar(k.nombre);
       const ctrl = new AbortController();

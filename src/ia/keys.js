@@ -32,6 +32,12 @@ export function crearPool({ keys, limiteDiarioPorKey = 250, archivoUso = null, a
       libres.sort((a, b) => usadas(a.nombre) - usadas(b.nombre));
       return libres[0] ?? null;
     },
+    // Milisegundos hasta que se libere la primera key en cooldown (null si ninguna se libera pronto).
+    esperaMinima() {
+      const t = ahora();
+      const xs = [...estado.values()].filter((k) => k.agotadaHasta <= t && usadas(k.nombre) < limiteDiarioPorKey && k.cooldownHasta > t).map((k) => k.cooldownHasta - t);
+      return xs.length ? Math.min(...xs) : null;
+    },
     contar(nombre) { uso.porKey[nombre] = usadas(nombre) + 1; guardar(); },
     // retry-after <= 120 s ⇒ cooldown; mayor ⇒ agotada.
     limitar(nombre, segundos) {
