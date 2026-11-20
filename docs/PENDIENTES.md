@@ -26,3 +26,7 @@ Todos cortan por trabada en el turno 15 (umbral 15). Muestra chica: hallazgo a c
 ## Verificación pendiente de F2
 - Paciencia con negativa por relación: el test actual (`tests/decisiones.test.js`) prueba el contador `siguientesFallos` con una secuencia armada a mano. Falta un test con un run real en el que un NPC se niegue por relación (motivo `umbral` del narrador) y el run no cierre por abandono.
 
+
+## Revisión de candidatos (charla-npc lote 200)
+- `t00002` (`docs/candidatos/charla-npc-200-textos.jsonl`, run `r0019-s219`, turno 9): "No lo sé, pero el humo ya se siente." Estado: editar. Nota: solo si `evento_incendio_puesto` activo en `escena_mercado_circular`. En la reejecución en modo código (seed 219) el incendio figura activo en ese turno, pero el texto de IA no se reproduce. Desde narrador 0.0.39 la IA rechaza humo, fuego, incendio, llamas o quemar sin incendio activo en la escena.
+- El resto de los candidatos de esa revisión sigue pendiente.
