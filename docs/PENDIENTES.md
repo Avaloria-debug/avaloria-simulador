@@ -25,3 +25,4 @@ Todos cortan por trabada en el turno 15 (umbral 15). Muestra chica: hallazgo a c
 
 ## Verificación pendiente de F2
 - Paciencia con negativa por relación: el test actual (`tests/decisiones.test.js`) prueba el contador `siguientesFallos` con una secuencia armada a mano. Falta un test con un run real en el que un NPC se niegue por relación (motivo `umbral` del narrador) y el run no cierre por abandono.
+

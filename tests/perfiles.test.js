@@ -10,7 +10,8 @@ import { ejecutarLote, resolverParametros } from '../src/lote.js';
 import { leerJsonl } from '../src/registro.js';
 
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'sim-f2-'));
-const lote = (cli, opciones = {}) => ejecutarLote({ salida: tmp(), ...cli }, { config: {}, ...opciones });
+// Modo código: estos tests no usan IA (desde F5 la mezcla por defecto es 40/60).
+const lote = (cli, opciones = {}) => ejecutarLote({ salida: tmp(), ...cli }, { config: { mezcla: { codigo: 100, ia: 0 } }, ...opciones });
 const base = () => JSON.parse(fs.readFileSync(new URL('../config/perfiles/curioso.json', import.meta.url), 'utf8'));
 
 test('carga los 13 perfiles', () => {
@@ -28,7 +29,7 @@ test('el validador rechaza cada caso inválido con archivo y campo', () => {
     [(p) => { p.ruido.typos = 2; }, /campo ruido\.typos/],
     [(p) => { p.ruido.nombraNpc = -1; }, /campo ruido\.nombraNpc/],
     [(p) => { p.repiteSiFalla = 3; }, /campo repiteSiFalla/],
-    [(p) => { p.haiku.p = 9; }, /campo haiku\.p/],
+    [(p) => { p.ia.p = 9; }, /campo ia\.p/],
     [(p) => { p.objetivo.tipo = 'ganar'; }, /campo objetivo\.tipo/],
     [(p) => { p.paciencia = 0; }, /campo paciencia/],
     [(p) => { p.evolucion = { cadaTurnos: 10, pBoton: -0.1, minPBoton: 2 }; }, /campo evolucion\.minPBoton/],

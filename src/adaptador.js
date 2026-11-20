@@ -11,6 +11,7 @@ import { VERSION } from 'narrador/narrador/version.js';
 import { escenasDeEntrega } from 'narrador/narrador/casos/hitos.js';
 import { TIPOS_TAG } from 'narrador/narrador/casos/tags.js';
 import { posicionesDeNpcs } from 'narrador/narrador/movimientoNpcs.js';
+import { normalizar } from 'narrador/narrador/comprension.js';
 
 const requerir = createRequire(import.meta.url);
 const archivoCasos = requerir('narrador/data/contenido/casos.json');
@@ -19,6 +20,9 @@ const lock = (() => { try { return requerir('../package-lock.json'); } catch { r
 export const casos = archivoCasos.casos;
 export const idsCasos = casos.map((c) => c.id);
 export const intenciones = contenido.intenciones;
+export { normalizar };
+// Formas ya conocidas por el narrador (normalizadas): las del contenido y las del léxico de comprensión.
+export const formasConocidas = new Set([...contenido.intenciones, ...(diccionarios.intencionesLexico ?? [])].flatMap((i) => i.formas ?? []).map(normalizar));
 export const versionNarrador = {
   version: VERSION,
   contenido: contenido.version,
@@ -51,7 +55,8 @@ function estadoCasoInicial(caso, seed, escena) {
   };
 }
 
-export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}` }) {
+// `ia` (modo ia): {tomarKey, http} de src/ia/narrador.js. Sin `ia` el narrador no recibe key (modo código).
+export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}`, ia = null }) {
   const caso = casos.find((c) => c.id === casoId);
   if (!caso) throw new Error(`caso inexistente: ${casoId}`);
   const persistencia = await abrirPersistenciaCasos({ versionContenido: contenido.version, indexedDB: new IDBFactory(), nombreBD: partidaId });
@@ -62,7 +67,7 @@ export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}` }) 
   const clasificar = (entrada) => {
     const partida = cargarPartida(e);
     const t = ejecutarTurno(partida, typeof entrada === 'string' ? { tipo: 'texto', texto: entrada } : entrada, { contenido, rng: crearRng(partida.semilla), diccionarios });
-    return { tipo: t.tipo, intencionId: t.intencionId ?? t.accion?.intencionId ?? null, parametros: t.accion?.parametros ?? {}, motivo: t.motivo ?? null, resultado: t.consulta?.motivo === 'umbral' ? 'negativa_relacion' : (RESULTADO[t.tipo] ?? 'no_entendido') };
+    return { tipo: t.tipo, intencionId: t.intencionId ?? t.accion?.intencionId ?? null, parametros: t.accion?.parametros ?? {}, motivo: t.motivo ?? null, consulta: t.consulta ? { npcId: t.consulta.npcId, conocimientoId: t.consulta.conocimientoId, resultado: t.consulta.resultado, motivo: t.consulta.motivo ?? null } : null, resultado: t.consulta?.motivo === 'umbral' ? 'negativa_relacion' : (RESULTADO[t.tipo] ?? 'no_entendido') };
   };
 
   return {
@@ -125,7 +130,15 @@ export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}` }) 
         : { tipo: 'texto', texto: entrada.texto };
       const d = clasificar(ent);
       const antes = e.caso ?? {};
-      const r = await narrar(e, ent, opciones);
+      const turnoIa = { llamadas: 0, tokens: 0, limitada: false };
+      let op = opciones;
+      if (ia && d.tipo === 'ia') {
+        const k = await ia.tomarKey();
+        op = { ...opciones, groqKey: k.key, http: ia.http(k, turnoIa), ...(ia.esperar ? { esperar: ia.esperar } : {}) };
+      }
+      const npcsPresentes = opcionesDeEscena(e, contenido).npcs.map((n) => ({ id: n.id, nombre: n.nombre }));
+      const eventosActivos = (e.eventosActivos ?? []).map((a) => ({ id: a.id, escena: a.escenaId }));
+      const r = await narrar(e, ent, op);
       if (r.tipo === 'error' && r.errores.some((x) => x.startsWith('error_interno'))) throw new Error(`narrador: ${r.errores.join('; ')}`);
       e = r.estado;
       const despues = e.caso ?? {};
@@ -146,8 +159,13 @@ export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}` }) 
         hito: (despues.hitosAlcanzados ?? []).find((h) => !hitosAntes.has(h)) ?? null,
         desenlace,
         tipoDesenlace: desenlace ? caso?.desenlaces?.find((x) => x.id === desenlace)?.tipo ?? null : null,
-        iaLlamadas: 0,
-        iaTokens: 0,
+        iaLlamadas: turnoIa.llamadas,
+        iaTokens: turnoIa.tokens,
+        iaLimitada: turnoIa.limitada,
+        tipoSalida: r.tipo,
+        consulta: d.consulta,
+        npcsPresentes,
+        eventosActivos,
         errores: r.errores,
       };
     },

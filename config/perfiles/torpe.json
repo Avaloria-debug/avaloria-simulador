@@ -49,7 +49,7 @@
   "repiteSiFalla": 0.5,
   "aprendeDeRespuestas": false,
   "evolucion": null,
-  "haiku": {
+  "ia": {
     "p": 0.1
   }
 }

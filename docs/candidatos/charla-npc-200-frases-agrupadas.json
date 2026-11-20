@@ -1,0 +1,46 @@
+{
+  "generado": "2026-11-20T07:22:06.956Z",
+  "fuente": [
+    "20261120-072125-200"
+  ],
+  "excluidas": {
+    "yaEnF4": 93
+  },
+  "resumen": {
+    "entradas": 1,
+    "yaConocidas": 0,
+    "candidatos": 1,
+    "apariciones": 1,
+    "marcadas": 0,
+    "conjugacionDudosa": 0,
+    "revisar": 0,
+    "porIntencion": {
+      "(sin intención)": 1
+    }
+  },
+  "candidatos": {
+    "(sin intención)": [
+      {
+        "id": "c0001",
+        "frase": "Leí el detalle del pliego de precios y veo que el pan fresco cuesta 2 monedas y el pan duro 1.",
+        "normalizada": "lei el detalle del pliego de precios y veo que el pan fresco cuesta 2 monedas y el pan duro 1",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-072125-200"
+        ],
+        "perfiles": [
+          "primerizo"
+        ],
+        "ejemplos": [
+          "Leí el detalle del pliego de precios y veo que el pan fresco cuesta 2 monedas y el pan duro 1."
+        ]
+      }
+    ]
+  },
+  "marcadas": []
+}
