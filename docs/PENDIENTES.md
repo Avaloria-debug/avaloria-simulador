@@ -30,3 +30,17 @@ Todos cortan por trabada en el turno 15 (umbral 15). Muestra chica: hallazgo a c
 ## Revisión de candidatos (charla-npc lote 200)
 - `t00002` (`docs/candidatos/charla-npc-200-textos.jsonl`, run `r0019-s219`, turno 9): "No lo sé, pero el humo ya se siente." Estado: editar. Nota: solo si `evento_incendio_puesto` activo en `escena_mercado_circular`. En la reejecución en modo código (seed 219) el incendio figura activo en ese turno, pero el texto de IA no se reproduce. Desde narrador 0.0.39 la IA rechaza humo, fuego, incendio, llamas o quemar sin incendio activo en la escena.
 - El resto de los candidatos de esa revisión sigue pendiente.
+
+## Verificación opcional: fuego con IA
+- Opcional, no se corre por ahora. Sería reejecutar `r0019-s219` en modo `ia` para ver la respuesta de Groq con el narrador 0.0.39. No se justifica gastar cuota: la validación (humo, fuego, incendio, llamas, quemar sin `evento_incendio_puesto` activo en la escena → plantilla de respaldo) la cubren los 6 tests de `narrador/fuegoIa.test.js`. El lote de 6 runs en modo código (seed-base 100, primerizo:3, curioso:3) tuvo 0 menciones de fuego en 90 turnos, con el incendio activo en 12 de ellos; en modo código no hay texto de IA.
+
+## Lote grande de charla (en espera)
+- Comando: `node src/cli.js --runs 240 --perfiles curioso:60,investigador:60,amable:40,primerizo:40,directo:40 --mezcla 0/100 --seed-base 300 --max-llamadas-ia 800`.
+- Estimación (`--estimar`, 2026-11-20): 240 runs `ia`, ~1200 llamadas (narrador 1200, jugador 0), ~672 000 tokens.
+- Capacidad tomada: 800 llamadas por día con 4 keys. La configuración calcula 1000 (250 por key); se usa 800 como margen.
+- 1200 > 800: necesita 2 días de cuota. Puede correr desde el 2026-11-21: 800 llamadas ese día; el 2026-11-22, `--reanudar <loteId>` para las ~400 restantes. El 2026-11-20 ya se usaron 206 llamadas.
+- Sin `--max-llamadas-ia 800`, el tope por defecto (300) cierra el lote por `cuota` antes.
+
+## Estado del merge
+- Rama `claude/wonderful-sagan-4s2j9m` mergeada a `main` con narrador `e10c0e8` (0.0.39), simulador 0.5.4, 64 tests en verde.
+- Sin decisiones de Tomás que bloqueen el merge. Siguen pendientes de Tomás las aprobaciones de candidatos (contenido, no código).
