@@ -74,7 +74,7 @@ Todos cortan por trabada en el turno 15 (umbral 15). Muestra chica: hallazgo a c
   - Son los perfiles que ya revelan conocimientos en el lote 300: amable serel_1 26/40; directo maren, serel y tiren, y además sale de la escena.
   - El jugador IA trae frases libres que ejercitan comprensión e IA.
   - No requiere código nuevo ni un escenario artificial.
-- Lote `20261120-193756-400`, seed-base 300 + 100 = 400, `--perfiles amable:20,directo:20 --mezcla 0/100 --jugador-ia si --max-llamadas-ia 300`. Con 60+60 la estimación daba 840; se redujo a 40 runs (estimación 280). Se usaron 79 llamadas (78 del jugador, 1 del narrador) y 31 183 tokens. El contador del día quedó en 332.
+- Lote `20261120-193756-400`, seed-base 400, `--perfiles amable:20,directo:20 --mezcla 0/100 --jugador-ia si --max-llamadas-ia 300`. Con 60+60 la estimación daba 840; se redujo a 40 runs (estimación 280). Se usaron 79 llamadas (78 del jugador, 1 del narrador) y 31 183 tokens. El contador del día quedó en 332.
 - Cierres: 40 trabada (turnos 15 a 22). 0 desenlace, maxTurnos, cuota y excepción. Hitos: 3 h1 (directo, caso_03).
 - Conocimientos revelados: amable serel_1 14/20, serel_2 9/20; directo maren_1 2, maren_2 2, serel_1 2, brenn_1 1. Nuevo respecto al lote 300: `conocimiento_brenn_1` (r0035-s435, directo, caso_04), que es p1 en caso_01. No apareció ningún `_2` nuevo.
 - Candidatos (pendientes, nada aprobado):
