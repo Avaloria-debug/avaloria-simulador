@@ -1,0 +1,37 @@
+{
+  "id": "agresivo",
+  "nombre": "Agresivo",
+  "descripcion": "Ataca y presiona.",
+  "pesos": {
+    "atacar": 25,
+    "presionar": 25,
+    "emboscar": 10,
+    "hablar_con": 10,
+    "huir": 10,
+    "defender": 10,
+    "viajar": 10
+  },
+  "objetivo": {
+    "tipo": "ninguno",
+    "sesgo": 1
+  },
+  "entrada": {
+    "pBoton": 0.4,
+    "pGenerico": 0,
+    "genericoHastaTurno": 0
+  },
+  "ruido": {
+    "typos": 0.05,
+    "mayusculas": 0,
+    "incompletas": 0,
+    "nombraNpc": 0.4,
+    "adversarial": 0
+  },
+  "paciencia": 8,
+  "repiteSiFalla": 0.2,
+  "aprendeDeRespuestas": false,
+  "evolucion": null,
+  "haiku": {
+    "p": 0.1
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "directo",
+  "nombre": "Directo",
+  "descripcion": "Va derecho al desenlace.",
+  "pesos": {
+    "viajar": 30,
+    "hablar_con": 25,
+    "consulta_tema": 25,
+    "usar": 10,
+    "negociar": 10
+  },
+  "objetivo": {
+    "tipo": "desenlace_directo",
+    "sesgo": 6
+  },
+  "entrada": {
+    "pBoton": 0.2,
+    "pGenerico": 0,
+    "genericoHastaTurno": 0
+  },
+  "ruido": {
+    "typos": 0.02,
+    "mayusculas": 0,
+    "incompletas": 0,
+    "nombraNpc": 0.8,
+    "adversarial": 0
+  },
+  "paciencia": 10,
+  "repiteSiFalla": 0.2,
+  "aprendeDeRespuestas": false,
+  "evolucion": null,
+  "haiku": {
+    "p": 0.1
+  }
+}

@@ -1,0 +1,43 @@
+# Supuestos
+
+- SUPUESTO: el narrador no tiene función pública para iniciar un caso. El adaptador arma `estado.caso` como en `narrador/casosIntegracion.test.js`: `{casoId, instancia: armarInstancia(caso, {}, seed, {contenido}), tags:[], contadorHitos:0, hitoPrevio:{id:null, hora:8, escena:<escena inicial>, contador:0}, hitosAlcanzados:[], hitosListos:[], hitosBloqueados:[]}` y pasa `casos.json` en `opciones.casos`.
+- SUPUESTO: la escena inicial es siempre `reglas.escenaInicial`, aunque no esté en `escenas_origen` del caso.
+- SUPUESTO: niveles de botón: nivel 1 = intención sin parámetros; nivel 2 = intención con un NPC, objeto o destino presente (según el texto de `intencion.parametros` y `viajar`).
+- SUPUESTO: `regla` = `motivo` de `ejecutarTurno` (solo en reformulaciones); el narrador no expone la regla aplicada, en el resto es `null`.
+- SUPUESTO: `resultado`: accion→`ejecuta`; consulta/saludo/reconocimiento→`consulta`; reformular→`reformula`; ia (sin IA) y error de entrada→`no_entendido`; `ia` solo si `narrar` devuelve `dialogo_ia`.
+- SUPUESTO: `textoId` = id del texto de hito usado en el turno (`caso.textosUsados`); las plantillas de narración no exponen id, entonces `null`.
+- SUPUESTO: `narrar` no lanza; un `error_interno` en `errores` se trata como excepción del run.
+- SUPUESTO: si ya existe la carpeta del `loteId` (dos lotes en el mismo segundo), se agrega `-2`, `-3`…
+- SUPUESTO: `seedBase` también se valida como entero > 0.
+- SUPUESTO: el texto de la política aleatoria es `forma + nombre` (70%) o solo `forma` (30%); el parámetro se elige entre NPC presentes, objetos y la escena actual.
+- SUPUESTO: el rng de la política es `mulberry32(seed ^ 0x9e3779b9)` y el `Math.random` del run es `mulberry32(seed ^ 0x5eed)`; `Date.now` = 2026-01-01T12:00Z + contador.
+- SUPUESTO: `tags[]` del estado y `tagsEscritos/Borrados` se expresan como `tipo|objetivo|nivel`; `tagsEscritos` en `runs.jsonl` es la cantidad.
+
+## F2
+- SUPUESTO: la política aleatoria de F1 (`aleatoria` en `src/politicas.js`) queda sin cambios como línea base; el perfil `aleatorio` usa la política por perfil con la tabla de FASES.md (todos los verbos peso 1, pBoton 0.5). Sin `--perfiles` se usa el perfil `aleatorio` con `runs` agentes.
+- SUPUESTO: disponibilidad de una acción: `consulta_tema` con NPC presente y pool no vacío; hablar_con, ayudar, presionar, emboscar y negociar con NPC presente; usar con objeto aplicable; atacar con NPC u objeto; viajar con salidas; el resto siempre.
+- SUPUESTO: objetivos. `agotar_conocimientos`: mientras haya palabras clave del pool sin preguntar, consulta_tema × sesgo y viajar fuera. `visitar_todas_las_escenas`: viajar × sesgo hacia salidas no visitadas. `seguir_pistas`: metas = escenas de entrega de hitos pendientes (`escenasDeEntrega` del narrador) y escenas de los NPC con pista no revelada; en una meta o con un NPC presente con pista no revelada, consulta_tema y hablar_con × sesgo con temas de esas pistas; si no, viajar × sesgo por el camino más corto (BFS por salidas). `desenlace_directo`: igual, con metas = solo escenas de entrega de hitos pendientes. `reparar_relaciones`: ayudar y calmar_la_situacion × sesgo sobre el NPC presente con tag desconfianza, rencor o miedo.
+- SUPUESTO (revisado 2026-11-20, motivo: decisión de relación, los conocimientos `_1` requieren relación y el jugador la construye antes de preguntar): en `agotar_conocimientos` y `seguir_pistas`, antes de consultar por un tema cuyo conocimiento pide `umbralRelacion` mayor que la relación actual con ese NPC, la política prioriza (× sesgo) las acciones que el narrador hace subir la relación con ese NPC y pregunta recién al alcanzar el umbral. Un rechazo por relación insuficiente no cuenta como pregunta agotada: el tema vuelve al pool. Reemplaza en esos dos objetivos el "consulta_tema × sesgo" directo del supuesto anterior; `desenlace_directo` y `reparar_relaciones` quedan igual.
+- SUPUESTO: `nombraNpc` decide si se nombra al NPC en hablar_con y en consulta_tema; en los demás verbos que llevan NPC el nombre va siempre. En consultas, si no se nombra y la plantilla es `{npc}, {kw}?`, se usa `qué sabés de {kw}`; si se nombra y la plantilla no lo lleva, se antepone `{npc}, `.
+- DECIDIDO (2026-11-20, decisión 1A de Tomás): preguntar sobre un tema va solo por texto libre. `consulta_tema` se arma siempre como texto (`src/politicas.js`, `construir`) y ninguna intención del narrador es de consulta, así que la política aleatoria tampoco la manda como botón.
+- SUPUESTO: `mayusculas` pasa la frase a mayúsculas; `incompletas` corta la frase entre el 30% y el 80% de su largo. El ruido no se aplica a frases de `adversarial.json`.
+- SUPUESTO: `aprendeDeRespuestas`: el pool de temas empieza vacío y solo crece con palabras clave que aparecen en el texto narrado.
+- DECIDIDO (2026-11-20, decisión 2A de Tomás): una negativa por falta de relación (motivo `umbral` del narrador, resultado `negativa_relacion`) es respuesta válida: no suma a la paciencia ni la reinicia, y no cuenta para el abandono. El abandono se da cuando los fallos seguidos (reformula/no_entendido) superan la paciencia (paciencia 6 ⇒ abandono en el 7.º fallo seguido).
+- SUPUESTO: `repiteSiFalla`: tras un fallo, con esa probabilidad se repite el mismo verbo con otra redacción; la regla de no repetir la acción exacta más de 2 veces seguidas no aplica a ese reintento.
+- SUPUESTO: `evolucion`: pBoton = base + ⌊(turno−1)/cadaTurnos⌋ × delta, acotado a [minPBoton, 1].
+- SUPUESTO: `estadosSinAccion` = turnos donde ningún verbo con peso > 0 del perfil está disponible; en ese turno se usa `observar`.
+- SUPUESTO: texto repetido dentro del run por `textoId` o, sin id, por hash del texto narrado completo.
+- SUPUESTO: similitud: Jaccard sobre `hito:textoId` y 1 − distancia de edición normalizada sobre la secuencia de hitos; se reportan las dos.
+- SUPUESTO: tag "decaído" = su tipo aparece alguna vez en `tagsBorrados` (bajar de nivel también borra la clave `tipo|objetivo|nivel`). 
+- DECIDIDO (2026-11-20, decisión 3A de Tomás): daño grave sin reparación = rencor, desconfianza o miedo que llegó a nivel 3 sobre un objetivo. Reparar es quitar el tag: si al final del run queda ese tipo sobre ese objetivo en cualquier nivel (por ejemplo, bajó de 3 a 2), no está reparado.
+- SUPUESTO: una excepción es "del narrador" cuando `narrar` devuelve `error_interno`; se marca `origenError: narrador` y va a "Fallas graves" del informe, cualquiera sea el perfil.
+- SUPUESTO: el reporte de F2 pide runs/seg con 100 runs mixtos: se usan los 13 perfiles (8 runs los primeros 9, 7 los últimos 4).
+
+## F3
+- SUPUESTO: `npm run ui` levanta el servidor y muestra la URL en consola; no abre el navegador solo (sin dependencias para hacerlo). Escucha en `127.0.0.1`; el puerto se puede cambiar con la variable `PUERTO`.
+- SUPUESTO: un solo lote a la vez; un segundo `POST /api/lote` mientras corre otro da 409. "Parar" mata el proceso hijo: lo ya registrado queda en disco y se puede reanudar con `npm run simular -- --reanudar <loteId>`.
+- SUPUESTO: el servidor valida los parámetros con `resolverParametros` antes de lanzar el hijo, así los errores vuelven como 400 con el mensaje. Los perfiles con 0 agentes o sin marcar no entran al lote.
+- SUPUESTO: runs/seg del último lote para la estimación: el hijo guarda `tiempo.json` (runs y segundos) en la carpeta del lote; se usa el lote más reciente que lo tenga. Turnos esperados = runs × media de turnos del último informe; sin lote previo, runs × trabada.
+- SUPUESTO: "similitud media" de la tarjeta = media de Jaccard de todos los casos, ponderada por cantidad de pares. "% reformulación" = porcentaje de turnos con resultado `reformula` del lote.
+- SUPUESTO: `GET /api/config` muestra las keys enmascaradas (`••••` + últimos 4). Además, toda respuesta JSON pasa por un filtro que reemplaza cualquier valor de `keys.json` por su versión enmascarada.
+- SUPUESTO: edición de perfiles: un campo por cada hoja del JSON; los valores `null` y las listas se editan como JSON. Para agregar un verbo nuevo a `pesos` hay que editar el archivo. El id no se edita: para otro id se usa "Duplicar", que crea `config/perfiles/<id>.json`.

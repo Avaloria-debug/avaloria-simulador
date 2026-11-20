@@ -1,0 +1,37 @@
+{
+  "id": "aventurero",
+  "nombre": "Aventurero",
+  "descripcion": "Recorre el mundo.",
+  "pesos": {
+    "viajar": 35,
+    "explorar": 25,
+    "avanzar_cautela": 10,
+    "examinar": 10,
+    "hablar_con": 8,
+    "usar": 7,
+    "observar": 5
+  },
+  "objetivo": {
+    "tipo": "visitar_todas_las_escenas",
+    "sesgo": 3
+  },
+  "entrada": {
+    "pBoton": 0.3,
+    "pGenerico": 0,
+    "genericoHastaTurno": 0
+  },
+  "ruido": {
+    "typos": 0.02,
+    "mayusculas": 0,
+    "incompletas": 0,
+    "nombraNpc": 0.5,
+    "adversarial": 0
+  },
+  "paciencia": 10,
+  "repiteSiFalla": 0.2,
+  "aprendeDeRespuestas": false,
+  "evolucion": null,
+  "haiku": {
+    "p": 0.1
+  }
+}

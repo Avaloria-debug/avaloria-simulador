@@ -1,0 +1,37 @@
+{
+  "id": "curioso",
+  "nombre": "Curioso",
+  "descripcion": "Pregunta todo el tiempo.",
+  "pesos": {
+    "consulta_tema": 40,
+    "hablar_con": 25,
+    "examinar": 10,
+    "observar": 10,
+    "leer": 8,
+    "explorar": 4,
+    "viajar": 3
+  },
+  "objetivo": {
+    "tipo": "agotar_conocimientos",
+    "sesgo": 3
+  },
+  "entrada": {
+    "pBoton": 0.2,
+    "pGenerico": 0,
+    "genericoHastaTurno": 0
+  },
+  "ruido": {
+    "typos": 0.03,
+    "mayusculas": 0,
+    "incompletas": 0,
+    "nombraNpc": 0.7,
+    "adversarial": 0
+  },
+  "paciencia": 10,
+  "repiteSiFalla": 0.2,
+  "aprendeDeRespuestas": false,
+  "evolucion": null,
+  "haiku": {
+    "p": 0.1
+  }
+}

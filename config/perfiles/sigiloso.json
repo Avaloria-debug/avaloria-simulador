@@ -1,0 +1,37 @@
+{
+  "id": "sigiloso",
+  "nombre": "Sigiloso",
+  "descripcion": "Se oculta y observa.",
+  "pesos": {
+    "ocultarse": 20,
+    "avanzar_cautela": 20,
+    "observar": 20,
+    "emboscar": 15,
+    "distraer": 10,
+    "examinar": 10,
+    "viajar": 5
+  },
+  "objetivo": {
+    "tipo": "ninguno",
+    "sesgo": 1
+  },
+  "entrada": {
+    "pBoton": 0.3,
+    "pGenerico": 0,
+    "genericoHastaTurno": 0
+  },
+  "ruido": {
+    "typos": 0.03,
+    "mayusculas": 0,
+    "incompletas": 0,
+    "nombraNpc": 0.4,
+    "adversarial": 0
+  },
+  "paciencia": 10,
+  "repiteSiFalla": 0.2,
+  "aprendeDeRespuestas": false,
+  "evolucion": null,
+  "haiku": {
+    "p": 0.1
+  }
+}

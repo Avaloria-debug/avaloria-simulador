@@ -1,0 +1,37 @@
+{
+  "id": "amable",
+  "nombre": "Amable",
+  "descripcion": "Ayuda y repara relaciones.",
+  "pesos": {
+    "ayudar": 30,
+    "hablar_con": 25,
+    "calmar_la_situacion": 15,
+    "consulta_tema": 10,
+    "negociar": 10,
+    "comprar": 5,
+    "trabajar": 5
+  },
+  "objetivo": {
+    "tipo": "reparar_relaciones",
+    "sesgo": 4
+  },
+  "entrada": {
+    "pBoton": 0.3,
+    "pGenerico": 0,
+    "genericoHastaTurno": 0
+  },
+  "ruido": {
+    "typos": 0.03,
+    "mayusculas": 0,
+    "incompletas": 0,
+    "nombraNpc": 0.8,
+    "adversarial": 0
+  },
+  "paciencia": 10,
+  "repiteSiFalla": 0.2,
+  "aprendeDeRespuestas": false,
+  "evolucion": null,
+  "haiku": {
+    "p": 0.1
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "investigador",
+  "nombre": "Investigador",
+  "descripcion": "Sigue las pistas del caso.",
+  "pesos": {
+    "consulta_tema": 30,
+    "examinar": 20,
+    "leer": 15,
+    "hablar_con": 15,
+    "observar": 10,
+    "viajar": 10
+  },
+  "objetivo": {
+    "tipo": "seguir_pistas",
+    "sesgo": 3
+  },
+  "entrada": {
+    "pBoton": 0.2,
+    "pGenerico": 0,
+    "genericoHastaTurno": 0
+  },
+  "ruido": {
+    "typos": 0.02,
+    "mayusculas": 0,
+    "incompletas": 0,
+    "nombraNpc": 0.7,
+    "adversarial": 0
+  },
+  "paciencia": 12,
+  "repiteSiFalla": 0.2,
+  "aprendeDeRespuestas": false,
+  "evolucion": null,
+  "haiku": {
+    "p": 0.1
+  }
+}
