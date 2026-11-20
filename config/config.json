@@ -1,0 +1,9 @@
+{
+  "runs": 20,
+  "mezcla": { "codigo": 100, "ia": 0 },
+  "trabada": 15,
+  "maxTurnos": 400,
+  "seedBase": 1,
+  "casos": "todos",
+  "salida": "simulaciones"
+}
