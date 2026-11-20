@@ -6,7 +6,7 @@ import path from 'node:path';
 import { crearClienteGroq, URL_GROQ } from '../src/ia/groq.js';
 import { crearPool, leerKeysGroq, ultimos4 } from '../src/ia/keys.js';
 import { validarFrase, crearJugadorIa } from '../src/ia/jugador.js';
-import { parsearFrasesJson, agrupar, ejecutarCorpus, estimar } from '../src/corpus.js';
+import { parsearFrasesJson, agrupar, ejecutarCorpus, estimar, tieneVoseo, SYSTEM_CORPUS, EJEMPLOS_VOSEO, INSTRUCCION_VOSEO } from '../src/corpus.js';
 import { crearPartida, formasConocidas } from '../src/adaptador.js';
 import { correrRun } from '../src/runner.js';
 import { cargarPerfiles } from '../src/perfiles.js';
@@ -163,7 +163,8 @@ test('corpus de punta a punta con fetch mockeado', async () => {
   assert.equal(r.tokens, 1850);
   assert.match(r.corte, /tope/);
   assert.equal(r.fallasParseo.length, 1);
-  assert.equal(r.frasesPedidas, 8); assert.equal(r.frasesValidas, 6); assert.equal(r.pctValidas, 75);
+  // Formato (1–200 caracteres, una línea): 6 de 8. Con voseo: solo "Mirá alrededor" (×2).
+  assert.equal(r.frasesPedidas, 8); assert.equal(r.frasesFormato, 6); assert.equal(r.frasesValidas, 2); assert.equal(r.pctValidas, 25); assert.equal(r.noVoseo, 4);
   const filas = leerJsonl(path.join(r.dir, 'candidatos', 'frases.jsonl'));
   assert.equal(filas.length, 6);
   assert.ok(filas.every((x) => x.estado === 'pendiente' && x.modelo === 'openai/gpt-oss-120b' && x.motor.resultado && x.estadoJuego.escena));
@@ -172,4 +173,25 @@ test('corpus de punta a punta con fetch mockeado', async () => {
   assert.ok(!todo.includes(K1));
   const e = await ejecutarCorpus({ perfiles: 'curioso', maxEstados: '2' }, { raiz: tmp, config: {}, env: {}, archivoKeys: SIN_KEYS }).catch((x) => x);
   assert.match(e.message, /no hay keys de Groq/);
+});
+
+test('voseo: detección de formas', () => {
+  for (const f of ['decime qué pasó', 'mirá esto', 'fijate acá', '¿tenés pan?', '¿querés venir?', 'podés pasar', 'sos vos', 'hacé algo', 'andá ya', '¿sabés algo?', 'che, ¿qué decís?']) assert.ok(tieneVoseo(f), f);
+  for (const f of ['Leo el mapa', 'Mira el cielo', 'Tú puedes hacerlo', 'usted sabe', 'voy más atrás', 'después del mercado', 'el país']) assert.ok(!tieneVoseo(f), f);
+});
+
+test('voseo en el corpus: sin voseo queda no_voseo y no entra a agrupadas; con voseo pasa', async () => {
+  const sin = '[{"frase":"Exameno el suelo con cuidado","intencion":"intencion_examinar"}]';
+  const con = '[{"frase":"Fijate qué hay en el suelo, exameno todo","intencion":"intencion_examinar"}]';
+  const f = fetchFalso([ok(sin, 300), ok(con, 300)]);
+  const r = await ejecutarCorpus({ perfiles: 'torpe', frases: '1', maxEstados: '2' }, { raiz: tmp, config: {}, env: { GROQ_API_KEY: K1 }, fetch: f });
+  const pedido = f.llamadas[0].body.messages;
+  assert.equal(pedido[0].content, SYSTEM_CORPUS);
+  assert.ok(EJEMPLOS_VOSEO.length === 6 && EJEMPLOS_VOSEO.every((e) => pedido[0].content.includes(e)));
+  assert.ok(pedido[1].content.includes(INSTRUCCION_VOSEO));
+  const filas = leerJsonl(path.join(r.dir, 'candidatos', 'frases.jsonl'));
+  assert.deepEqual(filas.map((x) => x.validacion), ['no_voseo', 'ok']);
+  assert.equal(r.noVoseo, 1); assert.equal(r.frasesValidas, 1); assert.equal(r.pctVoseo, 50);
+  const agrupadas = JSON.stringify(JSON.parse(fs.readFileSync(path.join(r.dir, 'candidatos', 'frases-agrupadas.json'), 'utf8')));
+  assert.ok(!agrupadas.includes('Exameno el suelo con cuidado'));
 });

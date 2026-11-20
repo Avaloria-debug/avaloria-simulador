@@ -13,6 +13,16 @@ import { validarFrase, describirPerfil, describirEstado } from './ia/jugador.js'
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const VERSION = JSON.parse(fs.readFileSync(path.join(RAIZ, 'package.json'), 'utf8')).version;
+export const INSTRUCCION_VOSEO = 'Todas las frases en voseo rioplatense, nunca usar tú ni usted.';
+export const EJEMPLOS_VOSEO = Object.freeze([
+  'Decime qué sabés del robo en el puerto',
+  'mirá, tenés que ayudarme con esto',
+  'fijate si hay algo raro en la mesa',
+  '¿querés venderme esa capa? podés ponerle precio',
+  'che, ¿sos vos el que vio al ladrón?',
+  'hacé lugar, andá a buscar al guardia',
+]);
+export const SYSTEM_CORPUS = `${SYSTEM_JUGADOR} ${INSTRUCCION_VOSEO}\nEjemplos de cómo escribís:\n${EJEMPLOS_VOSEO.map((e) => `- ${e}`).join('\n')}`;
 export const PEDIDO = 'Devolvé solo un JSON: [{"frase":"...","intencion":"<id>"}]. Mezclá frases cortas y largas, con y sin errores de tipeo, nombrando o no al NPC, y palabras sueltas.';
 export const CONSULTA = { id: 'consulta_tema', ejemplo: '¿qué sabés de <tema>?' };
 const NO_ENTENDIDAS = new Set(['reformula', 'no_entendido']);
@@ -65,6 +75,14 @@ export function parsearFrasesJson(texto) {
   return d.filter((x) => x && typeof x === 'object').map((x) => ({ frase: x.frase, intencion: typeof x.intencion === 'string' ? x.intencion : null }));
 }
 
+// Voseo: formas fijas (con o sin tilde cuando no hay ambigüedad) o verbos terminados en -ás/-és/-ís con tilde.
+const FORMAS_VOSEO = new Set(['vos', 'sos', 'tenés', 'tenes', 'querés', 'queres', 'podés', 'podes', 'decime', 'mirá', 'fijate', 'fijá', 'hacé', 'andá']);
+const NO_VERBOS = new Set(['más', 'además', 'jamás', 'atrás', 'detrás', 'demás', 'quizás', 'compás', 'después', 'través', 'inglés', 'francés', 'interés', 'revés', 'cortés', 'marqués', 'portugués', 'estrés', 'ciprés', 'país', 'maíz', 'raíz', 'anís']);
+export function tieneVoseo(frase) {
+  const palabras = String(frase).toLowerCase().match(/[a-záéíóúüñ]+/g) ?? [];
+  return palabras.some((w) => FORMAS_VOSEO.has(w) || (w.length > 3 && /(ás|és|ís)$/.test(w) && !NO_VERBOS.has(w)));
+}
+
 const claveEstado = (d) => `${d.escena}|${d.npcs.map((n) => n.id).sort().join(',')}|${d.objetos.map((o) => o.id).sort().join(',')}`;
 
 // Muestrea estados distintos por (escena, NPC presentes, objetos). Cada estado guarda cómo reproducirlo.
@@ -113,8 +131,8 @@ export function intencionesDisponibles(sim) {
 
 export function armarPedido(perfil, sim, frases) {
   const lista = intencionesDisponibles(sim);
-  const user = `${describirPerfil(perfil)}\n${describirEstado(sim.detalle(), sim.estado().hora)}\nIntenciones disponibles (id: forma de ejemplo):\n${lista.map((i) => `- ${i.id}: ${i.ejemplo}`).join('\n')}\nEscribí ${frases} frases de jugador repartidas entre esas intenciones. ${PEDIDO}`;
-  return { system: SYSTEM_JUGADOR, user, intenciones: lista.map((i) => i.id) };
+  const user = `${describirPerfil(perfil)}\n${describirEstado(sim.detalle(), sim.estado().hora)}\nIntenciones disponibles (id: forma de ejemplo):\n${lista.map((i) => `- ${i.id}: ${i.ejemplo}`).join('\n')}\nEscribí ${frases} frases de jugador repartidas entre esas intenciones. ${INSTRUCCION_VOSEO} Incluso si la frase es una acción, que tenga alguna forma de vos (por ejemplo dirigiéndote al NPC: "mirá", "fijate", "decime"). ${PEDIDO}`;
+  return { system: SYSTEM_CORPUS, user, intenciones: lista.map((i) => i.id) };
 }
 
 export function estimar({ estados, perfiles, frases, maxLlamadasIa, caracteresPedido }) {
@@ -180,21 +198,23 @@ export async function ejecutarCorpus(cli = {}, { config = leerConfig(), raiz = R
       const validas = lista.map((x) => ({ ...x, frase: validarFrase(x.frase) })).filter((x) => { if (!x.frase) invalidas++; return x.frase; });
       const motor = await enEstado(e, async (sim) => validas.map((x) => { const c = sim.clasificar(x.frase); return { intencion: c.intencionId, regla: c.motivo, resultado: c.resultado }; }));
       for (const [i, x] of validas.entries()) {
-        const fila = { id: `f${String(++idFrase).padStart(5, '0')}`, frase: x.frase, perfil: pid, estadoJuego: { escena: e.escena, npcs: e.npcs, objetos: e.objetos }, intencionObjetivo: x.intencion, motor: motor[i], modelo, seed: e.seed, fecha: new Date().toISOString(), versionNarrador: versionNarrador.version, estado: 'pendiente' };
+        const fila = { id: `f${String(++idFrase).padStart(5, '0')}`, frase: x.frase, validacion: tieneVoseo(x.frase) ? 'ok' : 'no_voseo', perfil: pid, estadoJuego: { escena: e.escena, npcs: e.npcs, objetos: e.objetos }, intencionObjetivo: x.intencion, motor: motor[i], modelo, seed: e.seed, fecha: new Date().toISOString(), versionNarrador: versionNarrador.version, estado: 'pendiente' };
         todas.push(fila);
         fs.appendFileSync(archivo, `${JSON.stringify(fila)}\n`);
       }
     }
   }
   if (!fs.existsSync(archivo)) fs.writeFileSync(archivo, '');
-  const agrupadas = agrupar(todas);
+  const conVoseo = todas.filter((f) => f.validacion === 'ok');
+  const agrupadas = agrupar(conVoseo);
   fs.writeFileSync(path.join(dirC, 'frases-agrupadas.json'), JSON.stringify(agrupadas, null, 2));
   const pct = (a, b) => (b ? Math.round((1000 * a) / b) / 10 : 0);
-  const noEnt = todas.filter((f) => NO_ENTENDIDAS.has(f.motor.resultado)).length;
+  const noEnt = conVoseo.filter((f) => NO_ENTENDIDAS.has(f.motor.resultado)).length;
   const resumen = {
     loteId, modelo, estados: estados.length, llamadas: ia.cliente.llamadas, tokens: ia.cliente.tokens, tokensEntrada: ia.cliente.tokensEntrada, tokensSalida: ia.cliente.tokensSalida,
-    frasesPedidas: pedidas, frasesValidas: todas.length, pctValidas: pct(todas.length, pedidas), invalidas, noEntendidas: noEnt, pctNoEntendidas: pct(noEnt, todas.length),
-    distintaDeObjetivo: todas.filter((f) => !coincide(f.intencionObjetivo, f.motor)).length, gruposCandidatos: Object.values(agrupadas).reduce((a, g) => a + g.length, 0),
+    frasesPedidas: pedidas, frasesFormato: todas.length, invalidas, noVoseo: todas.length - conVoseo.length, pctVoseo: pct(conVoseo.length, todas.length),
+    frasesValidas: conVoseo.length, pctValidas: pct(conVoseo.length, pedidas), noEntendidas: noEnt, pctNoEntendidas: pct(noEnt, conVoseo.length),
+    distintaDeObjetivo: conVoseo.filter((f) => !coincide(f.intencionObjetivo, f.motor)).length, gruposCandidatos: Object.values(agrupadas).reduce((a, g) => a + g.length, 0),
     fallasParseo, corte, keys: ia.pool.resumen(), estimacion: est,
   };
   fs.writeFileSync(path.join(dir, 'corpus.json'), JSON.stringify(resumen, null, 2));
