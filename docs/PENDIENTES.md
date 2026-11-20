@@ -172,3 +172,11 @@ El h1 de cada caso pide la pista del NPC de la ranura p1 (Brenn, Sarin, Ysolde o
 - Preguntas abiertas para Tomás (decisiones de diseño del juego):
   1. Relación contra pista: la pista de camino lleva al jugador al dueño de p1, pero ese NPC no revela con relación baja (umbral 30 a 50 para `_1`), y en 15 turnos no da el tiempo para construirla. ¿El h1 alcanzado por la pista debería bajar el umbral de ese NPC o dar relación, o se espera que el jugador vuelva más tarde?
   2. Momento de la pista: se narra a los 8 turnos sin avance (turnos 9 a 12 en los lotes), y deja pocos turnos antes de los 15 de trabada. ¿El valor 8 es el buscado para un jugador real, que suele tener más paciencia que el simulador?
+
+## Umbral reducido en primer contacto por pista (2026-11-20, pendiente de aprobación de Tomás)
+- [PR del narrador #10](https://github.com/Avaloria-debug/Avaloria-narrador/pull/10), sin mergear, VERSION 0.0.41. Valor propuesto: `UMBRAL_PRIMER_CONTACTO_PISTA = 0` (`narrador/conocimientos.js:78`). Rige solo para el `_1` del dueño de p1 y solo en la primera consulta con tema a ese NPC después de la pista. El `_2` no cambia.
+- El simulador está fijado al sha de la rama de la PR (`313a175fdc7bc80d7b0e99c95db43d75c7cda254`) solo para medir. **No mergear esta rama del simulador a main hasta que la PR del narrador esté aprobada y mergeada.** Después, fijarlo al sha de main del narrador.
+- Medición (lote 700 contra lote 600, detalle en `docs/charla-npc/lote-700/umbral-primer-contacto.md`):
+  - seguidor_pistas: pistas seguidas 2 de 3 en los dos lotes; h1 de 4 a 3; runs con `_1` de 1 a 0; runs con `_2` de 2 a 0.
+  - amable: h1 0 en los dos; `_1` de 3 a 7 y `_2` de 2 a 7, por variación entre seeds y no por el cambio.
+- El umbral reducido no se activó en ningún run: ninguna consulta con tema llegó al dueño de p1 después de la pista. El cambio no queda probado ni refutado; la medición no lo ejercitó. 37 llamadas IA (contador del día: 565 de 800).
