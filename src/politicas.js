@@ -20,7 +20,7 @@ export const politicas = { aleatoria };
 // ---- F2: política por perfil ----
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { verbos, intencionDeVerbo, escenas, conocimientos, palabrasClave, leerPistaCamino } from './adaptador.js';
+import { verbos, intencionDeVerbo, escenas, conocimientos, palabrasClave, leerPistaCamino, palabrasClaveDel1 } from './adaptador.js';
 
 const leerConfig = (n) => JSON.parse(fs.readFileSync(fileURLToPath(new URL(`../config/${n}`, import.meta.url)), 'utf8'));
 export const FRASES_PRIMERIZO = leerConfig('frases-primerizo.json');
@@ -122,6 +122,25 @@ export function pesosDelTurno(perfil, d, mem) {
       if (nuevas.length) { por('viajar'); pref.destino = nuevas; }
       break;
     }
+    case 'buscar_dueno_p1': {
+      // Busca al NPC que nombra la pista donde esté en este turno y le consulta, por texto, con una palabra clave de su _1.
+      // Después de esa consulta (o si la pista no nombra a un NPC) sigue como seguir_pistas.
+      const pista = mem.pistaCamino;
+      const kws = pista?.npcId ? palabrasClaveDel1(pista.npcId) : [];
+      if (pista?.npcId && kws.length && !mem.consultoDueno) {
+        if (d.npcs.some((n) => n.id === pista.npcId)) {
+          for (const v of Object.keys(pesos)) delete pesos[v];
+          pesos.consulta_tema = perfil.pesos.consulta_tema || 1;
+          pref.temas = kws; pref.npcId = pista.npcId; pref.consultaNpcId = pista.npcId;
+          break;
+        }
+        const escena = d.posicionesNpcs?.[pista.npcId] ?? pista.escena;
+        const paso = escena && escena !== d.escena ? siguientePaso(d.escena, [escena]) : null;
+        if (paso && d.destinos.includes(paso)) { por('viajar'); pref.destino = [paso]; }
+        break;
+      }
+    }
+    // falls through
     case 'seguir_pistas':
       // Fuente "narracion": solo sigue la pista de camino leída en el texto narrado; no mira el estado del caso.
       if (perfil.objetivo.fuente === 'narracion') {
@@ -204,6 +223,9 @@ function textoDeAccion(verbo, parametros, d, perfil, rng) {
 
 function textoDeConsulta(d, pref, pool, perfil, rng) {
   const kw = elegir(rng, pref.temas?.length ? pref.temas : pool);
+  // Consulta dirigida (buscar_dueno_p1): siempre nombra al NPC buscado.
+  const dirigido = pref.consultaNpcId ? d.npcs.find((n) => n.id === pref.consultaNpcId) : null;
+  if (dirigido) return { texto: `${dirigido.nombre}, ${elegir(rng, ['qué sabés de', 'contame de', '¿sabés algo de'])} ${kw}`.replace(/¿(.*)$/, '¿$1?'), kw, npcId: dirigido.id };
   const npc = d.npcs.length ? elegir(rng, d.npcs) : null;
   let plantilla = elegir(rng, PLANTILLAS_CONSULTA);
   const nombra = npc && rng() < perfil.ruido.nombraNpc;
@@ -217,7 +239,7 @@ const claveAccion = (e) => `${e.intencion}|${JSON.stringify(e.parametros ?? {})}
 
 // Política con memoria para un run. `elegir(sim, rng, ctx)` y `observar(entrada, resultado)`.
 export function crearPoliticaPerfil(perfil) {
-  const mem = { visitadas: new Set(), preguntadas: new Set(), aprendidas: new Set(), ultimas: [], ultimoFallo: null, pistaCamino: null };
+  const mem = { visitadas: new Set(), preguntadas: new Set(), aprendidas: new Set(), ultimas: [], ultimoFallo: null, pistaCamino: null, consultoDueno: false };
   return {
     elegir(sim, rng, { turno }) {
       const d = sim.detalle();
@@ -246,9 +268,9 @@ export function crearPoliticaPerfil(perfil) {
     },
     construir(verbo, d, pref, pool, rng, turno) {
       if (verbo === 'consulta_tema') {
-        const { texto, kw } = textoDeConsulta(d, pref, pool, perfil, rng);
+        const { texto, kw, npcId } = textoDeConsulta(d, pref, pool, perfil, rng);
         mem.preguntadas.add(kw);
-        return { tipo: 'texto', texto: aplicarRuido(texto, perfil.ruido, rng), intencion: 'consulta_tema', verbo };
+        return { tipo: 'texto', texto: aplicarRuido(texto, perfil.ruido, rng), intencion: 'consulta_tema', verbo, ...(npcId ? { npcId } : {}) };
       }
       const parametros = armarAccion(verbo, d, pref, rng);
       const intencion = intencionDeVerbo.get(verbo).id;
@@ -259,6 +281,7 @@ export function crearPoliticaPerfil(perfil) {
       mem.ultimas.push(claveAccion(entrada));
       if (mem.ultimas.length > 3) mem.ultimas.shift();
       mem.ultimoFallo = FALLOS.has(r.resultado) && entrada.verbo ? entrada.verbo : null;
+      if (entrada.npcId && entrada.npcId === mem.pistaCamino?.npcId) mem.consultoDueno = true;
       if (perfil.objetivo.fuente === 'narracion') mem.pistaCamino = leerPistaCamino(r.texto) ?? mem.pistaCamino;
       if (perfil.aprendeDeRespuestas && typeof r.texto === 'string') {
         const palabras = r.texto.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').split(/[^a-zñ]+/);
