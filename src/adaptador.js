@@ -38,6 +38,10 @@ export const escenas = new Map(contenido.escenas.map((x) => [x.id, { id: x.id, n
 export const npcsDef = new Map(contenido.npcs.map((n) => [n.id, n]));
 export const conocimientos = contenido.npcs.flatMap((n) => (n.conocimientos ?? []).map((k) => ({ id: k.id, npcId: n.id, palabrasClave: k.palabrasClave ?? [] })));
 export const palabrasClave = new Set(conocimientos.flatMap((k) => k.palabrasClave));
+// Palabras clave del _1 (primer conocimiento en el contenido) de un NPC. Solo lectura.
+export function palabrasClaveDel1(npcId) {
+  return [...(npcsDef.get(npcId)?.conocimientos?.[0]?.palabrasClave ?? [])];
+}
 
 // Pista de camino a p1 en el texto narrado: se reconoce por las plantillas `textos_pista_camino` de los casos.
 const escaparRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -144,6 +148,8 @@ export async function crearPartida({ seed, casoId, partidaId = `sim-${seed}`, ia
         tagsCaso: (c.tags ?? []).map(({ tipo, objetivo, nivel }) => ({ tipo, objetivo, nivel })),
         pistas: (c.instancia?.pistas ?? []).map((p) => ({ conocimientoId: p.conocimientoId, npcId: p.npcId, escena: posiciones[p.npcId] ?? null, revelado: revelados.has(p.conocimientoId) })),
         escenasPendientes: [...escenasPendientes],
+        // Escena de cada NPC en este turno (por horario). Solo lectura.
+        posicionesNpcs: { ...posiciones },
       };
     },
     async aplicar(entrada) {
