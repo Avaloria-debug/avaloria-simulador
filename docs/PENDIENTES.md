@@ -34,7 +34,7 @@ Todos cortan por trabada en el turno 15 (umbral 15). Muestra chica: hallazgo a c
 ## Verificación opcional: fuego con IA
 - Opcional, no se corre por ahora. Sería reejecutar `r0019-s219` en modo `ia` para ver la respuesta de Groq con el narrador 0.0.39. No se justifica gastar cuota: la validación (humo, fuego, incendio, llamas, quemar sin `evento_incendio_puesto` activo en la escena → plantilla de respaldo) la cubren los 6 tests de `narrador/fuegoIa.test.js`. El lote de 6 runs en modo código (seed-base 100, primerizo:3, curioso:3) tuvo 0 menciones de fuego en 90 turnos, con el incendio activo en 12 de ellos; en modo código no hay texto de IA.
 
-## Lote grande de charla (en espera)
+## Lote grande de charla (corrido el 2026-11-20, ver tanda abajo)
 - Comando: `node src/cli.js --runs 240 --perfiles curioso:60,investigador:60,amable:40,primerizo:40,directo:40 --mezcla 0/100 --seed-base 300 --max-llamadas-ia 800`.
 - Estimación (`--estimar`, 2026-11-20): 240 runs `ia`, ~1200 llamadas (narrador 1200, jugador 0), ~672 000 tokens.
 - Capacidad tomada: 800 llamadas por día con 4 keys. La configuración calcula 1000 (250 por key); se usa 800 como margen.
@@ -58,3 +58,12 @@ Todos cortan por trabada en el turno 15 (umbral 15). Muestra chica: hallazgo a c
   - t00002 sigue `editar`, condicionado al incendio (ver arriba).
 - El texto original no se tocó; la versión corregida está en `textoEditado`. La frase nueva del ítem 14 ya estaba rechazada.
 - Nada de esto entra al narrador sin una exportación aparte.
+
+## Lote grande de charla: tanda del 2026-11-20
+- Lote `20261120-193218-300`, lanzado con `--max-llamadas-ia 500`: 240 runs, curioso:60, investigador:60, amable:40, primerizo:40, directo:40, modo `ia`, seed-base 300.
+- No se pudo consultar el uso en console.groq.com (pide iniciar sesión). Se tomó el dato local: 206 llamadas ya usadas, 594 disponibles.
+- Resultado: los 240 runs completos en una sola tanda, con 47 llamadas y 28 670 tokens reales (el contador local quedó en 253 llamadas del día). La estimación (5 llamadas por run, ~1200) era un techo: en la práctica hubo ~0,2 llamadas por run, así que no hizo falta el segundo día.
+- Pendientes: 0. No hay nada que reanudar. Si hiciera falta, el comando es `node src/cli.js --reanudar 20261120-193218-300 --max-llamadas-ia 800`, y no correría ningún run. Reset de cuota: el contador local cambia a las 00:00 UTC (21:00 en Argentina). El reinicio real de Groq no está verificado.
+- Cierres: 240 por `trabada` (turno 15 a 17). Ningún desenlace, `maxTurnos`, `cuota` ni excepción. Es el mismo hallazgo de F2: los perfiles de charla no avanzan hitos con la relación inicial.
+- Fuego: de los 47 textos de IA, ninguno menciona humo, fuego, incendio, llamas ni quemar, y no hubo rechazos `fuego_sin_evento`. En ningún turno IA estaba activo el incendio.
+- Informe: `docs/charla-npc/lote-300/informe-charla.md` (y `.json`). Textos candidatos: `docs/candidatos/charla-npc-300-textos.jsonl` (47, todos pendientes).
