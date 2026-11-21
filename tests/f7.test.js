@@ -16,6 +16,39 @@ const leer = (dir, n) => fs.readFileSync(path.join(dir, n), 'utf8');
 const entradas = (t) => Number(/^entradas: (\d+)/m.exec(t)[1]);
 
 describe('F7: exportar', () => {
+  test('los editados salen con su textoEditado; sin textoEditado no salen; editar (pedido de cambio) tampoco', () => {
+    const items = [
+      texto('t1', 'Texto original que no sale.', 'editado', { textoEditado: 'Serel corrige: el pan sale al alba.' }),
+      texto('t2', 'Editado sin texto corregido.', 'editado'),
+      texto('t3', 'Pedido de edición sin aceptar.', 'editar', { textoEditado: 'Tampoco sale esto.' }),
+      { ...frase('f1', 'quiero comprarle algo al panadero', 'intencion_comprar', 'editado'), textoEditado: 'Me compro una hogaza.' },
+    ];
+    const dir = tmp('f7ed-');
+    const r = exportar({ items, dirSalida: dir, banco: vacio() });
+    const t = JSON.parse(leer(dir, 'textos.json')).textos;
+    assert.deepEqual(t.map((x) => [x.id, x.texto, x.estado, x.textoOriginal]), [['t1', 'Serel corrige: el pan sale al alba.', 'editado', 'Texto original que no sale.']]);
+    const todo = ['diccionario-lexico.add.md', 'frases-patrones.add.md', 'textos.json'].map((n) => leer(dir, n)).join('\n');
+    assert.match(todo, /me compro una hogaza/);
+    assert.doesNotMatch(todo, /quiero comprarle|Editado sin texto|Pedido de edición|Tampoco sale/);
+    assert.equal(r.resumen.aprobados, 3);
+    assert.equal(r.resumen.editados, 3);
+    assert.equal(r.resumen.editadosSinTexto, 1);
+    assert.deepEqual(r.resumen.descartes, [{ ref: 'mem/b.jsonl#t2', motivo: 'editado_sin_texto' }]);
+    assert.equal(r.resumen.ignoradosNoAprobados, 1);
+  });
+
+  test('los 4 editados reales de docs/candidatos tienen textoEditado y salen con él (exportación en carpeta temporal)', () => {
+    const reales = leerCandidatos({ ids: ['docs'] }).filter((c) => c.estado === 'editado');
+    assert.equal(reales.length, 4);
+    for (const c of reales) assert.ok(c.textoEditado && c.textoEditado.trim(), c.ref);
+    const dir = tmp('f7real-');
+    const r = exportar({ items: reales, dirSalida: dir, banco: vacio() });
+    const t = JSON.parse(leer(dir, 'textos.json')).textos;
+    assert.deepEqual(t.map((x) => x.texto).sort(), reales.map((c) => c.textoEditado).sort());
+    assert.equal(r.resumen.editadosSinTexto, 0);
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
   test('solo salen los aprobados; rechazados y pendientes nunca', () => {
     const items = [
       frase('f1', 'Me compro el pan fresco y el queso.', 'intencion_comprar'),
@@ -23,16 +56,15 @@ describe('F7: exportar', () => {
       frase('f3', 'Esto tampoco porque está pendiente', 'intencion_comprar', 'pendiente'),
       texto('t1', 'Serel te mira y sigue amasando.'),
       texto('t2', 'Texto rechazado que no sale.', 'rechazado'),
-      texto('t3', 'Texto editado que no sale.', 'editado', { textoEditado: 'x' }),
     ];
     const dir = tmp('f7e-');
     const r = exportar({ items, dirSalida: dir, banco: vacio() });
     const todo = ['diccionario-lexico.add.md', 'frases-patrones.add.md', 'textos.json'].map((n) => leer(dir, n)).join('\n');
     assert.match(todo, /me compro el pan fresco y el queso/);
     assert.match(todo, /Serel te mira y sigue amasando/);
-    assert.doesNotMatch(todo, /rechazad|pendiente|Texto editado|no sale/i);
+    assert.doesNotMatch(todo, /rechazad|pendiente|no sale/i);
     assert.equal(r.resumen.aprobados, 2);
-    assert.equal(r.resumen.ignoradosNoAprobados, 4);
+    assert.equal(r.resumen.ignoradosNoAprobados, 3);
     assert.deepEqual(r.resumen.exportados, { 'diccionario-lexico': 0, 'frases-patrones': 1, textos: 1 });
   });
 

@@ -7,5 +7,5 @@ try {
   const fuentes = valor('--fuentes')?.split(',').map((x) => x.trim()).filter(Boolean) ?? null;
   const { dir, archivos, resumen } = exportar({ fuentes, dirSalida: valor('--salida') });
   console.log(`Exportación en ${dir}: ${archivos.join(', ')}.`);
-  console.log(`Aprobados ${resumen.aprobados} · léxico ${resumen.exportados['diccionario-lexico']} · patrones ${resumen.exportados['frases-patrones']} · textos ${resumen.exportados.textos} · descartados por duplicado ${resumen.duplicados} · sin intención ${resumen.sinIntencion}.`);
+  console.log(`Aprobados ${resumen.aprobados} (editados ${resumen.editados}) · léxico ${resumen.exportados['diccionario-lexico']} · patrones ${resumen.exportados['frases-patrones']} · textos ${resumen.exportados.textos} · descartados por duplicado ${resumen.duplicados} · sin intención ${resumen.sinIntencion} · editados sin texto ${resumen.editadosSinTexto}.`);
 } catch (e) { console.error(`Error: ${e.message}`); process.exitCode = 1; }

@@ -9,6 +9,9 @@ export const DIR_SIM = path.join(RAIZ, 'simulaciones');
 export const DIR_DOCS = path.join(RAIZ, 'docs', 'candidatos');
 export const ACCIONES = Object.freeze({ aprobar: 'aprobado', rechazar: 'rechazado', pendiente: 'pendiente', editar: null });
 export const APROBADO = 'aprobado';
+// `editado`: Tomás aceptó una versión corregida (`textoEditado`); se exporta esa versión (SUPUESTO en docs/SUPUESTOS.md).
+export const EDITADO = 'editado';
+export const EXPORTABLES = Object.freeze([APROBADO, EDITADO]);
 
 /** Fuentes: `docs` (docs/candidatos) y cada lote con carpeta `candidatos/`. */
 export function listarFuentes({ dirSim = DIR_SIM, dirDocs = DIR_DOCS } = {}) {

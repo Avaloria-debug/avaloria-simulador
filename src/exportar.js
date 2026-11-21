@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { leerCandidatos, APROBADO } from './candidatos.js';
+import { leerCandidatos, EDITADO, EXPORTABLES } from './candidatos.js';
 import { idsIntenciones, normalizar, textoDiccionario, textosPlantillas, nombresNpcs, nombresEscenas, versionNarrador, DIR_NARRADOR } from './adaptador.js';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -105,15 +105,21 @@ No cambies contenido para que pase la suite. Si una fila hace fallar un test o l
 }
 
 /**
- * Exporta los candidatos aprobados de las fuentes elegidas a `exportaciones/<fecha>/`.
+ * Exporta los candidatos aprobados (y los editados, con su `textoEditado`) de las fuentes elegidas a `exportaciones/<fecha>/`.
  * @returns {{dir, archivos: string[], resumen: object}}
  */
 export function exportar({ fuentes = null, fecha = new Date().toISOString().slice(0, 10), dirSalida = null, dirExportaciones = DIR_EXPORTACIONES, banco = null, items = null, ...dirs } = {}) {
   const dir = verificarSalida(dirSalida ?? path.join(dirExportaciones, fecha));
   const todos = items ?? leerCandidatos({ ids: fuentes, ...dirs });
-  const aprobados = todos.filter((c) => c.estado === APROBADO);
+  const elegidos = todos.filter((c) => EXPORTABLES.includes(c.estado));
   const b = banco ?? leerBanco({ dirExportaciones });
-  const resumen = { fecha, versionNarrador, fuentes: fuentes ?? 'todas', aprobados: aprobados.length, ignoradosNoAprobados: todos.length - aprobados.length, duplicados: 0, sinIntencion: 0, vacias: 0, descartes: [] };
+  const resumen = { fecha, versionNarrador, fuentes: fuentes ?? 'todas', aprobados: elegidos.length, editados: elegidos.filter((c) => c.estado === EDITADO).length, ignoradosNoAprobados: todos.length - elegidos.length, duplicados: 0, sinIntencion: 0, vacias: 0, editadosSinTexto: 0, descartes: [] };
+  // Un editado sin texto corregido no se exporta: no se inventa el texto ni se usa el original.
+  const aprobados = elegidos.filter((c) => {
+    if (c.estado !== EDITADO || (typeof c.textoEditado === 'string' && c.textoEditado.trim())) return true;
+    resumen.editadosSinTexto += 1; resumen.descartes.push({ ref: c.ref, motivo: 'editado_sin_texto' });
+    return false;
+  });
   const lexico = {}; const patrones = {};
   const vistos = { lexico: new Set(b.lexico), patrones: new Set(b.patrones), textos: new Set(b.textos) };
   const textos = [];
@@ -132,7 +138,7 @@ export function exportar({ fuentes = null, fecha = new Date().toISOString().slic
       if (!k) { resumen.vacias += 1; continue; }
       if (vistos.textos.has(k)) { resumen.duplicados += 1; resumen.descartes.push({ ref: c.ref, motivo: 'duplicado' }); continue; }
       vistos.textos.add(k);
-      textos.push({ id: c.id, ref: c.ref, texto, tipo: c.tipo, npc: c.npc, escena: c.escena, intencion: c.intencion, fraseJugador: c.fraseJugador, nota: c.nota, versionNarrador: c.versionNarrador });
+      textos.push({ id: c.id, ref: c.ref, texto, ...(c.estado === EDITADO ? { estado: EDITADO, textoOriginal: limpiar(c.texto) } : {}), tipo: c.tipo, npc: c.npc, escena: c.escena, intencion: c.intencion, fraseJugador: c.fraseJugador, nota: c.nota, versionNarrador: c.versionNarrador });
     }
   }
   const conteos = {
