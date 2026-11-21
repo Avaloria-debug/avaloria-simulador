@@ -86,3 +86,43 @@ test('visor: el HTML generado no lleva keys de config/keys.json ni las guarda en
   assert.match(html, /href="#keys"/);
   fs.rmSync(base, { recursive: true, force: true });
 });
+
+test('visor: un archivo de candidatos o un config.json roto no tiran la generación', async () => {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'visor-roto-'));
+  const sim = path.join(base, 'simulaciones');
+  const mk = (d, archivos) => { fs.mkdirSync(path.join(sim, d, 'candidatos'), { recursive: true }); for (const [n, c] of Object.entries(archivos)) fs.writeFileSync(path.join(sim, d, n), c); };
+  mk('a', { 'config.json': '{ roto', 'informe.json': JSON.stringify({ runs: 1 }) });
+  mk('b', { 'config.json': JSON.stringify({ loteId: 'mismo', parametros: { perfiles: 'curioso', runs: '4' }, fecha: 'no-es-fecha' }) });
+  mk('c', { 'config.json': JSON.stringify({ loteId: 'mismo', parametros: null, narrador: null }), 'informe.json': '{roto' });
+  fs.writeFileSync(path.join(sim, 'b', 'candidatos', 'textos.jsonl'), '{"id":"t1","estado":"pendiente","texto":"bien"}\n{roto\n');
+  const docs = path.join(base, 'docs');
+  fs.mkdirSync(docs);
+  fs.writeFileSync(path.join(docs, 'x-frases-agrupadas.json'), JSON.stringify({ candidatos: { mirar: 'no-es-lista', saludar: [{ id: 'f1', estado: 'pendiente', frase: 'hola' }] } }));
+  const salida = path.join(base, 'out', 'index.html');
+  const r = generarHtml({ dirSim: sim, dirDocs: docs, salida, readme: path.join(base, 'no-hay.md') });
+  assert.equal(r.lotes, 3);
+  assert.equal(r.candidatos, 2);
+  assert.deepEqual(r.rotos.sort(), ['b/textos.jsonl (1)', 'docs/x-frases-agrupadas.json (1)']);
+  const datos = JSON.parse(fs.readFileSync(salida, 'utf8').match(/<script id="datos" type="application\/json">([\s\S]*?)<\/script>/)[1]);
+  const porId = Object.fromEntries(datos.lotes.map((l) => [l.id, l]));
+  assert.deepEqual(Object.keys(porId).sort(), ['a', 'b', 'c']);
+  assert.equal(porId.b.loteId, 'mismo');
+  assert.equal(porId.c.loteId, 'mismo');
+  assert.equal(porId.b.perfiles, 'curioso');
+  assert.equal(porId.b.runs, 4);
+  assert.equal(porId.b.fecha, null);
+  assert.equal(porId.a.informe.runs, 1);
+  assert.equal(porId.c.informe, null);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('visor: comun.js normaliza candidatos con tipos inesperados', async () => {
+  const { candidatosDeArchivo, resumenLote } = await import('../scripts/visor/comun.js');
+  assert.equal(candidatosDeArchivo('docs', 'notas.md', 'x'), null);
+  assert.equal(candidatosDeArchivo('docs', 'otro.json', '{"a":1}'), null);
+  const r = candidatosDeArchivo('l', 't.jsonl', '{"id":"a","estado":"pendiente","texto":"x","frecuencia":"3","perfiles":["p",1],"contexto":{"intencion":{"x":1}}}\n\n[1]\nnull\n');
+  assert.equal(r.errores, 0);
+  assert.deepEqual([r.items[0].frecuencia, r.items[0].perfil, r.items[0].intencion, r.items[0].lote], [1, 'p', null, 'l']);
+  assert.equal(resumenLote('d', [1], 'x', 5).loteId, 'd');
+  assert.equal(resumenLote('d', { parametros: { perfiles: [null, { id: 'a' }, 'b'] } }).perfiles, 'a, b');
+});
