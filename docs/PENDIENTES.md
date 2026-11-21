@@ -324,3 +324,15 @@ Decisiones de Opus en nombre de Tomás. Criterio: el jugador no debe sentir que 
   - El cambio también vale para el corpus (`src/corpus.js` usa la misma función).
 - Candidatos: `c0030`, `c0031` y `c0032` quedan rechazados con motivo `copia_descripcion_perfil`. Otras 4 frases del mismo perfil con las mismas palabras (`c0018`, `c0026`, `c0033`, `c0035`) quedan pendientes para Tomás. Pendientes en total: 92.
 - Llamadas IA de hoy en esta etapa: 21 (15 y 6). Contador del 2026-11-21: 51 de 800.
+
+## Tormenta: opción (b) en la PR #13 del narrador (2026-11-21)
+- **Medición** (lotes 300 a 800 ya registrados, 466 runs, 7909 turnos). La tormenta (`azar`, p 0.04 por turno, solo en la escena del jugador, 6 escenas de camino, 4 horas) estuvo activa en el 1.9 % de los turnos y en el 6.2 % de los runs. De los 112 runs con Hollis en p1, apareció antes del turno 25 en 7 (6.3 %).
+- **Criterio**: con al menos el 60 % de esos runs, se quedaba (a); con menos, (b). Se eligió **(b)**: el `_1` de Hollis ya no pide la tormenta. El cambio está en `data/contenido/contenido-v3.json` del narrador.
+- **PR #13 del narrador**: sha final `7d5ced1151d8d35d69118f6964bbf7af0bf934aa`, VERSION 0.0.43, 1774/1774, sin mergear. Al mergearla, Tomás aprueba tres cosas:
+  - El sendero se revela sin tormenta, por el h1 o por consulta con relación 30.
+  - La regla "el hito no entrega un conocimiento con evento sin cumplir". Hoy no afecta a ningún caso: los `_1` de Ivor y Darío no son pista.
+  - El `habilita` de la tormenta queda sin efecto práctico.
+- **Medición con el sha final** (rama `claude/medicion-h1-opcion-b`, instalación limpia, lote `20261121-015937-800`, `seguidor_pistas_dueno:6`, seed-base 800, `--trabada 25`, 15 llamadas IA). Hollis fue p1 en 1 run, r0002-s802. Ese run llegó al h1 en el turno 4 y reveló el sendero con la tormenta inactiva; no hubo tormenta en ningún turno. El rejuego sin IA coincide en los 6 runs.
+- **Estado del pin**:
+  - Esta rama fija el narrador al sha de la PR #13. No se mergea a main hasta que Tomás apruebe la PR. Después del merge del narrador, se vuelve a fijar a su commit en main del narrador, con instalación limpia, y recién ahí se mergea.
+  - Simulador en main (simulador#17): está fijado a `9f8071f`, que es el merge de la PR #11 y está en main del narrador. El sha de la PR #13 solo se instaló para medir y no se commiteó. Igual, cuando se mergee la PR #13, verificar que el simulador en main queda fijado a main del narrador.
