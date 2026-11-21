@@ -4,15 +4,18 @@ const num = (v, d = 1) => (v == null || Number.isNaN(v) ? '—' : Number(v).toLo
 const pct = (v) => (v == null ? '—' : `${num(v)} %`);
 const fecha = (f) => (f ? new Date(f).toLocaleString('es-AR') : '—');
 const vista = $('#vista');
+const obj = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
+const arr = (v) => (Array.isArray(v) ? v : v == null ? [] : [v]);
+const lista = (v) => arr(v).filter((x) => x != null).join(', ');
 const DATOS = JSON.parse($('#datos').textContent);
 DATOS.lotes ??= []; DATOS.candidatos ??= []; DATOS.comandos ??= [];
 
 const tabla = (cab, filas) => `<div class="scroll"><table><thead><tr>${cab.map((x) => `<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${filas.map((f) => `<tr>${f.map((x) => `<td>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
-function barras(obj, total) {
-  const e = Object.entries(obj ?? {});
+function barras(o, total) {
+  const e = Object.entries(obj(o)).map(([k, v]) => [k, Number(v)]).filter(([, v]) => Number.isFinite(v));
   if (!e.length) return '<span class="suave">—</span>';
-  const max = total || Math.max(...e.map(([, v]) => v)) || 1;
-  return e.map(([k, v]) => `<span>${esc(k)}</span><div class="barra-h"><div class="b" style="width:${(100 * v) / max}%"></div></div><span>${esc(num(v))}</span>`).join('');
+  const max = Number(total) || Math.max(...e.map(([, v]) => v)) || 1;
+  return e.map(([k, v]) => `<span>${esc(k)}</span><div class="barra-h"><div class="b" style="width:${Math.max(0, Math.min(100, (100 * v) / max))}%"></div></div><span>${esc(num(v))}</span>`).join('');
 }
 
 // Markdown mínimo (títulos, tablas, listas, párrafos) para informe.md.
@@ -40,7 +43,7 @@ function lotes(id) {
   if (id) return detalle(id);
   const ls = DATOS.lotes;
   vista.innerHTML = `<h1>Lotes</h1>${ls.length ? `<div class="tarjeta scroll"><table><thead><tr><th>Lote</th><th>Fecha</th><th>Tipo</th><th>Runs</th><th>Perfiles</th><th>Versión narrador</th><th>Informe</th></tr></thead><tbody>
-    ${ls.map((l) => `<tr class="clic" data-id="${esc(l.id)}" tabindex="0"><td>${esc(l.id)}</td><td>${esc(fecha(l.fecha))}</td><td>${esc(l.tipo)}</td><td>${esc(l.runs ?? '—')}</td><td>${esc(l.perfiles || '—')}</td><td>${esc(l.versionNarrador ?? '—')}</td><td>${l.informe || l.informeMd ? 'sí' : 'no'}</td></tr>`).join('')}
+    ${ls.map((l) => `<tr class="clic" data-id="${esc(l.id)}" tabindex="0"><td>${esc(l.loteId ?? l.id)}</td><td>${esc(fecha(l.fecha))}</td><td>${esc(l.tipo)}</td><td>${esc(l.runs ?? '—')}</td><td>${esc(l.perfiles || '—')}</td><td>${esc(l.versionNarrador ?? '—')}</td><td>${l.informe || l.informeMd ? 'sí' : 'no'}</td></tr>`).join('')}
     </tbody></table></div>` : '<p class="suave">No hay lotes. Corré <code>npm run generar-html</code> o cargá archivos desde «Cargar archivos».</p>'}`;
   for (const tr of vista.querySelectorAll('tr.clic')) {
     const ir = () => { location.hash = `lotes/${encodeURIComponent(tr.dataset.id)}`; };
@@ -52,30 +55,35 @@ function lotes(id) {
 function detalle(id) {
   const l = DATOS.lotes.find((x) => x.id === id);
   if (!l) { vista.innerHTML = `<h1>Lote no encontrado</h1><p><a href="#lotes">Volver</a></p>`; return; }
-  const cab = `<h1>Lote ${esc(id)}</h1><p class="suave">${esc(fecha(l.fecha))} · simulador ${esc(l.versionSimulador ?? '—')} · narrador ${esc(l.versionNarrador ?? '—')} · <a href="#lotes">volver</a></p>`;
+  const cab = `<h1>Lote ${esc(l.loteId ?? id)}</h1><p class="suave">${esc(fecha(l.fecha))} · simulador ${esc(l.versionSimulador ?? '—')} · narrador ${esc(l.versionNarrador ?? '—')} · <a href="#lotes">volver</a></p>`;
   const md = l.informeMd ? `<details class="tarjeta"${l.informe ? '' : ' open'}><summary>informe.md</summary><div class="md">${markdown(l.informeMd)}</div></details>` : '';
   const i = l.informe;
   if (!i) { vista.innerHTML = cab + (md || '<p class="suave">Este lote no tiene informe.</p>'); return; }
-  const runs = i.runs;
-  const desen = i.porCierre?.desenlace ?? 0;
-  const sims = Object.values(i.similitud ?? {}).filter((s) => s?.pares && s.jaccard);
+  const runs = Number.isFinite(Number(i.runs)) ? Number(i.runs) : null;
+  const desen = Number(obj(i.porCierre).desenlace) || 0;
+  const sims = Object.values(obj(i.similitud)).filter((s) => Number(s?.pares) > 0 && Number.isFinite(Number(s?.jaccard?.media)));
   const simMedia = sims.length ? sims.reduce((a, s) => a + s.jaccard.media * s.pares, 0) / sims.reduce((a, s) => a + s.pares, 0) : null;
-  const perf = Object.entries(i.porPerfil ?? {}).filter(([, p]) => p && typeof p === 'object');
-  const casos = Object.entries(i.porCaso ?? {});
-  const tarjetas = [[runs, 'runs'], [pct(runs ? (100 * desen) / runs : null), 'desenlace'], [pct(i.pctTrabada), 'trabada'], [num(i.turnos?.media), 'turnos (media)'], [num(i.turnos?.p90), 'turnos (p90)'], [num(simMedia, 2), 'similitud media (Jaccard)'], [pct(i.resultadosMotor?.reformula), 'reformulación']];
+  const perf = Object.entries(obj(i.porPerfil)).filter(([, p]) => p && typeof p === 'object');
+  const casos = Object.entries(obj(i.porCaso)).map(([k, x]) => [k, obj(x)]);
+  const motor = obj(i.resultadosMotor);
+  const noEnt = arr(i.topNoEntendidas).filter((x) => x && typeof x === 'object');
+  const trab = arr(i.trabadas).filter((x) => x && typeof x === 'object');
+  const fallas = arr(i.fallasGraves).filter((x) => x != null);
+  const tags = obj(i.tags);
+  const tarjetas = [[num(runs, 0), 'runs'], [pct(runs ? (100 * desen) / runs : null), 'desenlace'], [pct(i.pctTrabada), 'trabada'], [num(i.turnos?.media), 'turnos (media)'], [num(i.turnos?.p90), 'turnos (p90)'], [num(simMedia, 2), 'similitud media (Jaccard)'], [pct(motor.reformula), 'reformulación']];
   vista.innerHTML = `${cab}
   <div class="tarjetas">${tarjetas.map(([v, e]) => `<div class="tarjeta"><div class="cifra">${esc(v)}</div><div class="etiqueta">${e}</div></div>`).join('')}</div>
   <div class="tarjeta"><h2 class="primero">Cierres</h2><div class="barras">${barras(i.porCierre, runs)}</div></div>
   ${perf.length ? `<div class="tarjeta"><h2 class="primero">Por perfil</h2>
     ${tabla(['Perfil', 'Runs', 'Runs con hito', 'Hitos', 'pista_conocida', 'Turnos al 1er hito', '% reformula (20 primeros)', '% abandono', 'Excepciones'],
-      perf.map(([k, p]) => [k, p.runs, p.runsConHito, p.hitos, p.pistaConocidaEscrita, num(p.turnosHastaPrimerHito?.media), pct(p.pctReformulacionPrimeros20), pct(p.pctAbandono), p.excepciones]))}</div>` : ''}
-  <div class="tarjeta"><h2 class="primero">Por caso</h2>
-    ${tabla(['Caso', 'Runs', 'Hitos alcanzados', 'Desenlaces'], casos.map(([k, x]) => [k, x.runs, Object.entries(x.hitos ?? {}).map(([h, v]) => `${h} ${num(v.pct)} %`).join(' · ') || '—', Object.entries(x.desenlaces ?? {}).map(([d, v]) => `${d}: ${v?.cantidad ?? v}`).join(', ') || '—']))}</div>
-  <div class="tarjeta"><h2 class="primero">Resultados del motor</h2><div class="barras">${barras(i.resultadosMotor, 100)}</div></div>
-  ${(i.topNoEntendidas ?? []).length ? `<div class="tarjeta"><h2 class="primero">Frases no entendidas (top)</h2>${tabla(['Frase', 'Veces'], i.topNoEntendidas.map((x) => [x.frase, x.veces]))}</div>` : ''}
-  ${(i.trabadas ?? []).length ? `<div class="tarjeta"><h2 class="primero">Trabadas</h2>${tabla(['Run', 'Perfil', 'Caso', 'Escena', 'Hitos', 'Últimas acciones'], i.trabadas.slice(0, 50).map((x) => [x.runId, x.perfil, x.caso, x.escena, (x.hitos ?? []).join(', ') || '—', (x.ultimasAcciones ?? []).join(' · ')]))}${i.trabadas.length > 50 ? `<p class="suave">Mostrando 50 de ${i.trabadas.length}.</p>` : ''}</div>` : ''}
-  <div class="tarjeta"><h2 class="primero">Tags</h2><p>Nunca escritos: ${esc((i.tags?.nuncaEscritos ?? []).join(', ') || '—')}</p><p>Graves sin reparación: ${esc(i.tags?.gravesSinReparacion?.length ?? 0)}</p></div>
-  <div class="tarjeta"><h2 class="primero">Fallas graves</h2>${(i.fallasGraves ?? []).length ? tabla(['Run', 'Error'], i.fallasGraves.map((x) => [x.runId, x.error ?? x.mensaje ?? JSON.stringify(x)])) : '<p class="ok">Ninguna.</p>'}</div>
+      perf.map(([k, p]) => [k, num(p.runs, 0), num(p.runsConHito, 0), num(p.hitos, 0), num(p.pistaConocidaEscrita, 0), num(p.turnosHastaPrimerHito?.media), pct(p.pctReformulacionPrimeros20), pct(p.pctAbandono), num(p.excepciones, 0)]))}</div>` : ''}
+  ${casos.length ? `<div class="tarjeta"><h2 class="primero">Por caso</h2>
+    ${tabla(['Caso', 'Runs', 'Hitos alcanzados', 'Desenlaces'], casos.map(([k, x]) => [k, num(x.runs, 0), Object.entries(obj(x.hitos)).map(([h, v]) => `${h} ${pct(v?.pct)}`).join(' · ') || '—', Object.entries(obj(x.desenlaces)).map(([d, v]) => `${d}: ${num(v && typeof v === 'object' ? v.cantidad : v, 0)}`).join(', ') || '—']))}</div>` : ''}
+  <div class="tarjeta"><h2 class="primero">Resultados del motor</h2><div class="barras">${barras(motor, 100)}</div></div>
+  ${noEnt.length ? `<div class="tarjeta"><h2 class="primero">Frases no entendidas (top)</h2>${tabla(['Frase', 'Veces'], noEnt.map((x) => [x.frase ?? '—', num(x.veces, 0)]))}</div>` : ''}
+  ${trab.length ? `<div class="tarjeta"><h2 class="primero">Trabadas</h2>${tabla(['Run', 'Perfil', 'Caso', 'Escena', 'Hitos', 'Últimas acciones'], trab.slice(0, 50).map((x) => [x.runId ?? '—', x.perfil ?? '—', x.caso ?? '—', x.escena ?? '—', lista(x.hitos) || '—', arr(x.ultimasAcciones).join(' · ') || '—']))}${trab.length > 50 ? `<p class="suave">Mostrando 50 de ${trab.length}.</p>` : ''}</div>` : ''}
+  <div class="tarjeta"><h2 class="primero">Tags</h2><p>Nunca escritos: ${esc(lista(tags.nuncaEscritos) || '—')}</p><p>Graves sin reparación: ${esc(arr(tags.gravesSinReparacion).length)}</p></div>
+  <div class="tarjeta"><h2 class="primero">Fallas graves</h2>${fallas.length ? tabla(['Run', 'Error'], fallas.map((x) => [x.runId ?? '—', x.error ?? x.mensaje ?? JSON.stringify(x)])) : '<p class="ok">Ninguna.</p>'}</div>
   ${md}`;
 }
 
@@ -133,47 +141,42 @@ function comandos() {
 }
 
 // Cargar archivos (sin servidor): carpetas de simulaciones/ o de docs/candidatos/.
-const esCandidato = (x) => x && typeof x.id === 'string' && typeof x.estado === 'string' && (typeof x.frase === 'string' || typeof x.texto === 'string');
-function plano(fuente, archivo, x, grupo = null) {
-  const frase = typeof x.frase === 'string';
-  return { fuente, archivo, id: x.id, clase: frase ? 'frase' : 'texto', estado: x.estado, texto: frase ? x.frase : x.texto, textoEditado: x.textoEditado ?? null,
-    intencion: x.intencionAprobada ?? x.intencionObjetivo ?? x.motorIntencion ?? x.motor?.intencion ?? x.contexto?.intencion ?? (grupo && !grupo.startsWith('(') ? grupo : null),
-    lote: x.lote ?? x.tandas?.[0] ?? (fuente === 'docs' ? null : fuente), perfil: x.perfil ?? x.perfiles?.join(',') ?? null, frecuencia: x.frecuencia ?? 1,
-    npc: x.contexto?.npc ?? null, fraseJugador: x.contexto?.frase ?? null, nota: x.nota ?? null };
-}
 function cargar() {
   vista.innerHTML = `<h1>Cargar archivos</h1><div class="tarjeta"><p>Elegí la carpeta <code>simulaciones</code>, la de un lote o <code>docs/candidatos</code>. Se leen <code>config.json</code>, <code>informe.json</code>, <code>informe.md</code> y los archivos de candidatos. Nada sale del equipo.</p>
   <div class="fila"><label class="campo">Carpeta<input id="carpeta" type="file" webkitdirectory multiple></label><label class="campo">Archivos sueltos<input id="sueltos" type="file" multiple accept=".json,.jsonl,.md"></label></div><p id="cmsg" class="suave" role="status"></p></div>`;
   const leer = async (files) => {
-    const lotes = new Map(); let nc = 0;
+    $('#cmsg').className = 'suave'; $('#cmsg').textContent = 'Leyendo…';
+    const lotes = new Map(); let nc = 0; const rotos = []; let ignorados = 0;
     for (const f of files) {
       const partes = (f.webkitRelativePath || f.name).split('/');
       const nombre = partes.at(-1); const padre = partes.at(-2) ?? ''; const abuelo = partes.at(-3) ?? '';
-      let txt; try { txt = await f.text(); } catch { continue; }
-      try {
-        if (padre === 'candidatos' || (!padre && /agrupadas\.json$|textos\.jsonl$/.test(nombre))) {
-          const fuente = abuelo && abuelo !== 'docs' ? abuelo : 'docs';
-          const antes = DATOS.candidatos.length;
-          DATOS.candidatos = DATOS.candidatos.filter((c) => !(c.fuente === fuente && c.archivo === nombre));
-          if (nombre.endsWith('.jsonl')) for (const x of txt.split('\n').filter(Boolean).map((l) => JSON.parse(l))) { if (esCandidato(x)) DATOS.candidatos.push(plano(fuente, nombre, x)); }
-          else { const d = JSON.parse(txt); if (d?.candidatos && !Array.isArray(d.candidatos)) for (const [g, xs] of Object.entries(d.candidatos)) for (const x of xs) if (esCandidato(x)) DATOS.candidatos.push(plano(fuente, nombre, x, g)); }
-          nc += DATOS.candidatos.length - antes;
-        } else if (['config.json', 'informe.json', 'informe.md'].includes(nombre)) {
-          const id = padre || 'lote-cargado';
-          const l = lotes.get(id) ?? {}; lotes.set(id, l);
-          if (nombre === 'config.json') l.config = JSON.parse(txt); else if (nombre === 'informe.json') l.informe = JSON.parse(txt); else l.informeMd = txt;
-        }
-      } catch { /* archivo ilegible: se ignora */ }
+      const esCand = padre === 'candidatos' || (!padre && /agrupadas\.json$|textos\.jsonl$/.test(nombre));
+      const esLote = ['config.json', 'informe.json', 'informe.md'].includes(nombre);
+      if (!esCand && !esLote) { ignorados++; continue; }
+      let txt; try { txt = await f.text(); } catch { rotos.push(nombre); continue; }
+      if (esCand) {
+        const fuente = abuelo && abuelo !== 'docs' ? abuelo : 'docs';
+        const r = candidatosDeArchivo(fuente, nombre, txt);
+        if (!r) { ignorados++; continue; }
+        if (r.errores) rotos.push(`${fuente}/${nombre}`);
+        DATOS.candidatos = DATOS.candidatos.filter((c) => !(c.fuente === fuente && c.archivo === nombre)).concat(r.items);
+        nc += r.items.length;
+      } else {
+        const id = padre || 'archivos sueltos';
+        const l = lotes.get(id) ?? {}; lotes.set(id, l);
+        if (nombre === 'informe.md') l.informeMd = txt;
+        else { try { l[nombre === 'config.json' ? 'config' : 'informe'] = JSON.parse(txt); } catch { rotos.push(`${id}/${nombre}`); } }
+      }
     }
     for (const [id, l] of lotes) {
-      const c = l.config ?? {};
-      const x = { id: c.loteId ?? id, fecha: c.fecha ?? null, tipo: c.tipo ?? 'simulacion', runs: c.parametros?.runs ?? l.informe?.runs ?? null,
-        perfiles: (c.parametros?.perfiles ?? []).map((p) => (typeof p === 'string' ? p : `${p.id}:${p.agentes}`)).join(', '), versionNarrador: c.narrador?.version ?? null,
-        versionSimulador: c.version ?? null, informe: l.informe ?? null, informeMd: l.informeMd ?? null };
+      const x = resumenLote(id, l.config, l.informe, l.informeMd);
       DATOS.lotes = DATOS.lotes.filter((y) => y.id !== x.id).concat(x);
     }
-    DATOS.lotes.sort((a, b) => String(b.fecha ?? '').localeCompare(String(a.fecha ?? '')));
-    $('#cmsg').className = 'ok'; $('#cmsg').textContent = `Cargados: ${lotes.size} lotes y ${nc} candidatos.`;
+    DATOS.lotes.sort(porFecha);
+    const partes = [`Cargados: ${lotes.size} lotes y ${nc} candidatos.`];
+    if (ignorados) partes.push(`${ignorados} archivos no eran de lotes ni de candidatos.`);
+    if (rotos.length) partes.push(`Ilegibles (en todo o en parte): ${rotos.slice(0, 5).join(', ')}${rotos.length > 5 ? ` y ${rotos.length - 5} más` : ''}.`);
+    $('#cmsg').className = rotos.length || (!lotes.size && !nc) ? 'error' : 'ok'; $('#cmsg').textContent = partes.join(' ');
   };
   $('#carpeta').onchange = (e) => leer([...e.target.files]);
   $('#sueltos').onchange = (e) => leer([...e.target.files]);
@@ -245,7 +248,8 @@ function ruta() {
   const fn = PANTALLAS[p] ?? lotes;
   for (const a of document.querySelectorAll('.nav a')) a.classList.toggle('activo', a.getAttribute('href') === `#${p}`);
   $('#nav').classList.remove('abierto'); $('#menu').setAttribute('aria-expanded', 'false');
-  fn(resto.length ? decodeURIComponent(resto.join('/')) : undefined);
+  let arg; try { arg = resto.length ? decodeURIComponent(resto.join('/')) : undefined; } catch { arg = resto.join('/'); }
+  fn(arg || undefined);
 }
 $('#menu').onclick = () => { const a = $('#nav').classList.toggle('abierto'); $('#menu').setAttribute('aria-expanded', String(a)); };
 $('#generado').textContent = DATOS.generado ? `Generado ${fecha(DATOS.generado)}` : '';
