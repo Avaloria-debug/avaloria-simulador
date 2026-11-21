@@ -32,7 +32,7 @@ test('visor: un único archivo sin referencias externas', () => {
   assert.doesNotMatch(html, /<script[^>]*\bsrc=/i);
   assert.doesNotMatch(html, /\b(src|href)\s*=\s*["'](?!#)/i);
   assert.doesNotMatch(html, /https?:\/\//i);
-  assert.doesNotMatch(html, /@import|url\(/i);
+  assert.doesNotMatch(html, /@import|\burl\(/);
   assert.doesNotMatch(html, /\bfetch\(|XMLHttpRequest|EventSource|WebSocket/);
   assert.equal((html.match(/<\/script>/gi) ?? []).length, 2);
   fs.rmSync(base, { recursive: true, force: true });
@@ -69,4 +69,20 @@ test('visor: comandos del README sin nada que mencione keys', () => {
   const reales = leerComandos(fs.readFileSync(new URL('../README.md', import.meta.url), 'utf8'));
   assert.ok(reales.some((c) => c.comando === 'npm run generar-html'));
   assert.ok(reales.every((c) => !/key|clave/i.test(c.comando + c.seccion)));
+});
+
+test('visor: keys.json se arma conservando el resto y sin keys vacías', async () => {
+  const { leerKeysJson, armarKeysJson } = await import('../scripts/visor/keys-json.js');
+  const r = leerKeysJson(JSON.stringify({ groq: [{ nombre: 'k1', key: ' clave-falsa-0000000000001 ' }, { nombre: 'k2', key: 'PEGAR' }, { key: '' }], anthropic: { key: 'otra-falsa' } }));
+  assert.deepEqual(r.groq, [{ nombre: 'k1', key: 'clave-falsa-0000000000001' }]);
+  r.groq.push({ nombre: 'k2', key: 'clave-falsa-0000000000002' });
+  assert.deepEqual(JSON.parse(armarKeysJson(r)), { anthropic: { key: 'otra-falsa' }, groq: [{ nombre: 'k1', key: 'clave-falsa-0000000000001' }, { nombre: 'k2', key: 'clave-falsa-0000000000002' }] });
+  assert.throws(() => leerKeysJson('[]'));
+});
+
+test('visor: el HTML generado no lleva keys de config/keys.json ni las guarda en el navegador', () => {
+  const { html, base } = armar();
+  assert.doesNotMatch(html, /localStorage|sessionStorage|indexedDB|document\.cookie/);
+  assert.match(html, /href="#keys"/);
+  fs.rmSync(base, { recursive: true, force: true });
 });

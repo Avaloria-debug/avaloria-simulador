@@ -44,6 +44,7 @@ npm run generar-html
 
 1. Correr el comando de arriba (una vez, o cada vez que haya lotes nuevos). Lee `simulaciones/` y `docs/candidatos/` y escribe `docs/visor/index.html`.
 2. Abrir `docs/visor/index.html` con doble clic desde el explorador de archivos.
-3. Pantallas: «Lotes» (lista y detalle del informe), «Candidatos» (frases y textos con filtros, solo lectura), «Comandos» (con botón «copiar») y «Cargar archivos» (para abrir otra carpeta de `simulaciones/` sin regenerar).
+3. Pantallas: «Lotes» (lista y detalle del informe), «Candidatos» (frases y textos con filtros, solo lectura), «Comandos» (con botón «copiar»), «Cargar archivos» (para abrir otra carpeta de `simulaciones/` sin regenerar) y «Keys de Groq».
+4. «Keys de Groq»: abrir el `config/keys.json` actual (para no perder las que ya están), agregar o quitar keys y tocar «Guardar keys.json». En Chrome y Edge se elige dónde guardarlo: guardalo en `config/keys.json`. En otros navegadores se descarga y hay que moverlo a `config/`. Las keys solo quedan en la pestaña abierta, se muestran con los últimos 4 caracteres y nunca entran al HTML generado ni a git.
 
 El archivo queda fuera de git (`docs/visor/`), igual que `simulaciones/`. Para aprobar o editar candidatos se sigue usando `npm run ui`.
