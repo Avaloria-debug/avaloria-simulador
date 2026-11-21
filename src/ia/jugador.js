@@ -13,9 +13,15 @@ export function validarFrase(t) {
   return f;
 }
 
+// Rol del jugador: el nombre del perfil sin la aclaración entre paréntesis. La descripción no va al pedido:
+// el jugador IA la copiaba ("¿Qué sabés, dueño?", "contame lo primero que sepas").
+export function rolDePerfil(p) {
+  return String(p.nombre ?? p.id).replace(/\s*\([^)]*\)\s*$/, '').trim();
+}
+
 export function describirPerfil(p) {
   const pesos = Object.entries(p.pesos).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).map(([k]) => k).join(', ');
-  return `Perfil de jugador: ${p.nombre ?? p.id}. ${p.descripcion ?? ''} Acciones que más usa: ${pesos}.`.replace(/\s+/g, ' ').trim();
+  return `Perfil de jugador: ${rolDePerfil(p)}. Acciones que más usa: ${pesos}.`.replace(/\s+/g, ' ').trim();
 }
 
 export function describirEstado(d, hora) {

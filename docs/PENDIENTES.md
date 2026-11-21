@@ -309,3 +309,18 @@ Decisiones de Opus en nombre de Tomás. Criterio: el jugador no debe sentir que 
 - Sin medir:
   - `amable` en este lote: el tope de 30 llamadas cortó sus 6 runs (cierre `cuota`) y no se reanudó, para respetar el presupuesto.
   - El caso de una consulta a un `_1` revelado por el h1 cuando ese `_1` pide un evento: se dio (Hollis), pero solo con la tormenta inactiva.
+
+## El h1 respeta el evento, y jugador IA sin la descripción del perfil (2026-11-21)
+- **Decisión de Opus en nombre de Tomás: opción (a).** Un hito que narra un conocimiento no revelado con evento sin cumplir no se entrega: queda listo hasta que el evento esté activo, o hasta que el conocimiento se revele por consulta. Motivo: no cambia el contenido ni el contrato de los conocimientos, y el hito deja de revelar lo que la consulta no revelaría. Afecta a los `_1` de Hollis (tormenta), Ivor (deuda impaga) y Darío (disputa en la aduana). Los conocimientos con marca no cambian.
+- [PR #13 del narrador](https://github.com/Avaloria-debug/Avaloria-narrador/pull/13), sha `f83afe274074c65c41b31bd66a965557e4c8ec7d`, VERSION 0.0.43, 1770/1770, contenido válido. **Pendiente de aprobación de Tomás; no mergeada.** El simulador sigue en main del narrador (0.0.42).
+- Medición con el narrador de la PR (instalado sin commitear, lote `20261121-014607-800`: `seguidor_pistas_dueno:6`, seed-base 800, `--trabada 25`, 15 llamadas):
+  - Hollis fue p1 en un solo run, r0002-s802. En el lote del narrador de main, su h1 se entregaba en el turno 4 con la tormenta inactiva y revelaba el sendero. Con la PR no se entrega: el jugador estuvo con Hollis en 11 turnos, la tormenta no se activó en ningún turno y la trabada cortó en el 25. **El `_1` de Hollis no se reveló sin tormenta.**
+  - Riesgo esperado de la opción (a): en ese run, el h1 no llegó a entregarse.
+  - Los otros h1 (r0003 de Sarin y r0004 de Brenn, conocimientos sin evento) se entregaron igual que antes. Rejuego: 6 de 6 runs coinciden con el registro.
+- **Jugador IA sin la descripción del perfil** (`src/ia/jugador.js`; test en `tests/prompt-jugador.test.js`):
+  - El pedido lleva el rol (el nombre del perfil sin la aclaración entre paréntesis), las acciones que más usa y el estado de la escena. Ya no lleva la descripción. El resto del pedido no cambia.
+  - Antes: 72 de 92 frases del jugador IA de `seguidor_pistas_dueno` copiaban palabras de la descripción ("dueño", "lo primero que sabe/sepa"), en los 5 lotes anteriores del perfil con seed-base 800.
+  - Después: 0 de 6 (lote `20261121-014727-800`, `seguidor_pistas_dueno:3`, 6 llamadas).
+  - El cambio también vale para el corpus (`src/corpus.js` usa la misma función).
+- Candidatos: `c0030`, `c0031` y `c0032` quedan rechazados con motivo `copia_descripcion_perfil`. Otras 4 frases del mismo perfil con las mismas palabras (`c0018`, `c0026`, `c0033`, `c0035`) quedan pendientes para Tomás. Pendientes en total: 92.
+- Llamadas IA de hoy en esta etapa: 21 (15 y 6). Contador del 2026-11-21: 51 de 800.

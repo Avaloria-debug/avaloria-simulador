@@ -222,7 +222,7 @@
         "motorIntencion": null,
         "motorRegla": "no_entendido",
         "tipo": "voseo_dialogo",
-        "estado": "pendiente",
+        "estado": "rechazado",
         "tandas": [
           "20261121-013830-800"
         ],
@@ -231,7 +231,8 @@
         ],
         "ejemplos": [
           "¿Qué sabés, dueño?"
-        ]
+        ],
+        "motivo": "copia_descripcion_perfil"
       },
       {
         "id": "c0031",
@@ -242,7 +243,7 @@
         "motorIntencion": null,
         "motorRegla": "no_entendido",
         "tipo": "voseo_dialogo",
-        "estado": "pendiente",
+        "estado": "rechazado",
         "tandas": [
           "20261120-235915-800"
         ],
@@ -251,7 +252,8 @@
         ],
         "ejemplos": [
           "Serel Norlen, contame lo primero que sepas."
-        ]
+        ],
+        "motivo": "copia_descripcion_perfil"
       },
       {
         "id": "c0007",
@@ -342,7 +344,7 @@
         "motorIntencion": "intencion_viajar",
         "motorRegla": "falta_destino",
         "tipo": "no_valida",
-        "estado": "pendiente",
+        "estado": "rechazado",
         "tandas": [
           "20261120-235915-800"
         ],
@@ -351,7 +353,8 @@
         ],
         "ejemplos": [
           "viajar a la siguiente zona donde pueda encontrar al dueño."
-        ]
+        ],
+        "motivo": "copia_descripcion_perfil"
       },
       {
         "id": "c0021",
