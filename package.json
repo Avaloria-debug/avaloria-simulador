@@ -10,7 +10,7 @@
     "prepare": "node scripts/instalar-hook.js"
   },
   "dependencies": {
-    "narrador": "github:Avaloria-debug/Avaloria-narrador#03ea2f0a5e62fcc01df91b935c0fa1934d4dda74"
+    "narrador": "github:Avaloria-debug/Avaloria-narrador#b9406636574eebce0b6c3bdc307d1aa6b9ded54f"
   },
   "devDependencies": {
     "fake-indexeddb": "^6.2.8"
