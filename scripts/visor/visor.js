@@ -179,7 +179,67 @@ function cargar() {
   $('#sueltos').onchange = (e) => leer([...e.target.files]);
 }
 
-const PANTALLAS = { lotes, candidatos, comandos, cargar };
+// Keys de Groq: arma config/keys.json en memoria y lo guarda donde elija el usuario. Nunca se muestra una key completa ni se guarda en el navegador.
+const ultimos4 = (k) => (typeof k === 'string' && k.length ? `••••${k.slice(-4)}` : '');
+const KEYS = { groq: [], resto: {}, cargado: false };
+async function guardarArchivo(texto) {
+  if (typeof window.showSaveFilePicker === 'function') {
+    try {
+      const h = await window.showSaveFilePicker({ suggestedName: 'keys.json', types: [{ description: 'keys.json', accept: { 'application/json': ['.json'] } }] });
+      const w = await h.createWritable(); await w.write(texto); await w.close();
+      return 'Guardado. Si lo guardaste en config/keys.json, el simulador ya lo usa.';
+    } catch (e) { if (e?.name === 'AbortError') return 'Cancelado: no se guardó nada.'; }
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([texto], { type: 'application/json' }));
+  a.download = 'keys.json'; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  return 'Descargado como keys.json. Movelo a la carpeta config/ del simulador (reemplaza el anterior).';
+}
+function keys() {
+  vista.innerHTML = `<h1>Keys de Groq</h1>
+  <div class="tarjeta"><p>Arma el archivo <code>config/keys.json</code> que usa el simulador. Las keys quedan solo en esta pestaña mientras está abierta: no se guardan en el navegador ni en este HTML, y se muestran con los últimos 4 caracteres.</p>
+  <p class="suave">Para no perder las keys que ya tenés, primero abrí el <code>config/keys.json</code> actual. Guardar reemplaza el archivo completo.</p>
+  <label class="campo">Abrir keys.json actual (opcional)<input id="kabrir" type="file" accept=".json,application/json"></label><p id="kmsg1" class="suave" role="status"></p></div>
+  <div class="tarjeta"><h2 class="primero">Agregar key</h2><form id="kform" class="fila" autocomplete="off">
+    <label class="campo">Nombre<input id="knombre" placeholder="k1" maxlength="40"></label>
+    <label class="campo">Key<input id="kkey" type="password" placeholder="pegá la key de Groq" autocomplete="off" spellcheck="false"></label>
+    <button type="submit">Agregar</button></form><p id="kmsg2" class="suave" role="status"></p></div>
+  <div class="tarjeta"><h2 class="primero">Keys en el archivo</h2><div id="klista"></div>
+  <div class="fila"><button class="primario" id="kguardar">Guardar keys.json</button><span id="kmsg3" class="suave" role="status"></span></div></div>`;
+  const pintar = () => {
+    $('#klista').innerHTML = KEYS.groq.length ? `<div class="scroll"><table><thead><tr><th>Nombre</th><th>Key</th><th></th></tr></thead><tbody>${KEYS.groq.map((k, i) => `<tr><td>${esc(k.nombre)}</td><td>${esc(ultimos4(k.key))}</td><td><button data-q="${i}">Quitar</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="suave">Todavía no hay keys.</p>';
+    for (const b of vista.querySelectorAll('button[data-q]')) b.onclick = () => { KEYS.groq.splice(Number(b.dataset.q), 1); pintar(); };
+    $('#kguardar').disabled = !KEYS.groq.length;
+  };
+  $('#kabrir').onchange = async (e) => {
+    const f = e.target.files[0]; e.target.value = '';
+    if (!f) return;
+    try { const r = leerKeysJson(await f.text()); KEYS.groq = r.groq; KEYS.resto = r.resto; KEYS.cargado = true; $('#kmsg1').className = 'ok'; $('#kmsg1').textContent = `Abierto: ${r.groq.length} keys de Groq${Object.keys(r.resto).length ? ' y el resto del archivo se conserva' : ''}.`; }
+    catch { $('#kmsg1').className = 'error'; $('#kmsg1').textContent = 'No se pudo leer: no parece un keys.json.'; }
+    pintar();
+  };
+  $('#kform').onsubmit = (e) => {
+    e.preventDefault();
+    const key = $('#kkey').value.trim(); $('#kkey').value = '';
+    let nombre = $('#knombre').value.trim();
+    if (!key) { $('#kmsg2').className = 'error'; $('#kmsg2').textContent = 'Falta la key.'; return; }
+    if (/\s/.test(key) || key.length < 20) { $('#kmsg2').className = 'error'; $('#kmsg2').textContent = 'La key parece incompleta (sin espacios, al menos 20 caracteres).'; return; }
+    if (KEYS.groq.some((k) => k.key === key)) { $('#kmsg2').className = 'error'; $('#kmsg2').textContent = `Esa key ya está (${ultimos4(key)}).`; return; }
+    if (!nombre) { let n = KEYS.groq.length + 1; while (KEYS.groq.some((k) => k.nombre === `k${n}`)) n++; nombre = `k${n}`; }
+    if (KEYS.groq.some((k) => k.nombre === nombre)) { $('#kmsg2').className = 'error'; $('#kmsg2').textContent = `Ya hay una key llamada ${nombre}.`; return; }
+    KEYS.groq.push({ nombre, key }); $('#knombre').value = '';
+    $('#kmsg2').className = 'ok'; $('#kmsg2').textContent = `Agregada ${nombre} (${ultimos4(key)}).`;
+    pintar();
+  };
+  $('#kguardar').onclick = async () => {
+    if (!KEYS.cargado && !confirm('No abriste el keys.json actual. Si guardás encima de config/keys.json, se reemplazan las keys que tenía. ¿Seguir?')) return;
+    $('#kmsg3').className = 'suave'; $('#kmsg3').textContent = await guardarArchivo(armarKeysJson(KEYS));
+  };
+  pintar();
+}
+
+const PANTALLAS = { lotes, candidatos, comandos, cargar, keys };
 function ruta() {
   const [p, ...resto] = (location.hash.slice(1) || 'lotes').split('/');
   const fn = PANTALLAS[p] ?? lotes;

@@ -59,7 +59,7 @@ export function generarHtml({ dirSim = path.join(RAIZ, 'simulaciones'), dirDocs 
   const raices = [...new Set([RAIZ, path.dirname(dirSim), dirSim, dirDocs, process.cwd()].map((r) => path.resolve(r)))].sort((a, b) => b.length - a.length);
   const datos = sinRutas({ generado: ahora.toISOString(), lotes: leerLotes(dirSim), candidatos, comandos: leerComandos(leerTexto(readme) ?? '') }, raices);
   const json = JSON.stringify(datos).replace(/[<\u2028\u2029]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`);
-  const js = fs.readFileSync(path.join(VISOR, 'visor.js'), 'utf8');
+  const js = ['keys-json.js', 'visor.js'].map((f) => fs.readFileSync(path.join(VISOR, f), 'utf8').replace(/^export /gm, '')).join('\n');
   const css = fs.readFileSync(path.join(RAIZ, 'ui', 'estilos.css'), 'utf8');
   if (/<\/(script|style)/i.test(js + css)) throw new Error('visor.js o estilos.css contienen un cierre de etiqueta');
   const html = fs.readFileSync(path.join(VISOR, 'plantilla.html'), 'utf8')
