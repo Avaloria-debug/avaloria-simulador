@@ -287,3 +287,25 @@ Decisiones de Opus en nombre de Tomás. Criterio: el jugador no debe sentir que 
 - Hallazgos que siguen registrados:
   - El h1 de Hollis narra el `_1` y lo deja revelado aunque ese conocimiento pida la tormenta de verano. Con la decisión aprobada es lo esperado; si el evento tiene que ser obligatorio también en el hito, el cambio es de contenido.
   - Repetir el contenido ante un conocimiento ya revelado es revertible con `git revert b940663` en el narrador, que vuelve a la plantilla de fallo con la suite en verde.
+
+## Etapa h1 y candidatos (2026-11-21, rama claude/etapa-h1-candidatos; sin tocar el narrador)
+- **Paso 1. Respuesta a lo revelado, medida en juego** (lote `20261121-013830-800`, narrador de main `9f8071f`; detalle en `docs/charla-npc/lote-800-n042/respuesta-revelado.md`):
+  - h1 en 6 runs, y en los 6 reveló el `_1` del dueño de p1.
+  - 8 consultas al dueño de p1 después del h1:
+    - 6 de conocimientos ya revelados, que repiten el contenido.
+    - 2 del `_2` de Brenn, no revelado, que fallan por umbral con "no te cuenta nada nuevo por ahora", como corresponde.
+  - 0 respuestas con ".." y 0 que nieguen un conocimiento ya revelado.
+- **Paso 2. La tormenta en el h1 de Hollis** (dato para Tomás, sin cambios). En los 2 runs donde el h1 reveló el `_1` de Hollis (`conocimiento_sendero_sin_vigilancia`, que pide `evento_tormenta_verano`), la tormenta **no** estaba activa en el turno del h1 (`eventosActivos` del registro):
+  - r0002-s802, turno 4: solo `evento_feria_libros` en la Biblioteca.
+  - r0006-s806, turno 16: `evento_carta_viajero` y `evento_precio_pan_sube` en el Mercado, y `evento_feria_libros` en la Biblioteca.
+
+  El h1 narra y revela el conocimiento sin que se cumpla su evento. Por la consulta, ese conocimiento no se habría revelado sin la tormenta.
+- **Paso 3. Candidatos:**
+  - `charla-npc-300-800-textos.jsonl` sigue en 60 textos: los lotes nuevos no generaron textos.
+  - `charla-npc-300-800-frases-agrupadas.json` pasa de 29 a 35 frases. Las 6 nuevas son `c0030`–`c0035`; las anteriores conservan ids y contenido.
+  - El resumen está actualizado en `docs/candidatos/charla-npc-300-800-resumen.md`. **95 pendientes**, sin aprobar nada.
+  - Hallazgo: el jugador IA copia palabras de la descripción del perfil `seguidor_pistas_dueno` ("dueño", "lo primero que sepas"). Si se quiere evitar, hay que reescribir esa descripción en `config/perfiles/`; no se cambió.
+- Llamadas IA: 30, todas en el paso 1. El contador se renovó a las 00:00 UTC y quedó en 30 llamadas del 2026-11-21.
+- Sin medir:
+  - `amable` en este lote: el tope de 30 llamadas cortó sus 6 runs (cierre `cuota`) y no se reanudó, para respetar el presupuesto.
+  - El caso de una consulta a un `_1` revelado por el h1 cuando ese `_1` pide un evento: se dio (Hollis), pero solo con la tormenta inactiva.
