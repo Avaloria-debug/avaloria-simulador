@@ -1,5 +1,5 @@
 {
-  "generado": "2026-11-20T23:51:50.741Z",
+  "generado": "2026-11-21T01:39:36.288Z",
   "fuente": [
     "20261120-193218-300",
     "20261120-193756-400",
@@ -11,22 +11,24 @@
     "20261120-225453-600",
     "20261120-231351-700",
     "20261120-234103-800",
-    "20261120-235036-800"
+    "20261120-235036-800",
+    "20261120-235915-800",
+    "20261121-013830-800"
   ],
   "excluidas": {
     "yaEnCandidatos": 94,
     "salidaRotaJugadorIa": 64
   },
   "resumen": {
-    "entradas": 29,
+    "entradas": 35,
     "yaConocidas": 0,
-    "candidatos": 29,
-    "apariciones": 29,
+    "candidatos": 35,
+    "apariciones": 35,
     "marcadas": 0,
     "conjugacionDudosa": 0,
     "revisar": 0,
     "porIntencion": {
-      "(sin intención)": 29
+      "(sin intención)": 35
     }
   },
   "candidatos": {
@@ -212,6 +214,46 @@
         ]
       },
       {
+        "id": "c0030",
+        "frase": "¿Qué sabés, dueño?",
+        "normalizada": "que sabes dueno",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261121-013830-800"
+        ],
+        "perfiles": [
+          "seguidor_pistas_dueno"
+        ],
+        "ejemplos": [
+          "¿Qué sabés, dueño?"
+        ]
+      },
+      {
+        "id": "c0031",
+        "frase": "Serel Norlen, contame lo primero que sepas.",
+        "normalizada": "serel norlen contame lo primero que sepas",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": null,
+        "motorRegla": "no_entendido",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-235915-800"
+        ],
+        "perfiles": [
+          "seguidor_pistas_dueno"
+        ],
+        "ejemplos": [
+          "Serel Norlen, contame lo primero que sepas."
+        ]
+      },
+      {
         "id": "c0007",
         "frase": "Serel, pasame el pliego de precios, por favor.",
         "normalizada": "serel pasame el pliego de precios por favor",
@@ -289,6 +331,26 @@
         ],
         "ejemplos": [
           "viajar a Elia Miren"
+        ]
+      },
+      {
+        "id": "c0032",
+        "frase": "viajar a la siguiente zona donde pueda encontrar al dueño.",
+        "normalizada": "viajar a la siguiente zona donde pueda encontrar al dueno",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "no_valida",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-235915-800"
+        ],
+        "perfiles": [
+          "seguidor_pistas_dueno"
+        ],
+        "ejemplos": [
+          "viajar a la siguiente zona donde pueda encontrar al dueño."
         ]
       },
       {
@@ -529,6 +591,66 @@
         ],
         "ejemplos": [
           "Voy a buscar a Serel Norlen y le pregunto qué sabe del dueño."
+        ]
+      },
+      {
+        "id": "c0033",
+        "frase": "Voy a buscar a Ysolde Varn y le pregunto lo primero que sepa.",
+        "normalizada": "voy a buscar a ysolde varn y le pregunto lo primero que sepa",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "primera_persona_accion",
+        "estado": "pendiente",
+        "tandas": [
+          "20261121-013830-800"
+        ],
+        "perfiles": [
+          "seguidor_pistas_dueno"
+        ],
+        "ejemplos": [
+          "Voy a buscar a Ysolde Varn y le pregunto lo primero que sepa."
+        ]
+      },
+      {
+        "id": "c0034",
+        "frase": "Voy a buscar a Ysolde Varn y le pregunto qué sabe del mapa.",
+        "normalizada": "voy a buscar a ysolde varn y le pregunto que sabe del mapa",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261120-235915-800"
+        ],
+        "perfiles": [
+          "seguidor_pistas_dueno"
+        ],
+        "ejemplos": [
+          "Voy a buscar a Ysolde Varn y le pregunto qué sabe del mapa."
+        ]
+      },
+      {
+        "id": "c0035",
+        "frase": "Voy a Serel Norlen y le pregunto qué sabe del dueño.",
+        "normalizada": "voy a serel norlen y le pregunto que sabe del dueno",
+        "frecuencia": 1,
+        "intencionObjetivo": null,
+        "motorIntencion": "intencion_viajar",
+        "motorRegla": "falta_destino",
+        "tipo": "voseo_dialogo",
+        "estado": "pendiente",
+        "tandas": [
+          "20261121-013830-800"
+        ],
+        "perfiles": [
+          "seguidor_pistas_dueno"
+        ],
+        "ejemplos": [
+          "Voy a Serel Norlen y le pregunto qué sabe del dueño."
         ]
       },
       {
