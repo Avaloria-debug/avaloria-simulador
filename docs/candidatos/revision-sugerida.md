@@ -144,3 +144,9 @@ Las frases del jugador se agrupan por la intención que entendió el motor (toda
 Muestra de 10 de los 39 "A" elegidos al azar con seed 2026 (mulberry32, Fisher-Yates sobre el orden del archivo): t00003, t00032, c0027, t00017, t00054, t00057, t00008, t00013, t00022, t00031. Con el mismo criterio se mantienen 7; no pasan t00054, t00057 y t00022.
 Como fallaron más de 2, se revisaron otra vez los 39 con el mismo criterio, más estricto con que el texto responda a lo que dijo el jugador y con los lugares que nombra. Cae además c0002 (nombra una molinería que no existe). Quedan 35 "A". Los 4 que salieron de la lista pasan a E o R con el motivo marcado "Revisión de control".
 Sigue sin aprobarse nada: los 92 candidatos están en `pendiente` en sus archivos.
+
+## Segunda revisión de control (2026-11-21)
+
+Muestra de 10 de los 35 "A", elegidos al azar con seed 2027 (mismo método: mulberry32 y Fisher-Yates sobre el orden del archivo): c0029, c0005, t00003, t00053, c0020, c0027, c0028, t00020, c0007, t00013. Usé el criterio estricto: natural, voseo o neutro, sin copia del perfil, sin contradecir el mundo, sin salidas rotas y sin nombrar lugares que no existen. Pasan los 10, así que la lista se mantiene en 35 "A".
+- Datos que verifiqué en el contenido: Hollis está en el Camino del sur (c0029); Sarin, en el Camino del este (c0020); el pliego de precios es de Serel y aparece en el Mercado Circular (c0007). El "Mapa de la posada escondida" existe como objeto (c0028). El objeto es de Brenn, pero que el jugador se lo pregunte a otro NPC no contradice el mundo.
+- Ningún candidato cambió de estado: los 92 siguen en `pendiente`.
