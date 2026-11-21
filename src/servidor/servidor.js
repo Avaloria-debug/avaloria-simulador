@@ -9,6 +9,9 @@ import { leerJsonl } from '../registro.js';
 import { idsCasos, versionNarrador } from '../adaptador.js';
 import { ejecutarCorpus, resolverCorpus } from '../corpus.js';
 import { leerKeysGroq, ultimos4, crearPool } from '../ia/keys.js';
+import { replayRun, visorRun } from '../replay.js';
+import { correrDorada, listarDoradas, DIR_DORADA } from '../dorada.js';
+import { comparar, leerResumen } from '../comparar.js';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DIR_UI = path.join(RAIZ, 'ui');
@@ -29,7 +32,7 @@ function secretos(keys) {
 
 class ErrorHttp extends Error { constructor(estado, msg) { super(msg); this.estado = estado; } }
 
-export function crearServidor({ dirSim = path.join(RAIZ, 'simulaciones'), dirPerfiles = DIR_PERFILES, archivoKeys = path.join(RAIZ, 'config', 'keys.json'), archivoConfig = path.join(RAIZ, 'config', 'config.json'), env = process.env } = {}) {
+export function crearServidor({ dirDorada = DIR_DORADA, dirSim = path.join(RAIZ, 'simulaciones'), dirPerfiles = DIR_PERFILES, archivoKeys = path.join(RAIZ, 'config', 'keys.json'), archivoConfig = path.join(RAIZ, 'config', 'config.json'), env = process.env } = {}) {
   let lote = null; // { hijo, loteId, total, hechos, cierres, inicio, estado, mensaje }
   const clientes = new Set();
 
@@ -208,6 +211,27 @@ export function crearServidor({ dirSim = path.join(RAIZ, 'simulaciones'), dirPer
       const d = dirLote(x[1]);
       const f = path.join(d, 'runs.jsonl');
       return json(res, 200, fs.existsSync(f) ? leerJsonl(f) : []);
+    }
+    if (m === 'GET' && (x = r.match(/^\/api\/lotes\/([^/]+)\/replay\/([\w-]+)$/))) {
+      const d = dirLote(x[1]);
+      const run = leerJsonl(path.join(d, 'runs.jsonl')).find((y) => y.runId === x[2]);
+      if (!run) throw new ErrorHttp(404, `run inexistente: ${x[2]}`);
+      const turnos = leerJsonl(path.join(d, 'turnos.jsonl'));
+      const cfg = leer(path.join(d, 'config.json'));
+      const visor = visorRun(run, turnos, cfg.parametros?.trabada ?? cfg.trabada ?? 15);
+      const rep = url.searchParams.get('verificar') === '1' && run.turnos > 0 ? await replayRun(run, turnos) : null;
+      return json(res, 200, { ...visor, replay: rep && { divergencias: rep.divergencias, primera: rep.primera, mismaVersion: !cfg.narrador || cfg.narrador.commit === versionNarrador.commit } });
+    }
+    if (m === 'GET' && r === '/api/dorada') return json(res, 200, listarDoradas(dirDorada));
+    if (m === 'POST' && r === '/api/dorada') {
+      if (lote && lote.estado === 'corriendo') throw new ErrorHttp(409, 'hay un lote corriendo');
+      const { resumen } = await correrDorada({ dirSalida: dirDorada });
+      return json(res, 200, { version: resumen.version, segundos: resumen.segundos, runs: resumen.runs.length });
+    }
+    if (m === 'GET' && r === '/api/dorada/comparar') {
+      const a = url.searchParams.get('a'); const b = url.searchParams.get('b');
+      if (!/^[\w.-]+$/.test(a ?? '') || !/^[\w.-]+$/.test(b ?? '')) throw new ErrorHttp(400, 'versiones inválidas');
+      try { return json(res, 200, comparar(leerResumen(a, dirDorada), leerResumen(b, dirDorada))); } catch (e) { throw new ErrorHttp(404, e.message); }
     }
     throw new ErrorHttp(404, `ruta inexistente: ${m} ${r}`);
   }

@@ -14,7 +14,7 @@ async function api(ruta, opciones = {}) {
 
 // Navegación
 $('#menu').addEventListener('click', () => { const n = $('#nav'); n.classList.toggle('abierto'); $('#menu').setAttribute('aria-expanded', n.classList.contains('abierto')); });
-const PANTALLAS = { nueva, vivo, informes, perfiles, corpus, ajustes };
+const PANTALLAS = { nueva, vivo, informes, replay, regresion, perfiles, corpus, ajustes };
 let salir = () => {};
 function ruta() {
   salir(); salir = () => {};
@@ -280,3 +280,95 @@ async function ajustes() {
 }
 
 ruta();
+
+// Replay: elegir lote y run; visor turno a turno.
+async function replay(arg) {
+  const [loteId, runId] = (arg ?? '').split('~');
+  const lotes = await api('/api/lotes');
+  vista.innerHTML = `<h1>Replay</h1><div class="tarjeta"><div class="fila">
+    <label class="campo">Lote<select id="rl"><option value="">Elegí un lote</option>${lotes.map((l) => `<option value="${esc(l.id)}"${l.id === loteId ? ' selected' : ''}>${esc(l.id)}</option>`).join('')}</select></label>
+    <label class="campo">Run<select id="rr" disabled><option value="">—</option></select></label>
+  </div></div><div id="visor"></div>`;
+  const sl = $('#rl'); const sr = $('#rr');
+  const cargarRuns = async () => {
+    sr.innerHTML = '<option value="">—</option>'; sr.disabled = true; $('#visor').innerHTML = '';
+    if (!sl.value) return;
+    const runs = await api(`/api/lotes/${encodeURIComponent(sl.value)}/runs`);
+    sr.innerHTML = `<option value="">Elegí un run</option>${runs.filter((r) => r.turnos > 0).map((r) => `<option value="${esc(r.runId)}"${r.runId === runId ? ' selected' : ''}>${esc(r.runId)} · ${esc(r.perfil)} · ${esc(r.caso)} · ${esc(r.cierre)} (${esc(r.turnos)})</option>`).join('')}`;
+    sr.disabled = false;
+    if (sr.value) await verRun(sl.value, sr.value);
+  };
+  sl.addEventListener('change', cargarRuns);
+  sr.addEventListener('change', () => { if (sr.value) location.hash = `replay/${encodeURIComponent(`${sl.value}~${sr.value}`)}`; });
+  await cargarRuns();
+}
+
+async function verRun(loteId, runId) {
+  const v = await api(`/api/lotes/${encodeURIComponent(loteId)}/replay/${encodeURIComponent(runId)}`);
+  let i = 0;
+  const caja = $('#visor');
+  const pintar = () => {
+    const t = v.turnos[i];
+    const lista = (xs) => (xs?.length ? xs.map(esc).join('<br>') : '—');
+    caja.innerHTML = `<div class="tarjeta">
+      <p class="suave">${esc(v.run.perfil)} · ${esc(v.run.caso)} · seed ${esc(v.run.seed)} · modo ${esc(v.run.modo)} · cierre ${esc(v.run.cierre)}</p>
+      <div class="fila">
+        <button id="ant" ${i === 0 ? 'disabled' : ''}>Anterior</button>
+        <span>Turno <strong>${esc(t.turno)}</strong> de ${v.turnos.length}</span>
+        <button id="sig" ${i === v.turnos.length - 1 ? 'disabled' : ''}>Siguiente</button>
+        <button id="trab" ${v.primerTrabado < 0 ? 'disabled' : ''}>Primer turno trabado</button>
+        <button id="hito" ${v.primerHito < 0 ? 'disabled' : ''}>Primer hito</button>
+        <button id="verif">Verificar replay</button>
+      </div>
+      <p id="vres" class="suave" role="status"></p>
+      <div class="scroll"><table><tbody>
+        <tr><th>Frase</th><td>${esc(t.frase)}</td></tr>
+        <tr><th>Intención</th><td>${esc(t.intencion ?? '—')}</td></tr>
+        <tr><th>Regla</th><td>${esc(t.regla ?? '—')}</td></tr>
+        <tr><th>Resultado</th><td>${esc(t.resultado)}</td></tr>
+        <tr><th>Texto narrado</th><td style="white-space:pre-wrap">${esc(t.texto)}</td></tr>
+        <tr><th>Tags escritos</th><td>${lista(t.tagsEscritos)}</td></tr>
+        <tr><th>Tags borrados</th><td>${lista(t.tagsBorrados)}</td></tr>
+        <tr><th>Hito</th><td>${esc(t.hito ?? '—')}</td></tr>
+        <tr><th>Escena</th><td>${esc(t.escena)}</td></tr>
+        <tr><th>Hora</th><td>${esc(t.hora)}</td></tr>
+      </tbody></table></div></div>`;
+    $('#ant').onclick = () => { i -= 1; pintar(); };
+    $('#sig').onclick = () => { i += 1; pintar(); };
+    $('#trab').onclick = () => { i = v.primerTrabado; pintar(); };
+    $('#hito').onclick = () => { i = v.primerHito; pintar(); };
+    $('#verif').onclick = async () => {
+      const out = $('#vres'); out.textContent = 'Re-ejecutando…';
+      try {
+        const r = (await api(`/api/lotes/${encodeURIComponent(loteId)}/replay/${encodeURIComponent(runId)}?verificar=1`)).replay;
+        const aviso = r.mismaVersion ? '' : ' (otra versión del narrador)';
+        out.className = r.divergencias ? 'error' : 'ok';
+        out.textContent = r.divergencias ? `${r.divergencias} turnos divergentes${aviso}. Primero: turno ${r.primera.turno}, campo ${r.primera.campo}.` : `0 divergencias${aviso}.`;
+      } catch (e) { out.className = 'error'; out.textContent = e.message; }
+    };
+  };
+  pintar();
+}
+
+// Regresión: resúmenes de la dorada, correrla y comparar dos versiones.
+async function regresion() {
+  const lista = await api('/api/dorada');
+  vista.innerHTML = `<h1>Regresión</h1>
+  <div class="tarjeta"><div class="fila"><button class="primario" id="correr">Correr dorada</button><span id="cmsg" class="suave" role="status"></span></div></div>
+  <div class="tarjeta scroll">${lista.length ? tabla(['Versión', 'Commit', 'Fecha', 'Runs', '% hitos', 'Trabadas', 'Excepciones', 'Tiempo'],
+    lista.map((d) => [d.id, String(d.version?.commit ?? '').slice(0, 7), new Date(d.fecha).toLocaleString('es-AR'), d.runs, pct(d.pctHitosAlcanzados), d.trabadas, d.excepciones, duracion(d.segundos)])) : '<p class="suave">Todavía no hay resúmenes de la dorada.</p>'}</div>
+  ${lista.length > 1 ? `<div class="tarjeta"><h2 style="margin-top:0">Comparar</h2><div class="fila">
+    <label class="campo">Base<select id="ca">${lista.map((d, k) => `<option${k === lista.length - 2 ? ' selected' : ''}>${esc(d.id)}</option>`).join('')}</select></label>
+    <label class="campo">Nueva<select id="cb">${lista.map((d, k) => `<option${k === lista.length - 1 ? ' selected' : ''}>${esc(d.id)}</option>`).join('')}</select></label>
+    <button id="comp">Comparar</button></div><div id="cres"></div></div>` : ''}`;
+  $('#correr').onclick = async () => {
+    $('#correr').disabled = true; $('#cmsg').textContent = 'Corriendo la dorada…';
+    try { const r = await api('/api/dorada', { method: 'POST', body: '{}' }); $('#cmsg').textContent = `Listo: ${r.runs} runs en ${duracion(r.segundos)}.`; setTimeout(regresion, 800); } catch (e) { $('#cmsg').className = 'error'; $('#cmsg').textContent = e.message; $('#correr').disabled = false; }
+  };
+  if ($('#comp')) $('#comp').onclick = async () => {
+    const c = await api(`/api/dorada/comparar?a=${encodeURIComponent($('#ca').value)}&b=${encodeURIComponent($('#cb').value)}`);
+    const fila = (x, clase) => `<tr class="${clase}"><td>${esc(x.tipo)}</td><td>${x.items ? esc(x.items.join(', ')) : `${esc(x.antes)} → ${esc(x.despues)} (${x.diferencia > 0 ? '+' : ''}${esc(x.diferencia)})`}</td></tr>`;
+    $('#cres').innerHTML = `<p class="${c.regresion ? 'error' : 'ok'}">${c.regresion ? `${c.regresiones.length} regresiones` : 'Sin regresiones'}</p>
+      ${c.regresiones.length || c.cambios.length ? `<div class="scroll"><table><thead><tr><th>Cambio</th><th>Detalle</th></tr></thead><tbody>${c.regresiones.map((x) => fila(x, 'regresion')).join('')}${c.cambios.map((x) => fila(x, '')).join('')}</tbody></table></div>` : ''}`;
+  };
+}

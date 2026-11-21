@@ -54,3 +54,5 @@ textarea { width:100%; min-height:380px; font-family:ui-monospace, monospace; fo
   .nav-marca { display:none; }
   .vista { padding:16px; }
 }
+tr.regresion td { color:var(--error); font-weight:600; }
+select { max-width:100%; } .campo { min-width:0; max-width:100%; }
