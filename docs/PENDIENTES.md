@@ -240,3 +240,50 @@ Llamadas IA por run en modo `ia`, sin contar los runs cortados por cuota. "Narra
 - Revisión de Tomás de los 89 candidatos.
 - Las 2 preguntas de la etapa 1, que son de diseño del narrador: no se implementó nada.
 - Sin lotes nuevos hasta tener esas decisiones. Contador IA del día: 617 de 800.
+
+## Decisiones de primer contacto y revelado por el h1 (2026-11-20, pendiente de aprobación de Tomás)
+Decisiones de Opus en nombre de Tomás. Criterio: el jugador no debe sentir que el juego lo castiga por algo que no dependió de él, y el texto narrado no se puede contradecir con la respuesta siguiente. Los motivos están en `docs/SUPUESTOS-v3.md` del narrador.
+1. **El hito revela el conocimiento que narra.** Si el texto del h1 (o de cualquier hito) narra `{conocimiento:pN}`, el conocimiento queda revelado. La consulta siguiente de un conocimiento ya revelado repite lo contado con la plantilla `revelar_conocimiento.exito`, que ya existe; antes usaba "no te cuenta nada nuevo por ahora". Motivo: la respuesta no puede contradecir lo que el jugador acaba de leer.
+2. **El primer contacto por pista solo se consume si la consulta revela o falla por relación.** Un bloqueo por evento o por marca no lo gasta. Motivo: el bloqueo por un evento no depende del jugador.
+- [PR del narrador #11](https://github.com/Avaloria-debug/Avaloria-narrador/pull/11), VERSION 0.0.42, **sin mergear: pendiente de tu aprobación.** No se cambiaron textos de `data/`: los textos del h1 siguen igual.
+- Rama del simulador `claude/decisiones-primer-contacto`: narrador fijado al sha de la PR (`03ea2f0a5e62fcc01df91b935c0fa1934d4dda74`) solo para verificar. **No mergear hasta que la PR esté aprobada;** después, fijarlo a main del narrador.
+- Verificación:
+  - r0006-s806 se rejugó sin IA con sus entradas registradas, sobre el narrador de la PR.
+    - Turno 19: antes "Hollis Dren se encoge de hombros: de eso no sabe nada."; ahora "Hollis Dren baja la voz y te cuenta: Un sendero sin vigilancia en las colinas."
+    - Turno 37: antes "Hollis Dren no te cuenta nada nuevo por ahora."; ahora "Después de un rato, Hollis Dren te dice: Un sendero sin vigilancia en las colinas."
+  - El lote pedido, `20261120-235915-800` (`seguidor_pistas_dueno:6`, seed-base 800, `--trabada 25`, 19 llamadas), corre las seeds 800 a 805 y no incluye a r0006. En él:
+    - h1 en 3 runs, y en los 3 el conocimiento de p1 quedó revelado.
+    - 0 pistas narradas y 0 consultas al dueño después de la pista.
+    - Una consulta `ya_revelado` (r0003, Tiren) respondió con lo contado.
+- Hallazgos para Tomás:
+  - El h1 deja revelado el `_1` de Hollis aunque ese conocimiento pida la tormenta de verano: el hito ya lo narró.
+  - Varios conocimientos del contenido terminan en punto y las plantillas de revelar agregan otro, lo que deja ".." (por ejemplo, "…la primera hora.."). Aparece en 75 turnos de los lotes de hoy y es anterior a este cambio, que lo hace más visible. Se corrige en `contenido-v3.json` o en el completado de plantillas; las dos cosas son del narrador. No se tocó.
+- Contador IA del día: 636 de 800.
+
+## Estado de la PR #11 del narrador (2026-11-21, decisiones de Opus en nombre de Tomás)
+[PR #11](https://github.com/Avaloria-debug/Avaloria-narrador/pull/11), rama `fix/primer-contacto-y-revelado-h1`, VERSION 0.0.42, **sin mergear**. Cada cambio va en su propio commit, para poder revertirlo:
+
+| Commit | Qué hace | Para revertir |
+|---|---|---|
+| `03ea2f0` | El hito que narra un conocimiento lo deja revelado. El primer contacto no se consume por evento o marca. Incluía la respuesta "repetir lo contado", que se separó en los dos commits de abajo. | Revertir este commit deshace las dos decisiones de juego. |
+| `d93950f` | Sin "..": no se agrega el punto de la plantilla o del texto del hito si el valor ya cierra con puntuación final. Los 18 textos distintos de los 79 turnos del simulador quedan como ejemplos en el test. | Es una corrección de un error visible, no una decisión de juego. |
+| `3d5e8cd` | Intermedio: vuelve la respuesta a lo ya revelado a la plantilla de fallo y mantiene el h1 revelado. Equivale a la opción (b). | — |
+| `b940663` | **Decisión (a):** la consulta de un conocimiento ya revelado repite lo contado con la plantilla `exito`. Motivo: tras el h1, "no te cuenta nada nuevo" se lee como una negativa de algo que el NPC acaba de decir. | `git revert b940663` deja la opción (b), con la suite en verde (verificado: 1765 de 1765). |
+
+- `npm test` del narrador: 1765/1765. `validarContenido`: contenido válido. El diff toca solo `narrador/` (casos, conocimientos, consultas, narración, puntuación), tests, `SUPUESTOS-v3` y VERSION. Nada en `data/`.
+- Al correr la suite se regenera `docs/diagnostico-comprension.md` (ahora sin ".."). Se restauró sin commitear, porque los archivos de `docs/` no se reescriben. Cuando se apruebe, conviene regenerarlo.
+- Los textos del h1 no cambiaron.
+- Simulador (rama `claude/decisiones-primer-contacto`, sin mergear) fijado a `b9406636574eebce0b6c3bdc307d1aa6b9ded54f`. El lock solo cambia el narrador y `npm test` da 76/76. Rejuego sin IA:
+  - r0006-s806, turno 37: "Después de un rato, Hollis Dren te dice: Un sendero sin vigilancia en las colinas." (antes: "Hollis Dren no te cuenta nada nuevo por ahora.").
+  - r0003-s803 del lote `20261120-235915-800`, turno 42: "…y se cubre el resto del año." (antes terminaba en "..").
+- Hallazgo del h1 sobre Hollis: el `_1` de Hollis pide la tormenta de verano, pero el h1 lo narra y lo deja revelado sin el evento. Con la decisión 1 es lo esperado: el texto ya se lo dijo al jugador. Si el diseño quiere que el evento sea obligatorio también en el hito, el cambio es de contenido (que ese h1 no narre `{conocimiento:p1}`) o una regla nueva.
+- **Pendiente de Tomás:** aprobar o revertir `b940663` (respuesta a revelado), y aprobar la PR #11. Después, fijar el simulador a main del narrador y mergear la rama del simulador.
+
+## PR #11 del narrador aprobada y en main (2026-11-21)
+- Tomás aprobó `d93950f` (no duplicar el punto final en revelados) y `b940663` (respuesta a conocimiento revelado: repetir el contenido). La [PR #11](https://github.com/Avaloria-debug/Avaloria-narrador/pull/11) se mergeó completa.
+  - Main del narrador: `9f8071fffe96206d66099ba560177970343f8b95`, VERSION 0.0.42, `npm test` 1765/1765, contenido válido.
+  - Después, la [PR #12](https://github.com/Avaloria-debug/Avaloria-narrador/pull/12) (`docs: diagnóstico regenerado tras PR #11`, commit `59f57dc`) dejó main en `1805f1922ac4c7113900c211d5274ecd90fc8776`. Solo cambia `docs/diagnostico-comprension.md`, que pasa de 11 turnos con ".." a 0.
+- El simulador queda fijado a `9f8071fffe96206d66099ba560177970343f8b95`, el código de la PR #11. El commit de docs posterior no cambia código. El lock solo cambia el narrador.
+- Hallazgos que siguen registrados:
+  - El h1 de Hollis narra el `_1` y lo deja revelado aunque ese conocimiento pida la tormenta de verano. Con la decisión aprobada es lo esperado; si el evento tiene que ser obligatorio también en el hito, el cambio es de contenido.
+  - Repetir el contenido ante un conocimiento ya revelado es revertible con `git revert b940663` en el narrador, que vuelve a la plantilla de fallo con la suite en verde.
