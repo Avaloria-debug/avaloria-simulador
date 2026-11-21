@@ -1,6 +1,6 @@
 {
   "name": "avaloria-simulador",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "scripts": {
     "simular": "node src/cli.js",
@@ -11,7 +11,8 @@
     "replay": "node scripts/replay.js",
     "dorada": "node scripts/dorada.js",
     "comparar": "node scripts/comparar.js",
-    "exportar": "node scripts/exportar.js"
+    "exportar": "node scripts/exportar.js",
+    "generar-html": "node scripts/generar-html.js"
   },
   "dependencies": {
     "narrador": "github:Avaloria-debug/Avaloria-narrador#9f8071fffe96206d66099ba560177970343f8b95"
