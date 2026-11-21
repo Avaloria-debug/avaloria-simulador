@@ -278,3 +278,12 @@ Decisiones de Opus en nombre de Tomás. Criterio: el jugador no debe sentir que 
   - r0003-s803 del lote `20261120-235915-800`, turno 42: "…y se cubre el resto del año." (antes terminaba en "..").
 - Hallazgo del h1 sobre Hollis: el `_1` de Hollis pide la tormenta de verano, pero el h1 lo narra y lo deja revelado sin el evento. Con la decisión 1 es lo esperado: el texto ya se lo dijo al jugador. Si el diseño quiere que el evento sea obligatorio también en el hito, el cambio es de contenido (que ese h1 no narre `{conocimiento:p1}`) o una regla nueva.
 - **Pendiente de Tomás:** aprobar o revertir `b940663` (respuesta a revelado), y aprobar la PR #11. Después, fijar el simulador a main del narrador y mergear la rama del simulador.
+
+## PR #11 del narrador aprobada y en main (2026-11-21)
+- Tomás aprobó `d93950f` (no duplicar el punto final en revelados) y `b940663` (respuesta a conocimiento revelado: repetir el contenido). La [PR #11](https://github.com/Avaloria-debug/Avaloria-narrador/pull/11) se mergeó completa.
+  - Main del narrador: `9f8071fffe96206d66099ba560177970343f8b95`, VERSION 0.0.42, `npm test` 1765/1765, contenido válido.
+  - Después, la [PR #12](https://github.com/Avaloria-debug/Avaloria-narrador/pull/12) (`docs: diagnóstico regenerado tras PR #11`, commit `59f57dc`) dejó main en `1805f1922ac4c7113900c211d5274ecd90fc8776`. Solo cambia `docs/diagnostico-comprension.md`, que pasa de 11 turnos con ".." a 0.
+- El simulador queda fijado a `9f8071fffe96206d66099ba560177970343f8b95`, el código de la PR #11. El commit de docs posterior no cambia código. El lock solo cambia el narrador.
+- Hallazgos que siguen registrados:
+  - El h1 de Hollis narra el `_1` y lo deja revelado aunque ese conocimiento pida la tormenta de verano. Con la decisión aprobada es lo esperado; si el evento tiene que ser obligatorio también en el hito, el cambio es de contenido.
+  - Repetir el contenido ante un conocimiento ya revelado es revertible con `git revert b940663` en el narrador, que vuelve a la plantilla de fallo con la suite en verde.
