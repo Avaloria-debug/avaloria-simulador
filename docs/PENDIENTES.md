@@ -360,3 +360,11 @@ Decisiones de Opus en nombre de Tomás. Criterio: el jugador no debe sentir que 
 - **Observación para Tomás (sin decidir)**: en r0000-s900, el `_2` de Serel ("horno", umbral 25) se reveló en el turno 8, antes que su `_1` (umbral 30), que salió en el turno 12.
   - Pasó por una consulta del tema del `_2`. La regla "el `_2` nunca antes que el `_1`" está probada en el narrador solo por conversación, y en Serel el umbral del `_2` es menor que el del `_1`.
   - ¿Es lo esperado?
+
+## F6 y F7 (simulador 0.6.0 y 0.7.0, 2026-11-21)
+- **F6**: `npm run replay`, `npm run dorada` y `npm run comparar --estricto`, con las pantallas Replay y Regresión. El replay de 24 runs de los lotes 800 y 900 da 0 divergencias con el mismo narrador. Con otro commit del narrador avisa, y las diferencias son las esperadas. La dorada (36 runs, modo código) tarda unos 1.3 s.
+- **F7**:
+  - Pantalla Candidatos (frases y textos, filtros, acciones por ítem y sobre lo filtrado, contadores por estado), `npm run exportar` y `PROMPT-CARGA.md`.
+  - Formato de diccionarios según `docs/formato-diccionarios.md` del narrador: las filas generadas pasan su validador.
+  - No se aprobó ni se exportó nada real; los candidatos siguen como estaban.
+- **Pregunta para Tomás**: en `charla-npc-textos.jsonl` y `charla-npc-200-textos.jsonl` hay 4 textos en `editado` (con `textoEditado`) y 1 en `editar` (con nota). ¿`editado` cuenta como aprobado para exportar? Hoy solo se exporta `aprobado`: 4 textos.

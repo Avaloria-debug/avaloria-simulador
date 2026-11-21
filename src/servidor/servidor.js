@@ -6,12 +6,14 @@ import { fileURLToPath } from 'node:url';
 import { leerConfig, resolverParametros, estimarLote } from '../lote.js';
 import { cargarPerfiles, validarPerfil, DIR_PERFILES } from '../perfiles.js';
 import { leerJsonl } from '../registro.js';
-import { idsCasos, versionNarrador } from '../adaptador.js';
+import { idsCasos, versionNarrador, idsIntenciones } from '../adaptador.js';
 import { ejecutarCorpus, resolverCorpus } from '../corpus.js';
 import { leerKeysGroq, ultimos4, crearPool } from '../ia/keys.js';
 import { replayRun, visorRun } from '../replay.js';
 import { correrDorada, listarDoradas, DIR_DORADA } from '../dorada.js';
 import { comparar, leerResumen } from '../comparar.js';
+import { leerCandidatos, aplicarAccion, listarFuentes, contarPorEstado, DIR_DOCS } from '../candidatos.js';
+import { exportar, DIR_EXPORTACIONES } from '../exportar.js';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DIR_UI = path.join(RAIZ, 'ui');
@@ -32,7 +34,7 @@ function secretos(keys) {
 
 class ErrorHttp extends Error { constructor(estado, msg) { super(msg); this.estado = estado; } }
 
-export function crearServidor({ dirDorada = DIR_DORADA, dirSim = path.join(RAIZ, 'simulaciones'), dirPerfiles = DIR_PERFILES, archivoKeys = path.join(RAIZ, 'config', 'keys.json'), archivoConfig = path.join(RAIZ, 'config', 'config.json'), env = process.env } = {}) {
+export function crearServidor({ dirDocs = DIR_DOCS, dirExportaciones = DIR_EXPORTACIONES, dirDorada = DIR_DORADA, dirSim = path.join(RAIZ, 'simulaciones'), dirPerfiles = DIR_PERFILES, archivoKeys = path.join(RAIZ, 'config', 'keys.json'), archivoConfig = path.join(RAIZ, 'config', 'config.json'), env = process.env } = {}) {
   let lote = null; // { hijo, loteId, total, hechos, cierres, inicio, estado, mensaje }
   const clientes = new Set();
 
@@ -143,7 +145,7 @@ export function crearServidor({ dirDorada = DIR_DORADA, dirSim = path.join(RAIZ,
     if (m === 'GET' && r === '/api/config') {
       const keys = leerKeys(archivoKeys);
       return json(res, 200, {
-        config: leerConfig(archivoConfig), casos: idsCasos, narrador: versionNarrador,
+        config: leerConfig(archivoConfig), casos: idsCasos, intenciones: idsIntenciones, narrador: versionNarrador,
         keys: keys ? { groq: (keys.groq ?? []).map((k) => ({ nombre: k.nombre, key: enmascarar(k.key) })), anthropic: { key: enmascarar(keys.anthropic?.key) } } : null,
         ultimoRunsPorSeg: listarLotes().find((l) => l.runsPorSeg)?.runsPorSeg ?? null,
       });
@@ -221,6 +223,24 @@ export function crearServidor({ dirDorada = DIR_DORADA, dirSim = path.join(RAIZ,
       const visor = visorRun(run, turnos, cfg.parametros?.trabada ?? cfg.trabada ?? 15);
       const rep = url.searchParams.get('verificar') === '1' && run.turnos > 0 ? await replayRun(run, turnos) : null;
       return json(res, 200, { ...visor, replay: rep && { divergencias: rep.divergencias, primera: rep.primera, mismaVersion: !cfg.narrador || cfg.narrador.commit === versionNarrador.commit } });
+    }
+    if (m === 'GET' && r === '/api/candidatos/fuentes') {
+      return json(res, 200, listarFuentes({ dirSim, dirDocs }).map((f) => ({ id: f.id, porEstado: contarPorEstado(leerCandidatos({ ids: [f.id], dirSim, dirDocs })) })));
+    }
+    if (m === 'GET' && r === '/api/candidatos') {
+      const ids = url.searchParams.get('fuentes')?.split(',').filter(Boolean) ?? null;
+      return json(res, 200, leerCandidatos({ ids, dirSim, dirDocs }));
+    }
+    if (m === 'POST' && r === '/api/candidatos/accion') {
+      const b = await cuerpo(req);
+      if (!Array.isArray(b.refs) || !b.refs.length) throw new ErrorHttp(400, 'faltan candidatos');
+      try { return json(res, 200, aplicarAccion(b.refs, b.accion, { texto: b.texto ?? null, intencion: b.intencion ?? null, dirSim, dirDocs })); } catch (e) { throw new ErrorHttp(400, e.message); }
+    }
+    if (m === 'POST' && r === '/api/exportar') {
+      const b = await cuerpo(req);
+      const fuentes = Array.isArray(b.fuentes) && b.fuentes.length ? b.fuentes : null;
+      const { dir, archivos, resumen } = exportar({ fuentes, dirExportaciones, dirSim, dirDocs });
+      return json(res, 200, { dir: path.relative(RAIZ, dir), archivos, resumen });
     }
     if (m === 'GET' && r === '/api/dorada') return json(res, 200, listarDoradas(dirDorada));
     if (m === 'POST' && r === '/api/dorada') {

@@ -14,7 +14,7 @@ async function api(ruta, opciones = {}) {
 
 // Navegación
 $('#menu').addEventListener('click', () => { const n = $('#nav'); n.classList.toggle('abierto'); $('#menu').setAttribute('aria-expanded', n.classList.contains('abierto')); });
-const PANTALLAS = { nueva, vivo, informes, replay, regresion, perfiles, corpus, ajustes };
+const PANTALLAS = { nueva, vivo, informes, replay, regresion, perfiles, corpus, candidatos, ajustes };
 let salir = () => {};
 function ruta() {
   salir(); salir = () => {};
@@ -371,4 +371,84 @@ async function regresion() {
     $('#cres').innerHTML = `<p class="${c.regresion ? 'error' : 'ok'}">${c.regresion ? `${c.regresiones.length} regresiones` : 'Sin regresiones'}</p>
       ${c.regresiones.length || c.cambios.length ? `<div class="scroll"><table><thead><tr><th>Cambio</th><th>Detalle</th></tr></thead><tbody>${c.regresiones.map((x) => fila(x, 'regresion')).join('')}${c.cambios.map((x) => fila(x, '')).join('')}</tbody></table></div>` : ''}`;
   };
+}
+
+// Candidatos: revisar frases y textos, y exportar los aprobados.
+const ESTADO_FILTRO = { clase: 'frase', fuente: '', lote: '', perfil: '', intencion: '', frecuencia: 1, estado: 'pendiente' };
+async function candidatos() {
+  const [fuentes, cfg] = await Promise.all([api('/api/candidatos/fuentes'), api('/api/config')]);
+  const f = ESTADO_FILTRO;
+  let items = [];
+  vista.innerHTML = `<h1>Candidatos</h1>
+  <div class="fila pestanas" role="tablist">
+    <button role="tab" data-clase="frase" aria-selected="${f.clase === 'frase'}">Frases</button>
+    <button role="tab" data-clase="texto" aria-selected="${f.clase === 'texto'}">Textos</button>
+  </div>
+  <div class="tarjeta"><div class="fila">
+    <label class="campo">Fuente<select id="ff"><option value="">Todas</option>${fuentes.map((x) => `<option${x.id === f.fuente ? ' selected' : ''}>${esc(x.id)}</option>`).join('')}</select></label>
+    <label class="campo">Lote<select id="fl"></select></label>
+    <label class="campo">Perfil<select id="fp"></select></label>
+    <label class="campo">Intención<select id="fi"></select></label>
+    <label class="campo">Frecuencia mínima<input id="fq" type="number" min="1" value="${esc(f.frecuencia)}"></label>
+    <label class="campo">Estado<select id="fe"></select></label>
+  </div><p id="contadores" class="suave"></p>
+  <div class="fila"><button id="aprobarTodo">Aprobar lo filtrado</button><button id="rechazarTodo">Rechazar lo filtrado</button><span id="amsg" role="status" class="suave"></span></div></div>
+  <div id="lista"></div>
+  <div class="tarjeta"><h2 style="margin-top:0">Exportar aprobados</h2><p class="suave">Genera <code>exportaciones/&lt;fecha&gt;/</code> con los aprobados de la fuente elegida arriba (o de todas). No escribe en el repo del narrador.</p>
+    <button class="primario" id="exportar">Exportar</button><pre id="emsg" class="suave" style="white-space:pre-wrap"></pre></div>`;
+  const opciones = (sel, valores, actual, todas = 'Todos') => { sel.innerHTML = `<option value="">${todas}</option>${[...valores].sort().map((v) => `<option${v === actual ? ' selected' : ''}>${esc(v)}</option>`).join('')}`; };
+  const filtrados = () => items.filter((c) => c.clase === f.clase && (!f.lote || c.lote === f.lote) && (!f.perfil || (c.perfil ?? '').split(',').includes(f.perfil))
+    && (!f.intencion || (c.intencion ?? '(sin intención)') === f.intencion) && (c.frecuencia ?? 1) >= f.frecuencia && (!f.estado || c.estado === f.estado));
+  const pintar = () => {
+    const deClase = items.filter((c) => c.clase === f.clase);
+    opciones($('#fl'), new Set(deClase.map((c) => c.lote).filter(Boolean)), f.lote);
+    opciones($('#fp'), new Set(deClase.flatMap((c) => (c.perfil ?? '').split(',')).filter(Boolean)), f.perfil);
+    opciones($('#fi'), new Set(deClase.map((c) => c.intencion ?? '(sin intención)')), f.intencion, 'Todas');
+    opciones($('#fe'), new Set(deClase.map((c) => c.estado)), f.estado);
+    const cuenta = {}; for (const c of deClase) cuenta[c.estado] = (cuenta[c.estado] ?? 0) + 1;
+    const vis = filtrados();
+    $('#contadores').textContent = `${Object.entries(cuenta).map(([k, v]) => `${k}: ${v}`).join(' · ') || 'sin candidatos'} · filtrados: ${vis.length}`;
+    const max = 200;
+    $('#lista').innerHTML = vis.length ? `<div class="tarjeta scroll"><table class="candidatos"><thead><tr><th>Id</th><th>Estado</th><th>${f.clase === 'frase' ? 'Frase' : 'Texto'}</th><th>Intención</th><th>Lote</th><th>Perfil</th><th>Frec.</th><th>Acciones</th></tr></thead><tbody>
+      ${vis.slice(0, max).map((c, i) => `<tr><td>${esc(c.id)}<div class="suave">${esc(c.fuente)}/${esc(c.archivo)}</div></td><td>${esc(c.estado)}</td>
+        <td class="largo">${c.textoEditado ? `<s class="suave">${esc(c.texto)}</s><br>${esc(c.textoEditado)}` : esc(c.texto)}${c.fraseJugador ? `<div class="suave">jugador: ${esc(c.fraseJugador)}${c.npc ? ` · ${esc(c.npc)}` : ''}</div>` : ''}${c.nota ? `<div class="suave">nota: ${esc(c.nota)}</div>` : ''}</td>
+        <td>${esc(c.intencion ?? '—')}</td><td>${esc(c.lote ?? '—')}</td><td>${esc(c.perfil ?? '—')}</td><td>${esc(c.frecuencia)}</td>
+        <td><div class="fila"><button data-i="${i}" data-a="aprobar">Aprobar</button><button data-i="${i}" data-a="rechazar">Rechazar</button><button data-i="${i}" data-a="editar">Editar</button><button data-i="${i}" data-a="pendiente">Pendiente</button></div></td></tr>`).join('')}
+      </tbody></table>${vis.length > max ? `<p class="suave">Mostrando ${max} de ${vis.length}. Ajustá los filtros para ver el resto.</p>` : ''}</div>` : '<p class="suave">No hay candidatos con estos filtros.</p>';
+    for (const b of vista.querySelectorAll('#lista button[data-a]')) b.onclick = () => accion([vis[Number(b.dataset.i)]], b.dataset.a);
+  };
+  const cargar = async () => { items = await api(`/api/candidatos${f.fuente ? `?fuentes=${encodeURIComponent(f.fuente)}` : ''}`); pintar(); };
+  const accion = async (cs, a) => {
+    const cuerpoAccion = { refs: cs.map((c) => c.ref), accion: a };
+    if (a === 'editar') {
+      const c = cs[0];
+      const texto = prompt('Texto corregido:', c.textoEditado ?? c.texto);
+      if (texto == null || !texto.trim()) return;
+      cuerpoAccion.texto = texto;
+      if (c.clase === 'frase') {
+        const it = prompt(`Intención (una de: ${cfg.intenciones.join(', ')}, o consulta):`, c.intencion ?? '');
+        if (it && (cfg.intenciones.includes(it) || it === 'consulta')) cuerpoAccion.intencion = it;
+      }
+    }
+    try { const r = await api('/api/candidatos/accion', { method: 'POST', body: JSON.stringify(cuerpoAccion) }); $('#amsg').className = 'ok'; $('#amsg').textContent = `${r.cambiados} cambiados.`; await cargar(); } catch (e) { $('#amsg').className = 'error'; $('#amsg').textContent = e.message; }
+  };
+  for (const b of vista.querySelectorAll('[data-clase]')) b.onclick = () => { f.clase = b.dataset.clase; f.lote = f.perfil = f.intencion = ''; for (const x of vista.querySelectorAll('[data-clase]')) x.setAttribute('aria-selected', x === b); pintar(); };
+  $('#ff').onchange = (e) => { f.fuente = e.target.value; f.lote = ''; cargar(); };
+  $('#fl').onchange = (e) => { f.lote = e.target.value; pintar(); };
+  $('#fp').onchange = (e) => { f.perfil = e.target.value; pintar(); };
+  $('#fi').onchange = (e) => { f.intencion = e.target.value; pintar(); };
+  $('#fq').onchange = (e) => { f.frecuencia = Math.max(1, Number(e.target.value) || 1); pintar(); };
+  $('#fe').onchange = (e) => { f.estado = e.target.value; pintar(); };
+  const enLote = (a) => async () => { const vis = filtrados(); if (!vis.length || !confirm(`${a === 'aprobar' ? 'Aprobar' : 'Rechazar'} ${vis.length} candidatos filtrados?`)) return; await accion(vis, a); };
+  $('#aprobarTodo').onclick = enLote('aprobar');
+  $('#rechazarTodo').onclick = enLote('rechazar');
+  $('#exportar').onclick = async () => {
+    $('#emsg').textContent = 'Exportando…';
+    try {
+      const r = await api('/api/exportar', { method: 'POST', body: JSON.stringify({ fuentes: f.fuente ? [f.fuente] : [] }) });
+      const x = r.resumen;
+      $('#emsg').textContent = `En ${r.dir}: ${r.archivos.join(', ')}.\nAprobados ${x.aprobados} · léxico ${x.exportados['diccionario-lexico']} · patrones ${x.exportados['frases-patrones']} · textos ${x.exportados.textos} · descartados por duplicado ${x.duplicados} · sin intención ${x.sinIntencion}.`;
+    } catch (e) { $('#emsg').textContent = e.message; }
+  };
+  await cargar();
 }
