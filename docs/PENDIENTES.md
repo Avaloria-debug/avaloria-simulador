@@ -375,3 +375,26 @@ Decisiones de Opus en nombre de Tomás. Criterio: el jugador no debe sentir que 
 - **`editado` (decisión 2)**: cuenta como aprobado. F7 exporta los editados con su texto corregido. Los 4 textos de los lotes 100 y 200 tienen `textoEditado`. Nada exportado en `docs/` ni en `simulaciones/`.
 - **_2 antes del _1 por consulta (decisión 3)**: no es bug. El contenido no dice que el `_2` dependa del `_1`, y los tests del narrador esperan que la consulta revele el `_2` con su umbral. No se cambió el narrador. Si querés que el orden valga también en la consulta, es un cambio de diseño: habría que cambiar `noRevelacionTemprana.test.js` y el barrido de comprensión, y eso lo decidís vos.
 - **Candidatos**: en la muestra de control (10 de los 39 "A", seed 2026) se mantienen 7. Revisé de nuevo los 39 y quedan 35 "A" (A 35 · E 25 · R 32). Siguen todos en `pendiente`.
+
+## PR #13 del narrador: resumen para Tomás (sha `195c144`, 4 commits, sin mergear)
+- **Orden _1/_2 (decisión del 2026-11-21, opción a)**: el `_2` exige el `_1` revelado, también por consulta. Reemplaza la decisión 3 de la sección anterior (no era bug y no se tocaba). Motivo: el contenido ordena el `_1` antes que el `_2` en la lista de cada NPC; si la consulta revela el `_2` primero, ese orden se pierde. Los tests que esperaban lo contrario no salían de ninguna decisión: el comportamiento había quedado por omisión. Commit "narrador: _2 exige _1 revelado".
+- **Qué cambia en `data/`** (solo `contenido-v3.json`, 3 valores):
+  - `hollis_pastor.conocimientos[0].requiereEvento` (sendero): `evento_tormenta_verano` → `null`.
+  - `reglas.conocimientoSenderoSinVigilancia.requiereEvento`: `evento_tormenta_verano` → `null`.
+  - En `evento_tormenta_verano` se borra el efecto `habilita` sobre el sendero. El bloqueo de la antorcha sigue.
+  - Textos, umbrales y palabras clave sin cambios.
+- **Qué cambia en `narrador/`**:
+  - `conocimientos.js`: `eventoCumplido`, que `puedeRevelar` ahora usa sin cambiar el comportamiento, y `anteriorSinRevelar` con el motivo nuevo `orden`.
+  - `turno.js`: una consulta con un conocimiento anterior sin revelar da `fallo` con motivo `orden` y no gasta el primer contacto.
+  - `casos/narrar.js`: `hitoEsperaEvento`; un hito que narra un conocimiento con evento sin cumplir no se entrega.
+  - `index.js`: el contrato le pasa al caso `eventosActivos` y `conocimientosRevelados`.
+  - `barridoComprension.js`: el esperado de las frases que nombran un `_2` pasa a `fallo`.
+  - VERSION 0.0.43, en `version.js` y `prueba/index.html`.
+- **Tests reescritos o movidos**:
+  - Por la regla del orden: `noRevelacionTemprana.test.js` («con el umbral exacto…», 4 subtests: Ivor, Hollis, Elia y Oren) y 9 casos del barrido de comprensión (Maren «llave» y «cerradura», Serel «hornos», con relación 39, 40 y 50).
+  - Movidos a la copia `contenidoConSenderoPorTormenta`, con los mismos esperados: `conocimientos.test.js`, `turno.test.js`, `efectosEventos.test.js` («habilita») y `contenido.test.js` («conocimientoId de un efecto»).
+  - `reveladoH1.test.js`: el bloqueo por evento pasa a Ivor.
+  - En `noRevelacionTemprana.test.js`, el test «falte la condición del _1» queda solo para los NPC con condición.
+  - Tests nuevos: `h1Evento.test.js` (7) y `ordenConsulta.test.js` (3).
+- **Verificación**: 1777/1777 y contenido válido.
+- **Después del merge**: el checklist de arriba sigue igual: fijar el merge sha, hacer instalación limpia con `npm test`, y no mergear `claude/medicion-h1-opcion-b` tal como está.
