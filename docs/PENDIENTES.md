@@ -398,3 +398,32 @@ Decisiones de Opus en nombre de Tomás. Criterio: el jugador no debe sentir que 
   - Tests nuevos: `h1Evento.test.js` (7) y `ordenConsulta.test.js` (3).
 - **Verificación**: 1777/1777 y contenido válido.
 - **Después del merge**: el checklist de arriba sigue igual: fijar el merge sha, hacer instalación limpia con `npm test`, y no mergear `claude/medicion-h1-opcion-b` tal como está.
+
+## Auditoría de la PR #13 del narrador contra lo aprobado (2026-11-21, sha `195c144`)
+Lo aprobado por Tomás:
+- a) Quitar la tormenta del `_1` de Hollis (el sendero) y el efecto que lo habilitaba.
+- b) Que el `_2` exija el `_1` revelado también en la consulta por tema.
+- c) Umbral 0 en el primer contacto con el dueño de p1. Ya está en main (`UMBRAL_PRIMER_CONTACTO_PISTA = 0`, `narrador/conocimientos.js`) y la PR no lo toca.
+
+**Resultado: hay un cambio FUERA DE ALCANCE.** Es el commit `f83afe2` («casos: el hito no entrega un conocimiento con evento sin cumplir»).
+
+Verificación:
+- Narrador en clon limpio, en el sha de la PR: 1777/1777 y contenido válido.
+- Simulador con ese narrador instalado sin commitear: 108/108. Después volvió a `9f8071f`, también 108/108.
+- En `data/` cambian solo 3 valores, todos de a). Plantillas, textos de conocimientos, umbrales y palabras clave no cambian (comparado contra main `1805f19`). `casos.json` no cambia.
+
+| Cambio | Archivo y línea | Efecto en el juego | Riesgo | Recomendación |
+|---|---|---|---|---|
+| a) El sendero no pide la tormenta | `data/contenido/contenido-v3.json` (archivo de una línea): `npcs[10]` `hollis_pastor` → `conocimientos[0].requiereEvento`, y `reglas.conocimientoSenderoSinVigilancia.requiereEvento`, de `evento_tormenta_verano` a `null` | Hollis te cuenta lo del sendero sin vigilancia aunque no haya tormenta, si le caés bien (relación 30) o por la primera pista del caso. | Bajo: la tormenta salía en el 6 % de los runs, así que casi nadie dependía de ella. | Aprobar |
+| a) Sin el efecto de la tormenta | mismo archivo: `eventos[62]` `evento_tormenta_verano` → `efectos[1]` (`habilita`) borrado | Ninguno: la tormenta sigue apagando las antorchas en los caminos. | Bajo: el efecto ya no cambiaba nada después del cambio anterior. | Aprobar |
+| b) El _2 exige el _1 | `narrador/conocimientos.js:11` (motivo `orden`), `:44` (`anteriorSinRevelar`); `narrador/turno.js:8` (import) y `:203` | Si preguntás por lo segundo que sabe un personaje antes de que te cuente lo primero, te dice que no te va a contar nada nuevo. | Bajo: la conversación ya respetaba este orden. Puede sumar alguna respuesta de «no te cuenta» en partidas que antes avanzaban por ahí. | Aprobar |
+| b) Tests a la regla | `narrador/noRevelacionTemprana.test.js` (4 subtests); `narrador/barridoComprension.js:42` (9 casos); `narrador/ordenConsulta.test.js` (nuevo, 3 tests) | Ninguno: son pruebas. | Ninguno. | Aprobar |
+| a) Tests movidos a la copia con la tormenta | `narrador/utilsPrueba.js:24-41` (`contenidoConSenderoPorTormenta`); `conocimientos.test.js`, `turno.test.js`, `efectosEventos.test.js`, `contenido.test.js`, `reveladoH1.test.js`; `h1Evento.test.js` (nuevo, 7 tests) | Ninguno: son pruebas, con los mismos esperados. | Ninguno. | Aprobar |
+| **FUERA DE ALCANCE**: un hito no entrega un conocimiento con evento sin cumplir | `narrador/casos/narrar.js:16` (import), `:116` (`hitoEsperaEvento`), `:211` (no entrega el hito); `narrador/index.js:302, 317, 349, 363` (el contrato le pasa al caso `conocimientosRevelados` y `eventosActivos`); `narrador/conocimientos.js:15` y `:36` (`eventoCumplido`, extraído sin cambiar el comportamiento) | Hoy ninguno: ningún caso usa como pista un conocimiento que pida evento (los únicos son Ivor y Darío). Si mañana uno lo usa, el hito esperaría al evento en vez de contarte la pista. | Bajo hoy, pero es una regla nueva del juego que no está entre las aprobadas. | Rechazar hasta que se aclare |
+| Versión | `narrador/version.js:3` y `narrador/prueba/index.html:80`: 0.0.42 → 0.0.43 | Ninguno. | Ninguno: lo pide la regla del narrador. | Aprobar |
+
+**Recomendación general: rechazar hasta que se aclare `f83afe2`.** Hay dos salidas:
+1. Tomás aprueba también esa regla, y la PR se aprueba tal como está.
+2. Se revierte `f83afe2` en la rama: un commit de revert de `narrador/casos/narrar.js` y `narrador/index.js`, que deja `eventoCumplido` o lo vuelve atrás. Sin ese commit, `h1Evento.test.js` necesita revisión, porque prueba `hitoEsperaEvento`. Con eso, lo que queda es solo a) y b).
+
+No se ejecutó ninguna de las dos.
