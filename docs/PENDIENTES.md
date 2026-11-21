@@ -324,3 +324,47 @@ Decisiones de Opus en nombre de Tomás. Criterio: el jugador no debe sentir que 
   - El cambio también vale para el corpus (`src/corpus.js` usa la misma función).
 - Candidatos: `c0030`, `c0031` y `c0032` quedan rechazados con motivo `copia_descripcion_perfil`. Otras 4 frases del mismo perfil con las mismas palabras (`c0018`, `c0026`, `c0033`, `c0035`) quedan pendientes para Tomás. Pendientes en total: 92.
 - Llamadas IA de hoy en esta etapa: 21 (15 y 6). Contador del 2026-11-21: 51 de 800.
+
+## Tormenta: opción (b) en la PR #13 del narrador (2026-11-21)
+- **Medición** (lotes 300 a 800 ya registrados, 466 runs, 7909 turnos). La tormenta (`azar`, p 0.04 por turno, solo en la escena del jugador, 6 escenas de camino, 4 horas) estuvo activa en el 1.9 % de los turnos y en el 6.2 % de los runs. De los 112 runs con Hollis en p1, apareció antes del turno 25 en 7 (6.3 %).
+- **Criterio**: con al menos el 60 % de esos runs, se quedaba (a); con menos, (b). Se eligió **(b)**: el `_1` de Hollis ya no pide la tormenta. El cambio está en `data/contenido/contenido-v3.json` del narrador.
+- **PR #13 del narrador**: sha final `7d5ced1151d8d35d69118f6964bbf7af0bf934aa`, VERSION 0.0.43, 1774/1774, sin mergear. Al mergearla, Tomás aprueba tres cosas:
+  - El sendero se revela sin tormenta, por el h1 o por consulta con relación 30.
+  - La regla "el hito no entrega un conocimiento con evento sin cumplir". Hoy no afecta a ningún caso: los `_1` de Ivor y Darío no son pista.
+  - El `habilita` de la tormenta queda sin efecto práctico.
+- **Medición con el sha final** (rama `claude/medicion-h1-opcion-b`, instalación limpia, lote `20261121-015937-800`, `seguidor_pistas_dueno:6`, seed-base 800, `--trabada 25`, 15 llamadas IA). Hollis fue p1 en 1 run, r0002-s802. Ese run llegó al h1 en el turno 4 y reveló el sendero con la tormenta inactiva; no hubo tormenta en ningún turno. El rejuego sin IA coincide en los 6 runs.
+- **Estado del pin**:
+  - Esta rama fija el narrador al sha de la PR #13. No se mergea a main hasta que Tomás apruebe la PR. Después del merge del narrador, se vuelve a fijar a su commit en main del narrador, con instalación limpia, y recién ahí se mergea.
+  - Simulador en main (simulador#17): está fijado a `9f8071f`, que es el merge de la PR #11 y está en main del narrador. El sha de la PR #13 solo se instaló para medir y no se commiteó. Igual, cuando se mergee la PR #13, verificar que el simulador en main queda fijado a main del narrador.
+
+## PR #13 del narrador: verificación y checklist post-merge (2026-11-21)
+- **Verificado sobre el sha `7d5ced1151d8d35d69118f6964bbf7af0bf934aa`**:
+  - `npm test`: 1774/1774. `validarContenido`: contenido válido. VERSION 0.0.43. Sin mergear.
+  - En `data/` cambian solo 2 campos: `npcs[hollis_pastor].conocimientos[conocimiento_sendero_sin_vigilancia].requiereEvento` y `reglas.conocimientoSenderoSinVigilancia.requiereEvento`. Ambos pasan de `evento_tormenta_verano` a `null`.
+  - El texto, el umbral (30) y las palabras clave no cambian: la comparación campo por campo del JSON no da otra diferencia.
+- **Checklist post-merge**:
+  - [ ] (a) Tomás aprueba y mergea la PR #13 del narrador.
+  - [ ] (b) Verificar que el simulador queda fijado a main del narrador, no a la PR. En `package.json` y `package-lock.json` tiene que ir el sha del commit de merge en main, o `7d5ced1` solo si está en main. La rama `claude/medicion-h1-opcion-b` está fijada a la PR y no se mergea así.
+  - [ ] (c) Reinstalar limpio (`rm -rf node_modules && npm ci`) y correr `npm test`: 0 rojos.
+- **Pregunta para Tomás (sin decidir)**: con la opción (b), el efecto `habilita` de `evento_tormenta_verano` sobre el sendero queda sin efecto práctico. ¿Se borra del contenido o se deja?
+
+## Conocimientos _2 en un lote real (2026-11-21)
+- **Lote** `20261121-022400-900`: `seguidor_pistas_dueno:6` y `amable:6`, seed-base 900, modo ia, `--trabada 25`, 30 llamadas IA (techo alcanzado), narrador de main (0.0.42). Un solo intento. Revelados contados con rejuego sin IA, que coincide en los 12 runs.
+- **Resultado**: 9 de 12 runs revelan algún `_1` y 6 de 12 revelan un `_2`. Serel aparece en 5 de esos 6 y Hollis en 1. Respuesta del narrador al revelar cada `_2`:
+  - r0000-s900, t8, consulta "Serel Norlen, horno": "Serel Norlen baja la voz y te cuenta: Los hornos comunales del mercado se encienden antes del alba y quedan sin cuidar la primera hora."
+  - r0002-s902, t19, botón hablar con Hollis: "Tras un momento, Hollis Dren asiente y te responde. Después de un rato, Hollis Dren te dice: Cuando el rebaño pasa la noche en el cruce bajan lobos de las colinas, y los pastores prenden fogatas para alejarlos."
+  - r0008-s908, t8, "Serel Norlen, qué sabés de horno": "Después de un rato, Serel Norlen te dice: Los hornos comunales del mercado se encienden antes del alba y quedan sin cuidar la primera hora."
+  - r0009-s909, t12, "preguntar a Serel Norlen": la misma frase de los hornos, más la indicación de que Ysolde suele estar en Lago de espejos.
+  - r0010-s910, t14, "charlar con": "Tras un momento, Serel Norlen asiente y te responde. Después de un rato, Serel Norlen te dice: Los hornos comunales…"
+  - r0011-s911, t22, "charlá con Serel Norlen": "Serel Norlen te escucha y responde sin apuro. Después de un rato, Serel Norlen te dice: Los hornos comunales…"
+- **Observación para Tomás (sin decidir)**: en r0000-s900, el `_2` de Serel ("horno", umbral 25) se reveló en el turno 8, antes que su `_1` (umbral 30), que salió en el turno 12.
+  - Pasó por una consulta del tema del `_2`. La regla "el `_2` nunca antes que el `_1`" está probada en el narrador solo por conversación, y en Serel el umbral del `_2` es menor que el del `_1`.
+  - ¿Es lo esperado?
+
+## F6 y F7 (simulador 0.6.0 y 0.7.0, 2026-11-21)
+- **F6**: `npm run replay`, `npm run dorada` y `npm run comparar --estricto`, con las pantallas Replay y Regresión. El replay de 24 runs de los lotes 800 y 900 da 0 divergencias con el mismo narrador. Con otro commit del narrador avisa, y las diferencias son las esperadas. La dorada (36 runs, modo código) tarda unos 1.3 s.
+- **F7**:
+  - Pantalla Candidatos (frases y textos, filtros, acciones por ítem y sobre lo filtrado, contadores por estado), `npm run exportar` y `PROMPT-CARGA.md`.
+  - Formato de diccionarios según `docs/formato-diccionarios.md` del narrador: las filas generadas pasan su validador.
+  - No se aprobó ni se exportó nada real; los candidatos siguen como estaban.
+- **Pregunta para Tomás**: en `charla-npc-textos.jsonl` y `charla-npc-200-textos.jsonl` hay 4 textos en `editado` (con `textoEditado`) y 1 en `editar` (con nota). ¿`editado` cuenta como aprobado para exportar? Hoy solo se exporta `aprobado`: 4 textos.

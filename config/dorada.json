@@ -1,0 +1,186 @@
+{
+  "version": 1,
+  "descripcion": "Partidas fijas de regresión: 12 perfiles reales × 3 seeds, casos por rotación. Se corren en modo codigo.",
+  "entradas": [
+    {
+      "perfil": "agresivo",
+      "caso": "caso_01",
+      "seed": 7000
+    },
+    {
+      "perfil": "agresivo",
+      "caso": "caso_02",
+      "seed": 7001
+    },
+    {
+      "perfil": "agresivo",
+      "caso": "caso_03",
+      "seed": 7002
+    },
+    {
+      "perfil": "amable",
+      "caso": "caso_04",
+      "seed": 7003
+    },
+    {
+      "perfil": "amable",
+      "caso": "caso_01",
+      "seed": 7004
+    },
+    {
+      "perfil": "amable",
+      "caso": "caso_02",
+      "seed": 7005
+    },
+    {
+      "perfil": "aventurero",
+      "caso": "caso_03",
+      "seed": 7006
+    },
+    {
+      "perfil": "aventurero",
+      "caso": "caso_04",
+      "seed": 7007
+    },
+    {
+      "perfil": "aventurero",
+      "caso": "caso_01",
+      "seed": 7008
+    },
+    {
+      "perfil": "comerciante",
+      "caso": "caso_02",
+      "seed": 7009
+    },
+    {
+      "perfil": "comerciante",
+      "caso": "caso_03",
+      "seed": 7010
+    },
+    {
+      "perfil": "comerciante",
+      "caso": "caso_04",
+      "seed": 7011
+    },
+    {
+      "perfil": "curioso",
+      "caso": "caso_01",
+      "seed": 7012
+    },
+    {
+      "perfil": "curioso",
+      "caso": "caso_02",
+      "seed": 7013
+    },
+    {
+      "perfil": "curioso",
+      "caso": "caso_03",
+      "seed": 7014
+    },
+    {
+      "perfil": "directo",
+      "caso": "caso_04",
+      "seed": 7015
+    },
+    {
+      "perfil": "directo",
+      "caso": "caso_01",
+      "seed": 7016
+    },
+    {
+      "perfil": "directo",
+      "caso": "caso_02",
+      "seed": 7017
+    },
+    {
+      "perfil": "investigador",
+      "caso": "caso_03",
+      "seed": 7018
+    },
+    {
+      "perfil": "investigador",
+      "caso": "caso_04",
+      "seed": 7019
+    },
+    {
+      "perfil": "investigador",
+      "caso": "caso_01",
+      "seed": 7020
+    },
+    {
+      "perfil": "pasivo",
+      "caso": "caso_02",
+      "seed": 7021
+    },
+    {
+      "perfil": "pasivo",
+      "caso": "caso_03",
+      "seed": 7022
+    },
+    {
+      "perfil": "pasivo",
+      "caso": "caso_04",
+      "seed": 7023
+    },
+    {
+      "perfil": "primerizo",
+      "caso": "caso_01",
+      "seed": 7024
+    },
+    {
+      "perfil": "primerizo",
+      "caso": "caso_02",
+      "seed": 7025
+    },
+    {
+      "perfil": "primerizo",
+      "caso": "caso_03",
+      "seed": 7026
+    },
+    {
+      "perfil": "seguidor_pistas",
+      "caso": "caso_04",
+      "seed": 7027
+    },
+    {
+      "perfil": "seguidor_pistas",
+      "caso": "caso_01",
+      "seed": 7028
+    },
+    {
+      "perfil": "seguidor_pistas",
+      "caso": "caso_02",
+      "seed": 7029
+    },
+    {
+      "perfil": "sigiloso",
+      "caso": "caso_03",
+      "seed": 7030
+    },
+    {
+      "perfil": "sigiloso",
+      "caso": "caso_04",
+      "seed": 7031
+    },
+    {
+      "perfil": "sigiloso",
+      "caso": "caso_01",
+      "seed": 7032
+    },
+    {
+      "perfil": "torpe",
+      "caso": "caso_02",
+      "seed": 7033
+    },
+    {
+      "perfil": "torpe",
+      "caso": "caso_03",
+      "seed": 7034
+    },
+    {
+      "perfil": "torpe",
+      "caso": "caso_04",
+      "seed": 7035
+    }
+  ]
+}

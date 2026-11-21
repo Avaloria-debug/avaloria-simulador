@@ -12,6 +12,8 @@ import { escenasDeEntrega } from 'narrador/narrador/casos/hitos.js';
 import { TIPOS_TAG } from 'narrador/narrador/casos/tags.js';
 import { posicionesDeNpcs } from 'narrador/narrador/movimientoNpcs.js';
 import { normalizar } from 'narrador/narrador/comprension.js';
+import { validarDiccionario } from 'narrador/narrador/diccionarios.js';
+import fs from 'node:fs';
 
 const requerir = createRequire(import.meta.url);
 const archivoCasos = requerir('narrador/data/contenido/casos.json');
@@ -63,6 +65,22 @@ export function leerPistaCamino(texto) {
 
 const nombres = new Map([...contenido.npcs, ...contenido.objetos, ...contenido.escenas].map((x) => [x.id, x.nombre]));
 export const nombreDe = (id) => nombres.get(id) ?? id;
+
+// F7, solo lectura: diccionarios y plantillas del narrador para exportar y deduplicar. Nunca se escribe en el narrador.
+export const idsIntenciones = contenido.intenciones.map((i) => i.id);
+export const DIR_NARRADOR = fs.realpathSync(requerir.resolve('narrador/package.json').replace(/[/\\]package\.json$/, ''));
+export function textoDiccionario(nombre) {
+  try { return fs.readFileSync(requerir.resolve(`narrador/data/diccionarios/${nombre}.md`), 'utf8'); } catch { return null; }
+}
+export const validarDiccionarioNarrador = (nombre, texto) => validarDiccionario(nombre, texto, contenido);
+export const textosPlantillas = (() => {
+  const out = [];
+  const rec = (v) => { if (typeof v === 'string') out.push(v); else if (Array.isArray(v)) v.forEach(rec); else if (v && typeof v === 'object') Object.values(v).forEach(rec); };
+  rec(contenido.plantillas);
+  return out;
+})();
+export const nombresNpcs = contenido.npcs.map((n) => ({ id: n.id, nombres: [n.nombre, ...(n.alias ?? [])].filter(Boolean) }));
+export const nombresEscenas = contenido.escenas.map((x) => ({ id: x.id, nombres: [x.nombre] }));
 
 const claveTag = (t) => `${t.tipo}|${t.objetivo}|${t.nivel}`;
 const RESULTADO = { accion: 'ejecuta', consulta: 'consulta', saludo: 'consulta', reconocimiento: 'consulta', reformular: 'reformula', ia: 'no_entendido', error: 'no_entendido' };

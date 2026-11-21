@@ -54,3 +54,9 @@ textarea { width:100%; min-height:380px; font-family:ui-monospace, monospace; fo
   .nav-marca { display:none; }
   .vista { padding:16px; }
 }
+tr.regresion td { color:var(--error); font-weight:600; }
+select { max-width:100%; } .campo { min-width:0; max-width:100%; }
+.pestanas { margin-bottom:12px; }
+.pestanas button[aria-selected="true"] { border-color:var(--acento); color:var(--acento); }
+table.candidatos td.largo { white-space:normal; min-width:260px; max-width:420px; }
+table.candidatos td .fila { flex-wrap:nowrap; gap:6px; }
