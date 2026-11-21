@@ -347,3 +347,16 @@ Decisiones de Opus en nombre de Tomás. Criterio: el jugador no debe sentir que 
   - [ ] (b) Verificar que el simulador queda fijado a main del narrador, no a la PR. En `package.json` y `package-lock.json` tiene que ir el sha del commit de merge en main, o `7d5ced1` solo si está en main. La rama `claude/medicion-h1-opcion-b` está fijada a la PR y no se mergea así.
   - [ ] (c) Reinstalar limpio (`rm -rf node_modules && npm ci`) y correr `npm test`: 0 rojos.
 - **Pregunta para Tomás (sin decidir)**: con la opción (b), el efecto `habilita` de `evento_tormenta_verano` sobre el sendero queda sin efecto práctico. ¿Se borra del contenido o se deja?
+
+## Conocimientos _2 en un lote real (2026-11-21)
+- **Lote** `20261121-022400-900`: `seguidor_pistas_dueno:6` y `amable:6`, seed-base 900, modo ia, `--trabada 25`, 30 llamadas IA (techo alcanzado), narrador de main (0.0.42). Un solo intento. Revelados contados con rejuego sin IA, que coincide en los 12 runs.
+- **Resultado**: 9 de 12 runs revelan algún `_1` y 6 de 12 revelan un `_2`. Serel aparece en 5 de esos 6 y Hollis en 1. Respuesta del narrador al revelar cada `_2`:
+  - r0000-s900, t8, consulta "Serel Norlen, horno": "Serel Norlen baja la voz y te cuenta: Los hornos comunales del mercado se encienden antes del alba y quedan sin cuidar la primera hora."
+  - r0002-s902, t19, botón hablar con Hollis: "Tras un momento, Hollis Dren asiente y te responde. Después de un rato, Hollis Dren te dice: Cuando el rebaño pasa la noche en el cruce bajan lobos de las colinas, y los pastores prenden fogatas para alejarlos."
+  - r0008-s908, t8, "Serel Norlen, qué sabés de horno": "Después de un rato, Serel Norlen te dice: Los hornos comunales del mercado se encienden antes del alba y quedan sin cuidar la primera hora."
+  - r0009-s909, t12, "preguntar a Serel Norlen": la misma frase de los hornos, más la indicación de que Ysolde suele estar en Lago de espejos.
+  - r0010-s910, t14, "charlar con": "Tras un momento, Serel Norlen asiente y te responde. Después de un rato, Serel Norlen te dice: Los hornos comunales…"
+  - r0011-s911, t22, "charlá con Serel Norlen": "Serel Norlen te escucha y responde sin apuro. Después de un rato, Serel Norlen te dice: Los hornos comunales…"
+- **Observación para Tomás (sin decidir)**: en r0000-s900, el `_2` de Serel ("horno", umbral 25) se reveló en el turno 8, antes que su `_1` (umbral 30), que salió en el turno 12.
+  - Pasó por una consulta del tema del `_2`. La regla "el `_2` nunca antes que el `_1`" está probada en el narrador solo por conversación, y en Serel el umbral del `_2` es menor que el del `_1`.
+  - ¿Es lo esperado?
