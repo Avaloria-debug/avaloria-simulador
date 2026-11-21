@@ -35,6 +35,8 @@ Ids `c0001`–`c0035`. Se descartaron 64 salidas rotas del jugador IA: tokens de
 
 Todas van en el grupo "(sin intención)", porque el jugador IA no declara una intención objetivo.
 
-**Pendientes en total: 95** (60 textos y 35 frases).
+**Pendientes en total: 92** (60 textos y 32 frases). Rechazadas el 2026-11-21: 3 frases (`c0030`, `c0031`, `c0032`), con motivo `copia_descripcion_perfil`.
 
-Para la revisión: tres de las frases nuevas copian palabras de la descripción del perfil `seguidor_pistas_dueno`, que el jugador IA recibe en el pedido: "¿Qué sabés, dueño?", "contame lo primero que sepas", "viajar a la siguiente zona donde pueda encontrar al dueño". Son frases del simulador más que de un jugador real.
+Para la revisión: tres de las frases nuevas (ya rechazadas) copian palabras de la descripción del perfil `seguidor_pistas_dueno`, que el jugador IA recibe en el pedido: "¿Qué sabés, dueño?", "contame lo primero que sepas", "viajar a la siguiente zona donde pueda encontrar al dueño". Son frases del simulador más que de un jugador real.
+
+Otras 4 frases pendientes de `seguidor_pistas_dueno` usan las mismas palabras de la descripción ("dueño", "lo primero que sepa"): `c0018`, `c0026`, `c0033`, `c0035`. Quedan pendientes para que Tomás decida, porque solo se pidió rechazar las 3.
