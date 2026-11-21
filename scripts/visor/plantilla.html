@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visor del simulador</title>
+<style>
+/*ESTILOS*/
+.nav-pie { padding:16px 20px; font-size:12px; color:var(--suave); }
+h2.primero { margin-top:0; }
+.comando .fila { flex-wrap:nowrap; }
+code.cmd { flex:1; min-width:0; overflow-x:auto; white-space:pre; background:#262a31; border:1px solid var(--borde); border-radius:8px; padding:6px 10px; font-family:ui-monospace, monospace; font-size:13px; }
+details summary { cursor:pointer; color:var(--acento); }
+.md h2, .md h3, .md h4 { font-size:16px; }
+@media (max-width: 760px) { .comando .fila { flex-wrap:wrap; } code.cmd { flex-basis:100%; } }
+</style>
+</head>
+<body>
+<header class="barra">
+  <button id="menu" class="menu" aria-label="Abrir menú" aria-expanded="false">☰</button>
+  <span class="marca">Visor del simulador</span>
+</header>
+<nav id="nav" class="nav">
+  <div class="marca nav-marca">Visor del simulador</div>
+  <a href="#lotes">Lotes</a>
+  <a href="#candidatos">Candidatos</a>
+  <a href="#comandos">Comandos</a>
+  <a href="#cargar">Cargar archivos</a>
+  <div id="generado" class="nav-pie"></div>
+</nav>
+<main id="vista" class="vista"></main>
+<script id="datos" type="application/json">/*DATOS*/</script>
+<script>
+/*VISOR*/
+</script>
+</body>
+</html>

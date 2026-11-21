@@ -33,3 +33,17 @@ npm run corpus -- --perfiles curioso,torpe,primerizo --frases 30 --max-estados 2
 - `--reanudar` completa un lote cortado por cuota (código de salida 3): salta los runs terminados y mantiene las seeds.
 - `corpus` necesita keys de Groq (`config/keys.json`, a partir de `config/keys.ejemplo.json`, o `GROQ_API_KEY`). Sin keys sale con código 3 sin hacer llamadas.
 - Sin keys, el modo `ia` cierra por cuota; `--mezcla 100/0` corre todo en modo `codigo`.
+
+## Ver resultados sin terminal
+
+Un solo archivo HTML para revisar lotes, candidatos y comandos, sin servidor ni instalación:
+
+```bash
+npm run generar-html
+```
+
+1. Correr el comando de arriba (una vez, o cada vez que haya lotes nuevos). Lee `simulaciones/` y `docs/candidatos/` y escribe `docs/visor/index.html`.
+2. Abrir `docs/visor/index.html` con doble clic desde el explorador de archivos.
+3. Pantallas: «Lotes» (lista y detalle del informe), «Candidatos» (frases y textos con filtros, solo lectura), «Comandos» (con botón «copiar») y «Cargar archivos» (para abrir otra carpeta de `simulaciones/` sin regenerar).
+
+El archivo queda fuera de git (`docs/visor/`), igual que `simulaciones/`. Para aprobar o editar candidatos se sigue usando `npm run ui`.
