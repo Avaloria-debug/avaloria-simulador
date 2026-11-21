@@ -368,3 +368,10 @@ Decisiones de Opus en nombre de Tomás. Criterio: el jugador no debe sentir que 
   - Formato de diccionarios según `docs/formato-diccionarios.md` del narrador: las filas generadas pasan su validador.
   - No se aprobó ni se exportó nada real; los candidatos siguen como estaban.
 - **Pregunta para Tomás**: en `charla-npc-textos.jsonl` y `charla-npc-200-textos.jsonl` hay 4 textos en `editado` (con `textoEditado`) y 1 en `editar` (con nota). ¿`editado` cuenta como aprobado para exportar? Hoy solo se exporta `aprobado`: 4 textos.
+
+## Decisiones del 2026-11-21 (para Tomás al aprobar la PR #13)
+- **Tormenta (decisión 1)**: elegí la opción (a), quitar el efecto `habilita` de la tormenta sobre el sendero, porque ya no afectaba a nada. Va en un commit aparte de la PR #13 del narrador ("contenido: quitar efecto sin uso de la tormenta sobre el sendero", sha `c0768d9`): 1774/1774 y contenido válido. En `data/` el diff de la PR suma solo la quita de ese efecto. Si preferís dejarlo, se revierte ese commit y lo demás de la PR queda igual.
+  - Checklist post-merge: el (a) del checklist anterior ahora fija el merge sha de la PR con los dos commits.
+- **`editado` (decisión 2)**: cuenta como aprobado. F7 exporta los editados con su texto corregido. Los 4 textos de los lotes 100 y 200 tienen `textoEditado`. Nada exportado en `docs/` ni en `simulaciones/`.
+- **_2 antes del _1 por consulta (decisión 3)**: no es bug. El contenido no dice que el `_2` dependa del `_1`, y los tests del narrador esperan que la consulta revele el `_2` con su umbral. No se cambió el narrador. Si querés que el orden valga también en la consulta, es un cambio de diseño: habría que cambiar `noRevelacionTemprana.test.js` y el barrido de comprensión, y eso lo decidís vos.
+- **Candidatos**: en la muestra de control (10 de los 39 "A", seed 2026) se mantienen 7. Revisé de nuevo los 39 y quedan 35 "A" (A 35 · E 25 · R 32). Siguen todos en `pendiente`.

@@ -6,9 +6,9 @@ Criterio: natural, voseo o neutro, sin copia de la descripción del perfil, sin 
 
 | | A | E | R | Total |
 |---|---|---|---|---|
-| Textos del narrador | 25 | 12 | 23 | 60 |
-| Frases del jugador IA | 14 | 12 | 6 | 32 |
-| **Total** | **39** | **24** | **29** | **92** |
+| Textos del narrador | 22 | 13 | 25 | 60 |
+| Frases del jugador IA | 13 | 12 | 7 | 32 |
+| **Total** | **35** | **25** | **32** | **92** |
 
 Las frases del jugador se agrupan por la intención que entendió el motor (todas venían sin intención objetivo).
 
@@ -18,12 +18,12 @@ Las frases del jugador se agrupan por la intención que entendió el motor (toda
 |---|---|---|---|---|---|---|
 | c0029 | frase | A | Voy al Camino del sur a buscar a Hollis Dren y ver en qué lo puedo ayudar. |  | Natural. | voseo_dialogo · perfil amable · motor: npc_ausente |
 
-## intencion_comprar (8: A 4 · E 3 · R 1)
+## intencion_comprar (8: A 3 · E 3 · R 2)
 
 | Id | Clase | Sug. | Original | Texto corregido | Motivo | Contexto |
 |---|---|---|---|---|---|---|
 | c0001 | frase | R | Acercome a Serel Norlen, le saludo con una sonrisa y le digo: «Che, vi que tenés la espada rota. ¿Te doy una mano a repararla mientras te compro un pan fresco y un poco de queso?». |  | Poco natural ("Acercome"), muy largo e inventa una espada rota de Serel. | voseo_dialogo · perfil amable · motor: objeto_ambiguo |
-| c0002 | frase | A | Che, ¿querés que vaya a la molinería a confirmar el pedido y dejar el pago? |  | Voseo natural. | voseo_dialogo · perfil amable · motor: falta_objeto |
+| c0002 | frase | R | Che, ¿querés que vaya a la molinería a confirmar el pedido y dejar el pago? |  | Revisión de control: nombra una molinería que no existe en el mundo y un pedido que depende del caso. | voseo_dialogo · perfil amable · motor: falta_objeto |
 | c0004 | frase | A | Me compro el pan fresco y el queso curado. |  | Natural ("me compro" es habitual). | primera_persona_accion · perfil directo · motor: objeto_ambiguo |
 | c0005 | frase | A | Me llevo un pan fresco y un trozo de queso curado, por favor. |  | Natural. | primera_persona_accion · perfil amable · motor: objeto_ambiguo |
 | t00005 | texto | E | ¿Qué te llevo, pan recién horneado o algo más? | ¿Qué te llevás, pan recién horneado o algo más? | "¿Qué te llevo?" lo dice el que compra, no el que vende. | reaccion · serel_panadero · jugador: «adquirir» |
@@ -56,7 +56,7 @@ Las frases del jugador se agrupan por la intención que entendió el motor (toda
 |---|---|---|---|---|---|---|
 | c0020 | frase | A | Che, me voy al Camino del este a buscar a Sarin Tolle. |  | Voseo natural. | primera_persona_accion · perfil amable · motor: destino_ambiguo |
 
-## intencion_viajar (25: A 10 · E 7 · R 8)
+## intencion_viajar (25: A 8 · E 7 · R 10)
 
 | Id | Clase | Sug. | Original | Texto corregido | Motivo | Contexto |
 |---|---|---|---|---|---|---|
@@ -81,9 +81,9 @@ Las frases del jugador se agrupan por la intención que entendió el motor (toda
 | t00020 | texto | A | ¿A dónde querés ir? |  | Neutro y breve. | reaccion · serel_panadero · jugador: «ir» |
 | t00026 | texto | R | El Archivo Real queda al norte, por la calle principal; seguí recto y lo encontrás. |  | Inventa la ubicación del Archivo ("calle principal"). | reaccion · serel_panadero · jugador: «ir» |
 | t00040 | texto | R | No sé qué buscás, pero el Camino del Norte está al final del corredor de los puestos, justo después de la taberna. Andá rápido, que no me gusta quedarme escuchando más peleas. |  | Inventa la ubicación del Camino del norte ("después de la taberna"). | reaccion · serel_panadero · jugador: «llegar a Camino del note» |
-| t00054 | texto | A | Necesito que me dejes pasar sin retrasos, el cargamento no espera. No me queda más que seguir el rastro y llegar a la próxima parada. |  | Natural para un arriero apurado. | dialogo · brenn_arriero · jugador: «Voy a Brenn Holt y le pregunto qué necesita.» |
+| t00054 | texto | R | Necesito que me dejes pasar sin retrasos, el cargamento no espera. No me queda más que seguir el rastro y llegar a la próxima parada. |  | Revisión de control: no responde a lo que dijo el jugador (le pregunta qué necesita) y "seguir el rastro" no encaja con un arriero. | dialogo · brenn_arriero · jugador: «Voy a Brenn Holt y le pregunto qué necesita.» |
 | t00056 | texto | A | ¿Querés el pliego? Vení rápido, no tengo tiempo para charlas. |  | Natural. | reaccion · serel_panadero · jugador: «Quiero ir a la panadería a ver el pliego de precios.» |
-| t00057 | texto | A | ¿Qué querés, que te deje el pan a mitad de la calle? |  | Natural, con tono seco. | reaccion · serel_panadero · jugador: «viajar Panadería» |
+| t00057 | texto | R | ¿Qué querés, que te deje el pan a mitad de la calle? |  | Revisión de control: no responde a viajar a la panadería; la pregunta no tiene sentido ahí. | reaccion · serel_panadero · jugador: «viajar Panadería» |
 | t00060 | texto | R | Mirá, si la medalla tiene dueño, tal vez la encontrás en la biblioteca; el cruce está tenso, pero el camino sigue. |  | Inventa una pista: dice que la medalla está en la biblioteca. | reaccion · brenn_arriero · jugador: «Viajo al poblado más cercano buscando pistas del dueño de la medalla.» |
 
 ## (no entendido) (10: A 4 · E 5 · R 1)
@@ -114,7 +114,7 @@ Las frases del jugador se agrupan por la intención que entendió el motor (toda
 | t00015 | texto | R | El camino sigue recto hasta la colina, después girás a la derecha y ya ves la entrada al Archivo. |  | Inventa un recorrido hasta el Archivo que no coincide con los caminos. | reaccion · brenn_arriero · jugador: «ruta» |
 | t00018 | texto | E | Nada que valga la pena, solo polvo y la sombra de la noche. | Nada que valga la pena, solo polvo y camino. | "La sombra de la noche" depende de la hora. | consulta · brenn_arriero · jugador: «qué hay acá» |
 | t00021 | texto | R | Bueno, ahora seguimos hacia el Mercado Circular; si necesitás algo antes, decime. |  | El NPC habla como si viajara con el jugador hacia otra escena. | reaccion · brenn_arriero · jugador: «y ahora qué» |
-| t00022 | texto | A | ¿Qué buscás? No tengo tiempo para miradas. |  | Natural, con tono seco. | reaccion · serel_panadero · jugador: «y ahora qué» |
+| t00022 | texto | E | ¿Qué buscás? No tengo tiempo para miradas. | ¿Qué buscás? No tengo todo el día. | Revisión de control: "no tengo tiempo para miradas" no es natural. | reaccion · serel_panadero · jugador: «y ahora qué» |
 | t00023 | texto | R | Seguimos, pero cuidate del viento; no quiero que la tormenta nos arrastre a la colina. |  | Depende de la tormenta, un evento que puede no estar activo. | reaccion · brenn_arriero · jugador: «seguir» |
 | t00025 | texto | R | ¿Qué hacés con ese mapa ahora, en medio del caos? |  | Depende de un objeto (el mapa) y de un "caos" que puede no estar pasando. | reaccion · brenn_arriero · jugador: «seguir» |
 | t00027 | texto | E | ¿Querés una porción de pan o alguna indicación? No sé qué hacer. | ¿Querés una porción de pan o alguna indicación? | El NPC dice "No sé qué hacer", que es una frase del jugador. | reaccion · serel_panadero · jugador: «no sé qué hacer» |
@@ -138,3 +138,9 @@ Las frases del jugador se agrupan por la intención que entendió el motor (toda
 | t00052 | texto | R | Mirá, el sendero anda medio escabroso, con la tierra suelta y unas cuestas que te dejan sin aliento si no cuidás el paso. No hay más que eso por ahora. |  | Brenn habla del sendero, que es un conocimiento de Hollis; contradice el mundo. | dialogo · brenn_arriero · jugador: «Brenn Holt, contame de sendero» |
 | t00055 | texto | A | No sé por qué te interesa, pero dejá esas hierbas y seguí tu camino. |  | Natural y coherente con Hollis. | reaccion · hollis_pastor · jugador: «evr de cerca Hierbas medicinales» |
 | t00059 | texto | R | ¿Qué necesitás saber de las fogatas, Sarin? |  | Sarin se habla a sí misma ("Sarin"). | dialogo · sarin_mensajera · jugador: «Sarin Tolle, fogatas» |
+
+## Revisión de control (2026-11-21)
+
+Muestra de 10 de los 39 "A" elegidos al azar con seed 2026 (mulberry32, Fisher-Yates sobre el orden del archivo): t00003, t00032, c0027, t00017, t00054, t00057, t00008, t00013, t00022, t00031. Con el mismo criterio se mantienen 7; no pasan t00054, t00057 y t00022.
+Como fallaron más de 2, se revisaron otra vez los 39 con el mismo criterio, más estricto con que el texto responda a lo que dijo el jugador y con los lugares que nombra. Cae además c0002 (nombra una molinería que no existe). Quedan 35 "A". Los 4 que salieron de la lista pasan a E o R con el motivo marcado "Revisión de control".
+Sigue sin aprobarse nada: los 92 candidatos están en `pendiente` en sus archivos.

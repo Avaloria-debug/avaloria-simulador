@@ -394,7 +394,7 @@ async function candidatos() {
   </div><p id="contadores" class="suave"></p>
   <div class="fila"><button id="aprobarTodo">Aprobar lo filtrado</button><button id="rechazarTodo">Rechazar lo filtrado</button><span id="amsg" role="status" class="suave"></span></div></div>
   <div id="lista"></div>
-  <div class="tarjeta"><h2 style="margin-top:0">Exportar aprobados</h2><p class="suave">Genera <code>exportaciones/&lt;fecha&gt;/</code> con los aprobados de la fuente elegida arriba (o de todas). No escribe en el repo del narrador.</p>
+  <div class="tarjeta"><h2 style="margin-top:0">Exportar aprobados</h2><p class="suave">Genera <code>exportaciones/&lt;fecha&gt;/</code> con los aprobados y los editados (con su texto corregido) de la fuente elegida arriba (o de todas). No escribe en el repo del narrador.</p>
     <button class="primario" id="exportar">Exportar</button><pre id="emsg" class="suave" style="white-space:pre-wrap"></pre></div>`;
   const opciones = (sel, valores, actual, todas = 'Todos') => { sel.innerHTML = `<option value="">${todas}</option>${[...valores].sort().map((v) => `<option${v === actual ? ' selected' : ''}>${esc(v)}</option>`).join('')}`; };
   const filtrados = () => items.filter((c) => c.clase === f.clase && (!f.lote || c.lote === f.lote) && (!f.perfil || (c.perfil ?? '').split(',').includes(f.perfil))
@@ -447,7 +447,7 @@ async function candidatos() {
     try {
       const r = await api('/api/exportar', { method: 'POST', body: JSON.stringify({ fuentes: f.fuente ? [f.fuente] : [] }) });
       const x = r.resumen;
-      $('#emsg').textContent = `En ${r.dir}: ${r.archivos.join(', ')}.\nAprobados ${x.aprobados} · léxico ${x.exportados['diccionario-lexico']} · patrones ${x.exportados['frases-patrones']} · textos ${x.exportados.textos} · descartados por duplicado ${x.duplicados} · sin intención ${x.sinIntencion}.`;
+      $('#emsg').textContent = `En ${r.dir}: ${r.archivos.join(', ')}.\nAprobados ${x.aprobados} (editados ${x.editados}) · léxico ${x.exportados['diccionario-lexico']} · patrones ${x.exportados['frases-patrones']} · textos ${x.exportados.textos} · descartados por duplicado ${x.duplicados} · sin intención ${x.sinIntencion} · editados sin texto ${x.editadosSinTexto}.`;
     } catch (e) { $('#emsg').textContent = e.message; }
   };
   await cargar();
